@@ -1,0 +1,11 @@
+package-as: CharacterStats
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+ignore:
+  - .github
+  - .gitignore
+  - .pkgmeta
+  - docs
+  - .vscode
+  - .luacheckrc
