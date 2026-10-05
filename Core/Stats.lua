@@ -1,18 +1,27 @@
 ﻿local ADDON_NAME, ns = ...
-local pairs, ipairs, type = pairs, ipairs, type
+local ipairs, type = ipairs, type
 local wipe = wipe
 local pcall = pcall
 local GetTime = GetTime
 local string_upper = string.upper
 local Stats = {}
 ns.Stats = Stats
-local cache = {}
-local filteredCache = {}
-local statEntryPool = {}
-local filteredDirty = true
-local lastFilteredIlvl = nil
-local lastUpdate = 0
-local dirty = true
+local function NewCollectState()
+    return {
+        cache = {},
+        filtered = {},
+        pool = {},
+        dirty = true,
+        filteredDirty = true,
+        lastFilteredIlvl = nil,
+        lastUpdate = 0,
+    }
+end
+local enabledState = NewCollectState()
+local allState = NewCollectState()
+local function GetCollectState(ignoreEnabled)
+    return ignoreEnabled and allState or enabledState
+end
 local seenNonZero = {}
 local UPDATE_THROTTLE = 0.05
 local function IsEffectivelyZero(v)
@@ -141,8 +150,11 @@ local function ShouldShowStat(statId, statValue, def, ctx)
     return true
 end
 function Stats:Collect(ignoreEnabled)
+    local state = GetCollectState(ignoreEnabled)
+    local cache = state.cache
+    local statEntryPool = state.pool
     local now = GetTime()
-    if not dirty and (now - lastUpdate) < UPDATE_THROTTLE and #cache > 0 and not ignoreEnabled then
+    if not state.dirty and (now - state.lastUpdate) < UPDATE_THROTTLE and #cache > 0 then
         return cache
     end
     wipe(cache)
@@ -161,7 +173,7 @@ function Stats:Collect(ignoreEnabled)
                     ns.PrintMsg(string.format("Warning: Stat '%s' is enabled but has no definition", statId), "warning")
                 end
             elseif def and def.api then
-                local ok, rawValue = pcall(def.api)
+                local ok, rawValue, text, blizzardLabel = pcall(def.api)
                 local value = nil
                 local hasValue = false
                 local readSecret = false
@@ -174,13 +186,10 @@ function Stats:Collect(ignoreEnabled)
                         end
                     elseif rawValue ~= nil then
                         if type(rawValue) == "number" then
-                            local okNum, n = pcall(function() return rawValue + 0 end)
-                            if okNum and type(n) == "number" then
-                                value = n
-                                hasValue = true
-                                if def.hideIfZero then
-                                    seenNonZero[statId] = math.abs(n) >= 0.001
-                                end
+                            value = rawValue
+                            hasValue = true
+                            if def.hideIfZero then
+                                seenNonZero[statId] = math.abs(rawValue) >= 0.001
                             end
                         end
                     end
@@ -216,6 +225,11 @@ function Stats:Collect(ignoreEnabled)
                     entry.label = label
                     entry.shortLabel = shortLabel
                     entry.value = value
+                    entry.text = ok and type(text) == "string" and text or nil
+                    if def.useBlizzardLabel and ok and type(blizzardLabel) == "string" then
+                        entry.label = blizzardLabel
+                        entry.shortLabel = blizzardLabel
+                    end
                     entry.isSecret = readSecret
                     entry.percent = def.percent or false
                     entry.useDecimals = def.useDecimals or false
@@ -228,35 +242,28 @@ function Stats:Collect(ignoreEnabled)
             end
         end
     end
-    lastUpdate = now
-    dirty = false
+    state.lastUpdate = now
+    state.dirty = false
+    state.filteredDirty = true
     return cache
 end
 function Stats:Invalidate()
-    dirty = true
-    filteredDirty = true
+    enabledState.dirty = true
+    enabledState.filteredDirty = true
+    allState.dirty = true
+    allState.filteredDirty = true
 end
-function Stats:InvalidateRole()
+function Stats:InvalidateRole(wipeValues)
     ClearRoleContext()
-    dirty = true
-    filteredDirty = true
-end
-function Stats:UpdateMovementSpeed()
-    for _, stat in ipairs(cache) do
-        if stat.id == "movespeed" then
-            local def = ns.STAT_DEFS.movespeed
-            if def and def.api then
-                local ok, value = pcall(def.api)
-                if ok then
-                    stat.value = value
-                end
-            end
-            break
-        end
+    if wipeValues then
+        wipe(seenNonZero)
     end
+    self:Invalidate()
 end
 function Stats:CollectFiltered(includeIlvl, ignoreEnabled)
-    if not filteredDirty and lastFilteredIlvl == includeIlvl and #filteredCache > 0 and not ignoreEnabled then
+    local state = GetCollectState(ignoreEnabled)
+    local filteredCache = state.filtered
+    if not state.dirty and not state.filteredDirty and state.lastFilteredIlvl == includeIlvl and #filteredCache > 0 then
         return filteredCache
     end
     local allStats = self:Collect(ignoreEnabled)
@@ -273,8 +280,8 @@ function Stats:CollectFiltered(includeIlvl, ignoreEnabled)
             end
         end
     end
-    filteredDirty = false
-    lastFilteredIlvl = includeIlvl
+    state.filteredDirty = false
+    state.lastFilteredIlvl = includeIlvl
     return filteredCache
 end
 function Stats:CollectByCategory()
@@ -368,27 +375,4 @@ function Stats:GetLayoutList()
         end
     end
     return list
-end
-function Stats:SetEnabled(statId, state)
-    local db = ns.db
-    if not db then return end
-    if not db.stats then
-        db.stats = {}
-        for k, v in pairs(ns.DEFAULTS.stats) do
-            db.stats[k] = v
-        end
-    end
-    if state == nil then
-        db.stats[statId] = not db.stats[statId]
-    else
-        db.stats[statId] = state
-    end
-    local primaryIds = { str = true, agi = true, int = true }
-    if primaryIds[statId] then
-        local val = db.stats[statId]
-        for pStat in pairs(primaryIds) do
-            db.stats[pStat] = val
-        end
-    end
-    self:Invalidate()
 end

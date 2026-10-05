@@ -75,6 +75,16 @@ local function ProbeMoveSpeed()
         print("  movespeed stat's live api() result: ok=" .. tostring(ok4) .. " value=" .. tostring(live))
     end
 end
+local HELP_KEYS = {
+    "CMD_TOGGLE",
+    "CMD_CONFIG",
+    "CMD_STYLE",
+    "CMD_RESET",
+    "CMD_RESET_MINIMAP",
+    "CMD_SHOW",
+    "CMD_HIDE",
+    "CMD_REFRESH",
+}
 SLASH_CHARACTERSTATS1 = "/cs"
 SLASH_CHARACTERSTATS2 = "/charstats"
 SLASH_CHARACTERSTATS3 = "/cstats"
@@ -83,6 +93,8 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
     msg = string.lower(string.trim(msg or ""))
     if msg == "config" or msg == "options" or msg == "opt" then
         ns.ConfigPanel:Open()
+    elseif msg == "style" or msg == "look" then
+        ns.StylePicker.Show()
     elseif msg == "toggle" then
         ns.StatsFrame:Toggle()
     elseif msg == "show" then
@@ -95,9 +107,9 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
     elseif msg == "resetminimap" or msg == "resetmm" then
         if ns.MinimapButton and ns.MinimapButton.ResetPosition then
             ns.MinimapButton:ResetPosition()
-            PrintMsg("Minimap button position reset to default.")
+            PrintMsg(ns.L.MSG_MINIMAP_RESET or "Minimap button position reset to default.")
         else
-            PrintMsg("Minimap button not available.", "error")
+            PrintMsg(ns.L.MSG_MINIMAP_MISSING or "Minimap button not available.", "error")
         end
     elseif msg == "refresh" then
         if ns.RefreshNow then
@@ -108,16 +120,12 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
                 ns.StatsFrame:Refresh()
             end
         end
-        PrintMsg("Stats refreshed.")
+        PrintMsg(ns.L.MSG_REFRESHED or "Stats refreshed.")
     elseif msg == "help" or msg == "?" then
-        PrintMsg("Commands:")
-        print("  /cs - Toggle stats frame")
-        print("  /cs config - Open options")
-        print("  /cs reset - Reset stats frame position")
-        print("  /cs resetminimap - Reset minimap button position")
-        print("  /cs show - Show frame")
-        print("  /cs hide - Hide frame")
-        print("  /cs refresh - Force immediate frame refresh")
+        PrintMsg(ns.L.MSG_COMMANDS or "Commands:")
+        for _, key in ipairs(HELP_KEYS) do
+            print("  " .. (ns.L[key] or key))
+        end
     else
         ns.StatsFrame:Toggle()
     end
@@ -143,8 +151,12 @@ local UNIT_EVENTS = {
     "UNIT_SPELL_HASTE",
     "UNIT_MAXHEALTH",
     "UNIT_RESISTANCES",
+    "UNIT_INVENTORY_CHANGED",
+    "UNIT_MAXPOWER",
+    "UNIT_DISPLAYPOWER",
 }
 local UNIT_REFRESH_EVENTS = {}
+local UNIT_REFRESH_DELAY = 0.15
 for _, event in ipairs(UNIT_EVENTS) do
     UNIT_REFRESH_EVENTS[event] = true
 end
@@ -319,8 +331,8 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
             end
         end
         ns.db.cachedStatValues = nil
-        local addonName = ns.L.ADDON_NAME or "CharacterStats"
-        print(string.format("|cffff8000%s|r loaded. Type /cs to toggle.", addonName))
+        local addonName = ns.L.ADDON_TITLE or "CharacterStats"
+        print(string.format(ns.L.MSG_LOADED or "|cffff8000%s|r loaded. Type /cs to toggle.", addonName))
         return
     end
     if event == "PLAYER_LOGIN" then
@@ -335,10 +347,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
             ns.db.specProfiles.map = ns.db.specProfiles.map or {}
             for _, specName in ipairs(specs) do
                 if specName then
-                    ns.CreateProfile(specName)
-                    if not ns.db.specProfiles.map[specName] or ns.db.specProfiles.map[specName] == "Default" then
-                        ns.db.specProfiles.map[specName] = specName
-                    end
+                    ns.GetSpecProfile(specName)
                 end
             end
         end
@@ -360,6 +369,18 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
         if ns.db.showFrame then
             ns.StatsFrame:Show()
         end
+        if ns.GearBadges then
+            ns.GearBadges.Apply()
+        end
+        if ns.CharacterButton then
+            ns.CharacterButton.Apply()
+        end
+        if ns.StylePicker then
+            C_Timer.After(2, ns.StylePicker.ShowIfFirstRun)
+        end
+        if ns.Integrations then
+            C_Timer.After(4, ns.Integrations.CheckOnLogin)
+        end
         if ns.db.showMinimapButton then
             ns.MinimapButton:Show()
         end
@@ -371,14 +392,17 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
         end
         return
     end
+    if event == "UNIT_INVENTORY_CHANGED" then
+        if arg1 == "player" and ns.Gear then
+            ns.Gear.Invalidate()
+            if ns.GearBadges then ns.GearBadges.Refresh() end
+            if ns.PaperdollPanel then ns.PaperdollPanel:Refresh() end
+        end
+        return
+    end
     if UNIT_REFRESH_EVENTS[event] then
         if arg1 == "player" then
-            ns.QueueRefresh(event)
-            if event == "UNIT_AURA" and not ns._playerMoving then
-                if ns.StatsFrame and ns.StatsFrame.RefreshMovementSpeedOnly then
-                    ns.StatsFrame:RefreshMovementSpeedOnly()
-                end
-            end
+            ns.QueueRefresh(event, { delay = UNIT_REFRESH_DELAY })
         end
         return
     end
@@ -386,6 +410,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
        event == "PLAYER_AVG_ITEM_LEVEL_UPDATE" or
        event == "CHARACTER_ITEM_FIXUP_NOTIFICATION" then
         if event == "PLAYER_EQUIPMENT_CHANGED" then
+            if ns.GearBadges then ns.GearBadges.OnEquipmentChanged() end
             ns.InvalidateIlvlColor()
             if ns.InvalidateShieldCache then ns.InvalidateShieldCache() end
             if ns.InvalidateVersatilityCalibration then ns.InvalidateVersatilityCalibration() end
@@ -457,6 +482,9 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
     end
     if event == "PLAYER_STARTED_MOVING" then
         ns._playerMoving = true
+        if ns.StatsFrame and ns.StatsFrame.UpdateMovementTracking then
+            ns.StatsFrame:UpdateMovementTracking()
+        end
         return
     end
     if event == "PLAYER_STOPPED_MOVING" then

@@ -1,6 +1,21 @@
 ﻿local addonName, CS = ...
 local Widgets = {}
 CS.ConfigWidgets = Widgets
+function Widgets.BindEscapeToClose(popup, onEscape)
+    popup:EnableKeyboard(true)
+    if not InCombatLockdown() then
+        popup:SetPropagateKeyboardInput(true)
+    end
+    popup:SetScript("OnKeyDown", function(self, key)
+        local isEscape = key == "ESCAPE"
+        if not InCombatLockdown() then
+            self:SetPropagateKeyboardInput(not isEscape)
+        end
+        if isEscape then
+            onEscape(self)
+        end
+    end)
+end
 local COLORS = {
     background = { r = 0.06, g = 0.06, b = 0.06 },
     backgroundLight = { r = 0.12, g = 0.12, b = 0.12 },
@@ -531,6 +546,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
             dropdown.menu.rows[i]:Hide()
         end
         local menuHeight = needsScroll and maxHeight or (totalHeight + 2)
+        dropdown.menu:SetScale(dropdown:GetEffectiveScale() / UIParent:GetEffectiveScale())
         dropdown.menu:SetSize(menuWidth, menuHeight)
         dropdown.menu:ClearAllPoints()
         dropdown.menu:SetPoint("TOPLEFT", dropdown, "BOTTOMLEFT", 0, -2)
@@ -564,24 +580,6 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
         Widgets.ApplyFontColor(self.arrow, "textMuted")
     end
     return label, dropdown
-end
-function Widgets.CreateGroupBox(parent, title)
-    local group = CreateFrame("Frame", nil, parent)
-    group.bg = group:CreateTexture(nil, "BACKGROUND")
-    group.bg:SetAllPoints()
-    group.bg:SetColorTexture(0.07, 0.07, 0.07, 0.7)
-    Widgets.CreateBorder(group, 1)
-    if title then
-        group.title = group:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        group.title:SetPoint("TOPLEFT", group, "TOPLEFT", 8, -6)
-        group.title:SetText(title)
-        Widgets.ApplyFontColor(group.title, "accentGold")
-        Widgets.RegisterAccentFontString(group.title, 1)
-    end
-    group.content = CreateFrame("Frame", nil, group)
-    group.content:SetPoint("TOPLEFT", group, "TOPLEFT", 8, title and -24 or -8)
-    group.content:SetPoint("BOTTOMRIGHT", group, "BOTTOMRIGHT", -8, 8)
-    return group
 end
 function Widgets.CreateStatRow(parent, index, height)
     height = height or 24
@@ -643,96 +641,6 @@ function Widgets.CreateStatRow(parent, index, height)
     end
     return row
 end
-function Widgets.CreateTabButton(parent, text)
-    local btn = CreateFrame("Button", nil, parent)
-    btn:SetHeight(26)
-    btn.bg = btn:CreateTexture(nil, "BACKGROUND")
-    btn.bg:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
-    btn.bg:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
-    btn.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
-    btn.leftEdge = btn:CreateTexture(nil, "BORDER")
-    btn.leftEdge:SetPoint("TOPLEFT", btn, "TOPLEFT", -6, 0)
-    btn.leftEdge:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
-    btn.leftEdge:SetWidth(6)
-    btn.leftEdge:SetTexture("Interface\\Buttons\\WHITE8x8")
-    btn.leftEdge:SetColorTexture(0.12, 0.12, 0.12, 1)
-    btn.rightEdge = btn:CreateTexture(nil, "BORDER")
-    btn.rightEdge:SetPoint("TOPRIGHT", btn, "TOPRIGHT", 6, 0)
-    btn.rightEdge:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
-    btn.rightEdge:SetWidth(6)
-    btn.rightEdge:SetTexture("Interface\\Buttons\\WHITE8x8")
-    btn.rightEdge:SetColorTexture(0.12, 0.12, 0.12, 1)
-    btn.topBorder = btn:CreateTexture(nil, "ARTWORK")
-    btn.topBorder:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
-    btn.topBorder:SetPoint("TOPRIGHT", btn, "TOPRIGHT", 0, 0)
-    btn.topBorder:SetHeight(1)
-    btn.topBorder:SetColorTexture(0.3, 0.3, 0.3, 1)
-    btn.leftBorder = btn:CreateTexture(nil, "ARTWORK")
-    btn.leftBorder:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
-    btn.leftBorder:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
-    btn.leftBorder:SetWidth(1)
-    btn.leftBorder:SetColorTexture(0.3, 0.3, 0.3, 1)
-    btn.rightBorder = btn:CreateTexture(nil, "ARTWORK")
-    btn.rightBorder:SetPoint("TOPRIGHT", btn, "TOPRIGHT", 0, 0)
-    btn.rightBorder:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
-    btn.rightBorder:SetWidth(1)
-    btn.rightBorder:SetColorTexture(0.3, 0.3, 0.3, 1)
-    btn.bottomBorder = btn:CreateTexture(nil, "ARTWORK")
-    btn.bottomBorder:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
-    btn.bottomBorder:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
-    btn.bottomBorder:SetHeight(1)
-    btn.bottomBorder:SetColorTexture(0.3, 0.3, 0.3, 1)
-    btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    btn.text:SetPoint("CENTER", btn, "CENTER", 0, 1)
-    btn.text:SetText(text or "")
-    Widgets.ApplyFontColor(btn.text, "textMuted")
-    btn._active = false
-    function btn:SetActive(active)
-        self._active = active
-        if active then
-            self.bg:SetColorTexture(0.08, 0.08, 0.08, 1)
-            self.leftEdge:SetColorTexture(0.08, 0.08, 0.08, 1)
-            self.rightEdge:SetColorTexture(0.08, 0.08, 0.08, 1)
-            local c = Widgets.GetColor("accentGold")
-            self.topBorder:SetColorTexture(c.r, c.g, c.b, 1)
-            self.leftBorder:SetColorTexture(c.r, c.g, c.b, 0.6)
-            self.rightBorder:SetColorTexture(c.r, c.g, c.b, 0.6)
-            self.bottomBorder:Hide()
-            Widgets.ApplyFontColor(self.text, "textPrimary")
-        else
-            self.bg:SetColorTexture(0.05, 0.05, 0.05, 1)
-            self.leftEdge:SetColorTexture(0.05, 0.05, 0.05, 1)
-            self.rightEdge:SetColorTexture(0.05, 0.05, 0.05, 1)
-            self.topBorder:SetColorTexture(0.22, 0.22, 0.22, 1)
-            self.leftBorder:SetColorTexture(0.22, 0.22, 0.22, 1)
-            self.rightBorder:SetColorTexture(0.22, 0.22, 0.22, 1)
-            self.bottomBorder:SetColorTexture(0.22, 0.22, 0.22, 1)
-            self.bottomBorder:Show()
-            Widgets.ApplyFontColor(self.text, "textMuted")
-        end
-    end
-    function btn:RefreshTheme()
-        self:SetActive(self._active)
-    end
-    btn:SetScript("OnEnter", function(self)
-        if not self._active then
-            self.bg:SetColorTexture(0.1, 0.1, 0.1, 1)
-            self.leftEdge:SetColorTexture(0.1, 0.1, 0.1, 1)
-            self.rightEdge:SetColorTexture(0.1, 0.1, 0.1, 1)
-            Widgets.ApplyFontColor(self.text, "textPrimary", 0.8)
-        end
-    end)
-    btn:SetScript("OnLeave", function(self)
-        if not self._active then
-            self.bg:SetColorTexture(0.05, 0.05, 0.05, 1)
-            self.leftEdge:SetColorTexture(0.05, 0.05, 0.05, 1)
-            self.rightEdge:SetColorTexture(0.05, 0.05, 0.05, 1)
-            Widgets.ApplyFontColor(self.text, "textMuted")
-        end
-    end)
-    btn:SetWidth(btn.text:GetStringWidth() + 24)
-    return btn
-end
 function Widgets.CreateScrollFrame(parent)
     local scroll = CreateFrame("ScrollFrame", nil, parent)
     scroll.content = CreateFrame("Frame", nil, scroll)
@@ -751,38 +659,119 @@ function Widgets.CreateScrollFrame(parent)
     end)
     return scroll
 end
-function Widgets.NormalizeDropdownWidths(dropdowns, minWidth, maxWidth)
-    minWidth = minWidth or 120
-    maxWidth = maxWidth or 300
-    local globalMaxWidth = 0
-    for _, dropdown in ipairs(dropdowns) do
-        if dropdown._items then
-            for _, item in ipairs(dropdown._items) do
-                local text = item.text or item.value or ""
-                dropdown.text:SetText(text)
-                local textWidth = dropdown.text:GetStringWidth() or 0
-                if textWidth > globalMaxWidth then
-                    globalMaxWidth = textWidth
-                end
+function Widgets.OpenColorPicker(r, g, b, onChange, onCancel)
+    if not ColorPickerFrame then return end
+    local info = {
+        r = r,
+        g = g,
+        b = b,
+        hasOpacity = false,
+        swatchFunc = function()
+            local nr, ng, nb = ColorPickerFrame:GetColorRGB()
+            onChange(nr, ng, nb)
+        end,
+        cancelFunc = function(prev)
+            if onCancel and prev then
+                onCancel(prev.r, prev.g, prev.b)
             end
-        end
+        end,
+    }
+    if ColorPickerFrame.SetupColorPickerAndShow then
+        ColorPickerFrame:SetupColorPickerAndShow(info)
+    else
+        ColorPickerFrame.hasOpacity = false
+        ColorPickerFrame.previousValues = { r = r, g = g, b = b }
+        ColorPickerFrame.func = info.swatchFunc
+        ColorPickerFrame.cancelFunc = function() info.cancelFunc(ColorPickerFrame.previousValues) end
+        ColorPickerFrame:SetColorRGB(r, g, b)
+        ColorPickerFrame:Hide()
+        ColorPickerFrame:Show()
     end
-    local finalWidth = globalMaxWidth + 38
-    finalWidth = math.max(minWidth, math.min(maxWidth, finalWidth))
-    for _, dropdown in ipairs(dropdowns) do
-        dropdown:SetWidth(finalWidth)
-        if dropdown._value then
-            for _, item in ipairs(dropdown._items or {}) do
-                if item.value == dropdown._value then
-                    dropdown.text:SetText(item.text or tostring(dropdown._value))
-                    break
-                end
-            end
+end
+function Widgets.CreateSwatch(parent)
+    local swatch = CreateFrame("Button", nil, parent)
+    swatch:SetSize(16, 16)
+    swatch:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    Widgets.CreateBorder(swatch, 1)
+    swatch.tex = swatch:CreateTexture(nil, "ARTWORK")
+    swatch.tex:SetPoint("TOPLEFT", 1, -1)
+    swatch.tex:SetPoint("BOTTOMRIGHT", -1, 1)
+    swatch.tex:SetColorTexture(1, 1, 1, 1)
+    swatch.disabled = swatch:CreateTexture(nil, "OVERLAY")
+    swatch.disabled:SetAllPoints()
+    swatch.disabled:SetColorTexture(0, 0, 0, 0.55)
+    swatch.disabled:Hide()
+    function swatch:SetColor(r, g, b, a)
+        self.tex:SetColorTexture(r or 1, g or 1, b or 1, a or 1)
+    end
+    function swatch:SetDisabled(disabled)
+        self:EnableMouse(not disabled)
+        self.disabled:SetShown(disabled)
+    end
+    return swatch
+end
+function Widgets.CreateNavButton(parent, text)
+    local btn = CreateFrame("Button", nil, parent)
+    btn:SetHeight(26)
+    btn.bg = btn:CreateTexture(nil, "BACKGROUND")
+    btn.bg:SetAllPoints()
+    btn.bg:SetColorTexture(0, 0, 0, 0)
+    btn.bar = btn:CreateTexture(nil, "ARTWORK")
+    btn.bar:SetPoint("TOPLEFT", btn, "TOPLEFT", 0, 0)
+    btn.bar:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+    btn.bar:SetWidth(2)
+    btn.bar:Hide()
+    btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    btn.text:SetPoint("LEFT", btn, "LEFT", 12, 0)
+    btn.text:SetPoint("RIGHT", btn, "RIGHT", -6, 0)
+    btn.text:SetJustifyH("LEFT")
+    btn.text:SetText(text or "")
+    Widgets.ApplyFontColor(btn.text, "textMuted")
+    btn._active = false
+    function btn:SetActive(active)
+        self._active = active == true
+        if self._active then
+            self.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
+            Widgets.ApplyTextureColor(self.bar, "accentGold", 1)
+            self.bar:Show()
+            Widgets.ApplyFontColor(self.text, "textPrimary")
         else
-            dropdown.text:SetText("")
+            self.bg:SetColorTexture(0, 0, 0, 0)
+            self.bar:Hide()
+            Widgets.ApplyFontColor(self.text, "textMuted")
         end
     end
-    return finalWidth
+    function btn:RefreshTheme()
+        self:SetActive(self._active)
+    end
+    btn:SetScript("OnEnter", function(self)
+        if not self._active then
+            self.bg:SetColorTexture(0.10, 0.10, 0.10, 1)
+            Widgets.ApplyFontColor(self.text, "textPrimary", 0.85)
+        end
+    end)
+    btn:SetScript("OnLeave", function(self)
+        if not self._active then
+            self.bg:SetColorTexture(0, 0, 0, 0)
+            Widgets.ApplyFontColor(self.text, "textMuted")
+        end
+    end)
+    return btn
+end
+function Widgets.CreateSectionHeader(parent, text)
+    local header = CreateFrame("Frame", nil, parent)
+    header:SetHeight(18)
+    header.text = header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    header.text:SetPoint("LEFT", header, "LEFT", 0, 0)
+    header.text:SetText(text or "")
+    Widgets.ApplyFontColor(header.text, "accentGold")
+    Widgets.RegisterAccentFontString(header.text, 1)
+    header.line = header:CreateTexture(nil, "ARTWORK")
+    header.line:SetPoint("LEFT", header.text, "RIGHT", 8, 0)
+    header.line:SetPoint("RIGHT", header, "RIGHT", 0, 0)
+    header.line:SetHeight(1)
+    Widgets.ApplyTextureColor(header.line, "border", 1)
+    return header
 end
 local activePopup = nil
 local function CloseActivePopup()
@@ -827,12 +816,7 @@ function Widgets.CreatePopup(title, body, onAccept, okText, cancelText)
     cancelBtn:SetScript("OnClick", function()
         CloseActivePopup()
     end)
-    popup:EnableKeyboard(true)
-    popup:SetScript("OnKeyDown", function(self, key)
-        if key == "ESCAPE" then
-            CloseActivePopup()
-        end
-    end)
+    Widgets.BindEscapeToClose(popup, CloseActivePopup)
     activePopup = popup
     return popup
 end
@@ -895,12 +879,7 @@ function Widgets.CreateInputPopup(title, body, defaultText, onAccept, okText, ca
     editBox:SetScript("OnEscapePressed", function()
         CloseActivePopup()
     end)
-    popup:EnableKeyboard(true)
-    popup:SetScript("OnKeyDown", function(self, key)
-        if key == "ESCAPE" then
-            CloseActivePopup()
-        end
-    end)
+    Widgets.BindEscapeToClose(popup, CloseActivePopup)
     editBox:SetFocus()
     editBox:HighlightText()
     activePopup = popup
@@ -958,12 +937,7 @@ function Widgets.CreateSelectPopup(title, body, items, defaultValue, onAccept, o
     cancelBtn:SetScript("OnClick", function()
         CloseActivePopup()
     end)
-    popup:EnableKeyboard(true)
-    popup:SetScript("OnKeyDown", function(self, key)
-        if key == "ESCAPE" then
-            CloseActivePopup()
-        end
-    end)
+    Widgets.BindEscapeToClose(popup, CloseActivePopup)
     activePopup = popup
     return popup
 end

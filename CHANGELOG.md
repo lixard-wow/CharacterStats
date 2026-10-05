@@ -1,4 +1,29 @@
-# Changelog
+﻿# Changelog
+
+## Version 2.1.5 (unreleased)
+
+### Added
+
+- Real-Time Versatility option (Retail): in combat where versatility is hidden, show the live rating-based value instead of an estimate.
+
+### Fixed
+
+- Switching profiles no longer carries settings over from the previous profile, and "Reset Colors" no longer comes back after a reload.
+- Block chance now shows on non-English game clients.
+- Specialization profiles no longer get shared between classes with the same spec name (for example Holy Priest and Holy Paladin). Existing profiles are copied over automatically.
+- Confirmation popups no longer block movement and other keys while open, and Escape now closes the Share menu.
+- The Share menu no longer errors after a friend comes online, skips values the game currently hides, and tells you when chat is restricted instead of failing silently.
+- The options window now remembers its size.
+- The "UI Scale" slider is now labeled "Options Window Scale", since it only ever scaled the options window.
+- The stats panel no longer briefly shows stats you disabled while the character panel is open.
+- On Classic, the addon no longer replaces game functions that other addons and the default UI rely on.
+- Versatility estimates in restricted content are more accurate when buffs were active at login.
+
+### Improved
+
+- Movement speed updates only run while you are moving or in the air, instead of all the time.
+- Buff and debuff changes in combat are grouped into fewer refreshes.
+- Less work done on every refresh (gear versatility is cached, fewer temporary tables).
 
 ## Version 2.1.4
 
