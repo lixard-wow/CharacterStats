@@ -21,6 +21,11 @@ function BlizzardStats.IsAvailable()
     return CharacterFrame ~= nil and CharacterFrame.GetStatsPane ~= nil
 end
 local percentByKey = {}
+function BlizzardStats.SecretsActive()
+    if not issecretvalue or not GetCombatRatingBonus then return false end
+    local ok, value = pcall(GetCombatRatingBonus, 26)
+    return ok and ns.IsSecretValue(value)
+end
 function BlizzardStats.StripColon(text)
     if type(text) ~= "string" or ns.IsSecretValue(text) then return text end
     text = text:gsub(":%s*$", "")

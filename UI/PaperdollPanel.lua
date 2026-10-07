@@ -58,6 +58,7 @@ local function ResetProxy(labelString, valueString)
 end
 local function TryShowBlizzardTooltipByKey(hoverFrame, key, statIndexId)
     if not PAPERDOLL_STATINFO or not key then return false end
+    if ns.BlizzardStats.SecretsActive() then return false end
     local info = PAPERDOLL_STATINFO[key]
     if not info or not info.updateFunc then return false end
     ResetProxy(mockFontString, mockFontString)
@@ -65,8 +66,9 @@ local function TryShowBlizzardTooltipByKey(hoverFrame, key, statIndexId)
     if not ok then return false end
     if statProxy.onEnterFunc then
         local copied = {}
+        local hadUpdateTooltip = hoverFrame.UpdateTooltip ~= nil
         for k, v in pairs(statProxy) do
-            if hoverFrame[k] == nil then
+            if hoverFrame[k] == nil and k ~= "UpdateTooltip" then
                 hoverFrame[k] = v
                 copied[k] = true
             end
@@ -74,6 +76,9 @@ local function TryShowBlizzardTooltipByKey(hoverFrame, key, statIndexId)
         local success = pcall(statProxy.onEnterFunc, hoverFrame)
         for k in pairs(copied) do
             hoverFrame[k] = nil
+        end
+        if not hadUpdateTooltip then
+            hoverFrame.UpdateTooltip = nil
         end
         if not success then return false end
     else
@@ -158,11 +163,16 @@ function PaperdollPanel.ShowStatTooltip(owner, statId, title, valueText, bodyTex
     if TryShowBlizzardTooltip(owner, statId) then return end
     if not title then return end
     GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
-    local header = title
-    if valueText then
-        header = header .. ": " .. valueText
+    if valueText and ns.IsSecretValue(valueText) then
+        GameTooltip:SetText(title, 1, 1, 1)
+        GameTooltip:AddLine(valueText, 1, 1, 1)
+    else
+        local header = title
+        if valueText then
+            header = header .. ": " .. valueText
+        end
+        GameTooltip:SetText(HIGHLIGHT_FONT_COLOR_CODE .. header .. FONT_COLOR_CODE_CLOSE)
     end
-    GameTooltip:SetText(HIGHLIGHT_FONT_COLOR_CODE .. header .. FONT_COLOR_CODE_CLOSE)
     if bodyText and bodyText ~= "" then
         GameTooltip:AddLine(bodyText, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
     end
