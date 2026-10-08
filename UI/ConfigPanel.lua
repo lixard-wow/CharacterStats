@@ -9,6 +9,7 @@ local NAV_WIDTH = 140
 local TITLE_HEIGHT = 32
 local CONTENT_PAD = 14
 local frame
+local framesByTheme = {}
 local pages = {}
 local pageOrder = {}
 function ConfigPanel.RegisterPage(key, def)
@@ -131,10 +132,16 @@ local function CreateCloseButton(parent)
     return btn
 end
 local function CreateMainFrame()
-    if frame then return frame end
+    local themeKey = CS.Theme.Get() and CS.Theme.key
+    if framesByTheme[themeKey] then
+        frame = framesByTheme[themeKey]
+        return frame
+    end
     local Widgets = CS.ConfigWidgets
     local L = CS.L
     frame = CreateFrame("Frame", "CharacterStatsConfigFrame", UIParent)
+    framesByTheme[themeKey] = frame
+    frame.themeKey = themeKey
     local savedUi = CS.db and CS.db.ui
     local savedWidth = savedUi and tonumber(savedUi.configWidth)
     local savedHeight = savedUi and tonumber(savedUi.configHeight)
@@ -149,10 +156,7 @@ local function CreateMainFrame()
         frame:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
     end
     frame:Hide()
-    frame.bg = frame:CreateTexture(nil, "BACKGROUND")
-    frame.bg:SetAllPoints()
-    frame.bg:SetColorTexture(0.06, 0.06, 0.06, 0.98)
-    Widgets.CreateBorder(frame, 1)
+    CS.Theme.Window(frame, TITLE_HEIGHT + 1, true)
     frame.titleBar = CreateFrame("Frame", nil, frame)
     frame.titleBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
     frame.titleBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
@@ -161,23 +165,19 @@ local function CreateMainFrame()
     frame.titleBar:RegisterForDrag("LeftButton")
     frame.titleBar:SetScript("OnDragStart", function() frame:StartMoving() end)
     frame.titleBar:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
-    frame.titleBar.bg = frame.titleBar:CreateTexture(nil, "BACKGROUND")
-    frame.titleBar.bg:SetAllPoints()
-    frame.titleBar.bg:SetColorTexture(0.08, 0.08, 0.08, 1)
-    frame.titleBar.divider = frame.titleBar:CreateTexture(nil, "ARTWORK")
-    frame.titleBar.divider:SetPoint("BOTTOMLEFT", frame.titleBar, "BOTTOMLEFT", 0, 0)
-    frame.titleBar.divider:SetPoint("BOTTOMRIGHT", frame.titleBar, "BOTTOMRIGHT", 0, 0)
-    frame.titleBar.divider:SetHeight(1)
-    Widgets.ApplyTextureColor(frame.titleBar.divider, "divider", 1)
     frame.title = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     frame.title:SetPoint("LEFT", frame.titleBar, "LEFT", 12, 0)
-    frame.title:SetText(L.ADDON_TITLE or "CharacterStats")
-    Widgets.ApplyFontColor(frame.title, "textPrimary")
+    CS.Theme.SetTitle(frame.title, L.ADDON_TITLE or "CharacterStats")
+    Widgets.ApplyFontColor(frame.title, "title")
     frame.version = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     frame.version:SetPoint("LEFT", frame.title, "RIGHT", 8, -1)
     frame.version:SetText(CS.VERSION or "")
     Widgets.ApplyFontColor(frame.version, "textMuted", 0.7)
-    frame.closeBtn = CreateCloseButton(frame.titleBar)
+    if CS.Theme.key == "classic" then
+        frame.closeBtn = CreateCloseButton(frame.titleBar)
+    else
+        frame.closeBtn = CS.Theme.CloseButton(frame.titleBar, 22)
+    end
     frame.closeBtn:SetPoint("RIGHT", frame.titleBar, "RIGHT", -8, 0)
     frame.closeBtn:SetScript("OnClick", function()
         ConfigPanel.Hide()
@@ -186,9 +186,7 @@ local function CreateMainFrame()
     frame.nav:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 0, 0)
     frame.nav:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 1, 1)
     frame.nav:SetWidth(NAV_WIDTH)
-    frame.nav.bg = frame.nav:CreateTexture(nil, "BACKGROUND")
-    frame.nav.bg:SetAllPoints()
-    frame.nav.bg:SetColorTexture(0.045, 0.045, 0.045, 1)
+    CS.Theme.CornerFill(frame.nav, "nav", math.max(0, ((CS.Theme.Get()).windowRadius or 0) - 1))
     frame.nav.divider = frame.nav:CreateTexture(nil, "ARTWORK")
     frame.nav.divider:SetPoint("TOPRIGHT", frame.nav, "TOPRIGHT", 0, 0)
     frame.nav.divider:SetPoint("BOTTOMRIGHT", frame.nav, "BOTTOMRIGHT", 0, 0)
@@ -229,7 +227,27 @@ local function CreateMainFrame()
             CS.FlushProfileSave()
         end
     end)
+    CS.Theme.ApplyFonts(frame)
     return frame
+end
+function ConfigPanel.OnThemeChanged()
+    local current = frame
+    if not current or not current:IsShown() then
+        frame = nil
+        return
+    end
+    local page = current._activePage
+    local point, relativeTo, relativePoint, x, y = current:GetPoint(1)
+    current:Hide()
+    frame = nil
+    ConfigPanel.Show()
+    if frame and point then
+        frame:ClearAllPoints()
+        frame:SetPoint(point, relativeTo, relativePoint, x, y)
+    end
+    if page then
+        ConfigPanel.ShowPage(page)
+    end
 end
 local function GetPageFrame(key)
     local container = frame.pageFrames[key]
@@ -240,6 +258,7 @@ local function GetPageFrame(key)
     container:SetAllPoints(frame.content)
     container:Hide()
     container.page = def.create(container) or {}
+    CS.Theme.ApplyFonts(container)
     frame.pageFrames[key] = container
     return container
 end
@@ -299,4 +318,5 @@ end
 function ConfigPanel.IsShown()
     return frame and frame:IsShown()
 end
+CS.Theme.OnChange(ConfigPanel.OnThemeChanged)
 return ConfigPanel

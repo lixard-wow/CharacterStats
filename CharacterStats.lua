@@ -79,6 +79,7 @@ local HELP_KEYS = {
     "CMD_TOGGLE",
     "CMD_CONFIG",
     "CMD_STYLE",
+    "CMD_THEME",
     "CMD_RESET",
     "CMD_RESET_MINIMAP",
     "CMD_SHOW",
@@ -95,6 +96,9 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
         ns.ConfigPanel:Open()
     elseif msg == "style" or msg == "look" then
         ns.StylePicker.Show()
+    elseif msg == "theme" then
+        ns.Theme.Cycle()
+        PrintMsg(string.format(ns.L.MSG_THEME_SET or "Window theme: %s", ns.Theme.GetName(ns.Theme.key)))
     elseif msg == "toggle" then
         ns.StatsFrame:Toggle()
     elseif msg == "show" then
@@ -254,8 +258,12 @@ function ns.QueueRefresh(reason, opts)
 end
 eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
+        local freshInstall = CharacterStatsDB == nil
         if not CharacterStatsDB then
             CharacterStatsDB = {}
+        end
+        if CharacterStatsDB.uiTheme == nil and ns.Theme then
+            CharacterStatsDB.uiTheme = ns.Theme.DefaultKey(freshInstall)
         end
         for k, v in pairs(ns.DEFAULTS) do
             if CharacterStatsDB[k] == nil then

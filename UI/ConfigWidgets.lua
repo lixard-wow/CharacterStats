@@ -1,6 +1,28 @@
 ﻿local addonName, CS = ...
 local Widgets = {}
 CS.ConfigWidgets = Widgets
+local THEME_KEYS = {
+    background = "window",
+    backgroundLight = "hover",
+    textPrimary = "text",
+    textMuted = "muted",
+    accentGold = "accent",
+    border = "border",
+    divider = "line",
+}
+local function ThemeColor(key)
+    local _, C = CS.Theme.Get()
+    return C[THEME_KEYS[key] or key] or C.text
+end
+local function Paint(tex, key, alpha)
+    local c = ThemeColor(key)
+    tex:SetVertexColor(c[1], c[2], c[3], alpha or c[4] or 1)
+end
+local function Radius()
+    local T = CS.Theme.Get()
+    return T.buttonRadius or 0
+end
+Widgets.Paint = Paint
 function Widgets.BindEscapeToClose(popup, onEscape)
     popup:EnableKeyboard(true)
     if not InCombatLockdown() then
@@ -16,15 +38,6 @@ function Widgets.BindEscapeToClose(popup, onEscape)
         end
     end)
 end
-local COLORS = {
-    background = { r = 0.06, g = 0.06, b = 0.06 },
-    backgroundLight = { r = 0.12, g = 0.12, b = 0.12 },
-    textPrimary = { r = 0.92, g = 0.91, b = 0.86 },
-    textMuted = { r = 0.70, g = 0.70, b = 0.70 },
-    accentGold = { r = 0.78, g = 0.66, b = 0.22 },
-    border = { r = 0.22, g = 0.22, b = 0.22 },
-    divider = { r = 0.28, g = 0.28, b = 0.28 },
-}
 local accentTextures = {}
 local accentFontStrings = {}
 function Widgets.RegisterAccentTexture(tex, alpha)
@@ -34,6 +47,7 @@ function Widgets.RegisterAccentFontString(fs, alpha)
     if fs then accentFontStrings[fs] = alpha or 1 end
 end
 function Widgets.RefreshThemeColors()
+    CS.Theme.Load()
     local c = Widgets.GetColor("accentGold")
     for tex, alpha in pairs(accentTextures) do
         if tex and tex.SetColorTexture then
@@ -47,11 +61,8 @@ function Widgets.RefreshThemeColors()
     end
 end
 function Widgets.GetColor(key)
-    if key == "accentGold" and CS.GetCurrentThemeColor then
-        local r, g, b = CS.GetCurrentThemeColor()
-        return { r = r, g = g, b = b }
-    end
-    return COLORS[key] or COLORS.textPrimary
+    local c = ThemeColor(key)
+    return { r = c[1], g = c[2], b = c[3] }
 end
 function Widgets.ApplyFontColor(fs, colorKey, alpha)
     if not fs or not fs.SetTextColor then return end
@@ -65,7 +76,7 @@ function Widgets.ApplyTextureColor(tex, colorKey, alpha)
 end
 function Widgets.CreateBorder(frame, thickness)
     local t = thickness or 1
-    local c = COLORS.border
+    local c = Widgets.GetColor("border")
     local border = {}
     border.top = frame:CreateTexture(nil, "BORDER")
     border.top:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
@@ -91,10 +102,16 @@ function Widgets.CreateBorder(frame, thickness)
     return border
 end
 function Widgets.SetBorderColor(frame, colorKey, alpha)
-    if not frame or not frame._border then return end
-    local c = Widgets.GetColor(colorKey) or COLORS.border
+    if not frame then return end
+    local c = Widgets.GetColor(colorKey)
     local a = alpha or 1
-    local b = frame._border
+    local edge = rawget(frame, "edge")
+    if edge then
+        edge:SetVertexColor(c.r, c.g, c.b, a)
+        return
+    end
+    local b = rawget(frame, "_border")
+    if not b then return end
     if b.top then b.top:SetColorTexture(c.r, c.g, c.b, a) end
     if b.bottom then b.bottom:SetColorTexture(c.r, c.g, c.b, a) end
     if b.left then b.left:SetColorTexture(c.r, c.g, c.b, a) end
@@ -103,32 +120,29 @@ end
 function Widgets.CreateFlatButton(parent, width, height, text)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(width or 80, height or 22)
-    btn.bg = btn:CreateTexture(nil, "BACKGROUND")
-    btn.bg:SetAllPoints()
-    btn.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
-    Widgets.CreateBorder(btn, 1)
+    btn.bg = CS.Theme.Box(btn, "button", "buttonBorder", Radius())
     btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    btn.text.themeRole = "button"
     btn.text:SetPoint("CENTER")
     btn.text:SetText(text or "")
-    Widgets.ApplyFontColor(btn.text, "textMuted")
+    Widgets.ApplyFontColor(btn.text, "buttonText")
     btn:SetScript("OnEnter", function(self)
-        self.bg:SetColorTexture(0.18, 0.18, 0.18, 1)
-        Widgets.SetBorderColor(self, "border")
-        Widgets.ApplyFontColor(self.text, "textPrimary")
+        Paint(self.bg, "buttonHover")
+        Widgets.ApplyFontColor(self.text, "text")
     end)
     btn:SetScript("OnLeave", function(self)
-        self.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
-        Widgets.SetBorderColor(self, "border")
-        Widgets.ApplyFontColor(self.text, "textMuted")
+        Paint(self.bg, "button")
+        Widgets.SetBorderColor(self, "buttonBorder")
+        Widgets.ApplyFontColor(self.text, "buttonText")
     end)
     btn:SetScript("OnMouseDown", function(self)
         if self:IsEnabled() then
-            self.bg:SetColorTexture(0.08, 0.08, 0.08, 1)
+            Paint(self.bg, "field")
         end
     end)
     btn:SetScript("OnMouseUp", function(self)
         if self:IsEnabled() then
-            self.bg:SetColorTexture(0.18, 0.18, 0.18, 1)
+            Paint(self.bg, "buttonHover")
         end
     end)
     function btn:SetText(t)
@@ -168,7 +182,8 @@ function Widgets.CreateToggle(parent, labelText)
     toggle.box:SetSize(BOX_SIZE, BOX_SIZE)
     toggle.box.bg = toggle.box:CreateTexture(nil, "BACKGROUND")
     toggle.box.bg:SetAllPoints()
-    toggle.box.bg:SetColorTexture(0.1, 0.1, 0.1, 1)
+    toggle.box.bg:SetColorTexture(1, 1, 1, 1)
+    Paint(toggle.box.bg, "field")
     Widgets.CreateBorder(toggle.box, 1)
     toggle.check = toggle.box:CreateTexture(nil, "ARTWORK")
     toggle.check:SetPoint("TOPLEFT", toggle.box, "TOPLEFT", CHECK_INSET, -CHECK_INSET)
@@ -231,7 +246,8 @@ function Widgets.CreateSlider(parent, opts)
     end
     s.track.bg = s.track:CreateTexture(nil, "BACKGROUND")
     s.track.bg:SetAllPoints()
-    s.track.bg:SetColorTexture(0.2, 0.2, 0.2, 0.9)
+    s.track.bg:SetColorTexture(1, 1, 1, 1)
+    Paint(s.track.bg, "hover", 0.9)
     Widgets.CreateBorder(s.track, 1)
     s.fill = s.track:CreateTexture(nil, "ARTWORK")
     s.fill:SetPoint("LEFT", s.track, "LEFT", 0, 0)
@@ -327,10 +343,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
     dropdown:SetSize(width or 150, 22)
     dropdown:EnableMouse(true)
     dropdown:RegisterForClicks("AnyUp")
-    dropdown.bg = dropdown:CreateTexture(nil, "BACKGROUND")
-    dropdown.bg:SetAllPoints()
-    dropdown.bg:SetColorTexture(0.1, 0.1, 0.1, 1)
-    Widgets.CreateBorder(dropdown, 1)
+    dropdown.bg = CS.Theme.Box(dropdown, "field", "border", Radius())
     dropdown.text = dropdown:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     dropdown.text:SetPoint("LEFT", dropdown, "LEFT", 8, 0)
     dropdown.text:SetPoint("RIGHT", dropdown, "RIGHT", -20, 0)
@@ -419,10 +432,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
             dropdown.menu:SetFrameStrata("TOOLTIP")
             dropdown.menu:SetClampedToScreen(true)
             dropdown.menu:EnableMouse(true)
-            dropdown.menu.bg = dropdown.menu:CreateTexture(nil, "BACKGROUND")
-            dropdown.menu.bg:SetAllPoints()
-            dropdown.menu.bg:SetColorTexture(0.08, 0.08, 0.08, 1)
-            Widgets.CreateBorder(dropdown.menu, 1)
+            dropdown.menu.bg = CS.Theme.Box(dropdown.menu, "window", "border", Radius())
             dropdown.menu.rows = {}
         end
         local parent = dropdown.menu
@@ -440,14 +450,16 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
                 track:SetPoint("TOPRIGHT", -1, -1)
                 track:SetPoint("BOTTOMRIGHT", -1, 1)
                 track:SetWidth(scrollBarWidth)
-                track:SetColorTexture(0.15, 0.15, 0.15, 1)
+                track:SetColorTexture(1, 1, 1, 1)
+                Paint(track, "line")
                 dropdown.menu.track = track
                 local thumb = CreateFrame("Button", nil, dropdown.menu)
                 thumb:SetWidth(scrollBarWidth)
                 thumb:SetPoint("TOPRIGHT", -1, -1)
                 thumb.tex = thumb:CreateTexture(nil, "ARTWORK")
                 thumb.tex:SetAllPoints()
-                thumb.tex:SetColorTexture(0.4, 0.4, 0.4, 1)
+                thumb.tex:SetColorTexture(1, 1, 1, 1)
+                Paint(thumb.tex, "muted")
                 dropdown.menu.thumb = thumb
                 thumb:EnableMouse(true)
                 thumb:SetScript("OnMouseDown", function() thumb.dragging = true end)
@@ -514,7 +526,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
             end
             row:SetScript("OnEnter", function(self)
                 if self.bg then
-                    self.bg:SetColorTexture(0.18, 0.18, 0.18, 1)
+                    Paint(self.bg, "buttonHover")
                 end
                 Widgets.SetBorderColor(self, "accentGold", 0.95)
                 if self._isSelected then
@@ -525,7 +537,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
             end)
             row:SetScript("OnLeave", function(self)
                 if self.bg then
-                    self.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
+                    Paint(self.bg, "button")
                 end
                 Widgets.SetBorderColor(self, "border")
                 if self._isSelected then
@@ -545,6 +557,7 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
         for i = #items + 1, #dropdown.menu.rows do
             dropdown.menu.rows[i]:Hide()
         end
+        CS.Theme.ApplyFonts(dropdown.menu)
         local menuHeight = needsScroll and maxHeight or (totalHeight + 2)
         dropdown.menu:SetScale(dropdown:GetEffectiveScale() / UIParent:GetEffectiveScale())
         dropdown.menu:SetSize(menuWidth, menuHeight)
@@ -568,14 +581,14 @@ function Widgets.CreateDropdown(parent, labelText, width, opts)
     function dropdown:Disable()
         self._disabled = true
         self:EnableMouse(false)
-        self.bg:SetColorTexture(0.05, 0.05, 0.05, 0.5)
-        self.text:SetTextColor(0.4, 0.4, 0.4)
-        self.arrow:SetTextColor(0.4, 0.4, 0.4)
+        Paint(self.bg, "field", 0.5)
+        Widgets.ApplyFontColor(self.text, "disabled")
+        Widgets.ApplyFontColor(self.arrow, "disabled")
     end
     function dropdown:Enable()
         self._disabled = false
         self:EnableMouse(true)
-        self.bg:SetColorTexture(0.1, 0.1, 0.1, 1)
+        Paint(self.bg, "field")
         Widgets.ApplyFontColor(self.text, "textMuted")
         Widgets.ApplyFontColor(self.arrow, "textMuted")
     end
@@ -590,11 +603,13 @@ function Widgets.CreateStatRow(parent, index, height)
     row:RegisterForDrag("LeftButton")
     row.alt = row:CreateTexture(nil, "BACKGROUND")
     row.alt:SetAllPoints()
-    row.alt:SetColorTexture(0.15, 0.15, 0.15, 0.4)
+    row.alt:SetColorTexture(1, 1, 1, 1)
+    Paint(row.alt, "surface", 0.7)
     row.alt:Hide()
     row.hover = row:CreateTexture(nil, "BACKGROUND", nil, 1)
     row.hover:SetAllPoints()
-    row.hover:SetColorTexture(0.3, 0.3, 0.3, 0.3)
+    row.hover:SetColorTexture(1, 1, 1, 1)
+    Paint(row.hover, "hover", 0.8)
     row.hover:Hide()
     row.grip = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.grip:SetPoint("LEFT", row, "LEFT", 8, 0)
@@ -731,7 +746,8 @@ function Widgets.CreateNavButton(parent, text)
     function btn:SetActive(active)
         self._active = active == true
         if self._active then
-            self.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
+            self.bg:SetColorTexture(1, 1, 1, 1)
+            Paint(self.bg, "hover")
             Widgets.ApplyTextureColor(self.bar, "accentGold", 1)
             self.bar:Show()
             Widgets.ApplyFontColor(self.text, "textPrimary")
@@ -746,7 +762,8 @@ function Widgets.CreateNavButton(parent, text)
     end
     btn:SetScript("OnEnter", function(self)
         if not self._active then
-            self.bg:SetColorTexture(0.10, 0.10, 0.10, 1)
+            self.bg:SetColorTexture(1, 1, 1, 1)
+            Paint(self.bg, "surface")
             Widgets.ApplyFontColor(self.text, "textPrimary", 0.85)
         end
     end)
@@ -762,6 +779,7 @@ function Widgets.CreateSectionHeader(parent, text)
     local header = CreateFrame("Frame", nil, parent)
     header:SetHeight(18)
     header.text = header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    header.text.themeRole = "heading"
     header.text:SetPoint("LEFT", header, "LEFT", 0, 0)
     header.text:SetText(text or "")
     Widgets.ApplyFontColor(header.text, "accentGold")
@@ -783,19 +801,15 @@ local function CloseActivePopup()
 end
 function Widgets.CreatePopup(title, body, onAccept, okText, cancelText)
     CloseActivePopup()
-    local popup = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+    local popup = CreateFrame("Frame", nil, UIParent)
     popup:SetFrameStrata("FULLSCREEN_DIALOG")
     popup:SetSize(320, 120)
     popup:SetPoint("CENTER")
     popup:SetClampedToScreen(true)
-    popup:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1,
-    })
-    popup:SetBackdropColor(0.06, 0.06, 0.06, 1)
-    popup:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    popup:EnableMouse(true)
+    CS.Theme.Box(popup, "window", "border", (CS.Theme.Get()).windowRadius)
     local titleFs = popup:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    titleFs.themeRole = "heading"
     titleFs:SetPoint("TOPLEFT", 12, -12)
     titleFs:SetText(title or "")
     Widgets.ApplyFontColor(titleFs, "textPrimary")
@@ -817,24 +831,21 @@ function Widgets.CreatePopup(title, body, onAccept, okText, cancelText)
         CloseActivePopup()
     end)
     Widgets.BindEscapeToClose(popup, CloseActivePopup)
+    CS.Theme.ApplyFonts(popup)
     activePopup = popup
     return popup
 end
 function Widgets.CreateInputPopup(title, body, defaultText, onAccept, okText, cancelText)
     CloseActivePopup()
-    local popup = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+    local popup = CreateFrame("Frame", nil, UIParent)
     popup:SetFrameStrata("FULLSCREEN_DIALOG")
     popup:SetSize(320, 140)
     popup:SetPoint("CENTER")
     popup:SetClampedToScreen(true)
-    popup:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1,
-    })
-    popup:SetBackdropColor(0.06, 0.06, 0.06, 1)
-    popup:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    popup:EnableMouse(true)
+    CS.Theme.Box(popup, "window", "border", (CS.Theme.Get()).windowRadius)
     local titleFs = popup:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    titleFs.themeRole = "heading"
     titleFs:SetPoint("TOPLEFT", 12, -12)
     titleFs:SetText(title or "")
     Widgets.ApplyFontColor(titleFs, "textPrimary")
@@ -844,18 +855,14 @@ function Widgets.CreateInputPopup(title, body, defaultText, onAccept, okText, ca
     bodyFs:SetJustifyH("LEFT")
     bodyFs:SetText(body or "")
     Widgets.ApplyFontColor(bodyFs, "textMuted")
-    local editBox = CreateFrame("EditBox", nil, popup, "BackdropTemplate")
+    local editBox = CreateFrame("EditBox", nil, popup)
     editBox:SetSize(296, 24)
     editBox:SetPoint("TOPLEFT", 12, -60)
     editBox:SetAutoFocus(false)
     editBox:SetFontObject(GameFontHighlightSmall)
-    editBox:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1,
-    })
-    editBox:SetBackdropColor(0.1, 0.1, 0.1, 1)
-    editBox:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    CS.Theme.Box(editBox, "field", "border", Radius())
+    local fieldText = Widgets.GetColor("text")
+    editBox:SetTextColor(fieldText.r, fieldText.g, fieldText.b)
     editBox:SetTextInsets(6, 6, 0, 0)
     editBox:SetText(defaultText or "")
     local okBtn = Widgets.CreateFlatButton(popup, 80, 22, okText or "OK")
@@ -880,6 +887,7 @@ function Widgets.CreateInputPopup(title, body, defaultText, onAccept, okText, ca
         CloseActivePopup()
     end)
     Widgets.BindEscapeToClose(popup, CloseActivePopup)
+    CS.Theme.ApplyFonts(popup)
     editBox:SetFocus()
     editBox:HighlightText()
     activePopup = popup
@@ -887,19 +895,15 @@ function Widgets.CreateInputPopup(title, body, defaultText, onAccept, okText, ca
 end
 function Widgets.CreateSelectPopup(title, body, items, defaultValue, onAccept, okText, cancelText)
     CloseActivePopup()
-    local popup = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+    local popup = CreateFrame("Frame", nil, UIParent)
     popup:SetFrameStrata("FULLSCREEN_DIALOG")
     popup:SetSize(320, 140)
     popup:SetPoint("CENTER")
     popup:SetClampedToScreen(true)
-    popup:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1,
-    })
-    popup:SetBackdropColor(0.06, 0.06, 0.06, 1)
-    popup:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    popup:EnableMouse(true)
+    CS.Theme.Box(popup, "window", "border", (CS.Theme.Get()).windowRadius)
     local titleFs = popup:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    titleFs.themeRole = "heading"
     titleFs:SetPoint("TOPLEFT", 12, -12)
     titleFs:SetText(title or "")
     Widgets.ApplyFontColor(titleFs, "textPrimary")
@@ -938,6 +942,7 @@ function Widgets.CreateSelectPopup(title, body, items, defaultValue, onAccept, o
         CloseActivePopup()
     end)
     Widgets.BindEscapeToClose(popup, CloseActivePopup)
+    CS.Theme.ApplyFonts(popup)
     activePopup = popup
     return popup
 end

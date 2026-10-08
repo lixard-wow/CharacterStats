@@ -1,7 +1,7 @@
 local ADDON_NAME, ns = ...
 local StylePicker = {}
 ns.StylePicker = StylePicker
-local ipairs = ipairs
+local ipairs, pairs, wipe = ipairs, pairs, wipe
 local CARD_WIDTH = 158
 local CARD_HEIGHT = 196
 local CARD_GAP = 10
@@ -169,14 +169,46 @@ local function Apply()
     MarkSeen()
     frame:Hide()
 end
+local HEADER_HEIGHT = 44
+local rebuilding = false
+local themeButtons = {}
+local function UpdateThemeButtons()
+    local Widgets = ns.ConfigWidgets
+    for key, button in pairs(themeButtons) do
+        if key == ns.Theme.key then
+            Widgets.SetBorderColor(button, "accentGold", 1)
+            Widgets.ApplyFontColor(button.text, "accentGold")
+        else
+            Widgets.SetBorderColor(button, "buttonBorder", 1)
+            Widgets.ApplyFontColor(button.text, "buttonText")
+        end
+    end
+end
+local function StylePrimary(button)
+    local Widgets = ns.ConfigWidgets
+    Widgets.Paint(button.bg, "primary")
+    Widgets.SetBorderColor(button, "primaryBorder", 1)
+    Widgets.ApplyFontColor(button.text, "primaryText")
+    button:SetScript("OnEnter", function(self)
+        Widgets.Paint(self.bg, "primaryHover")
+    end)
+    button:SetScript("OnLeave", function(self)
+        Widgets.Paint(self.bg, "primary")
+        Widgets.SetBorderColor(self, "primaryBorder", 1)
+        Widgets.ApplyFontColor(self.text, "primaryText")
+    end)
+end
 local function Create()
-    if frame then return frame end
+    if frame and frame.themeKey == ns.Theme.key then return frame end
     local Widgets = ns.ConfigWidgets
     local L = ns.L
     local styles = ns.Styles.List()
     local width = PAD * 2 + #styles * CARD_WIDTH + (#styles - 1) * CARD_GAP
+    wipe(cards)
+    wipe(themeButtons)
     frame = CreateFrame("Frame", "CharacterStatsStylePicker", UIParent)
-    frame:SetSize(width, CARD_HEIGHT + 120)
+    frame.themeKey = ns.Theme.key
+    frame:SetSize(width, HEADER_HEIGHT + 68 + CARD_HEIGHT + 52)
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 60)
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -185,16 +217,38 @@ local function Create()
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", frame.StartMoving)
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-    frame.bg = frame:CreateTexture(nil, "BACKGROUND")
-    frame.bg:SetAllPoints()
-    frame.bg:SetColorTexture(0.06, 0.06, 0.06, 0.98)
-    Widgets.CreateBorder(frame, 1)
+    ns.Theme.Window(frame, HEADER_HEIGHT)
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD, -PAD)
-    title:SetText(L.PICKER_TITLE or "Choose a look for CharacterStats")
-    Widgets.ApplyFontColor(title, "textPrimary")
+    title:SetPoint("LEFT", frame, "TOPLEFT", PAD, -HEADER_HEIGHT / 2)
+    ns.Theme.SetTitle(title, L.PICKER_TITLE or "Choose a look for CharacterStats")
+    Widgets.ApplyFontColor(title, "title")
+    local themeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    themeLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD, -(HEADER_HEIGHT + 18))
+    themeLabel:SetText(L.PICKER_THEME or "Window theme")
+    Widgets.ApplyFontColor(themeLabel, "textMuted")
+    local previous
+    for _, key in ipairs(ns.Theme.ORDER) do
+        local button = Widgets.CreateFlatButton(frame, 110, 24, ns.Theme.GetName(key))
+        if previous then
+            button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+        else
+            button:SetPoint("LEFT", themeLabel, "RIGHT", 12, 0)
+        end
+        button:SetScript("OnClick", function()
+            if ns.Theme.key ~= key then
+                ns.Theme.Set(key)
+            end
+        end)
+        themeButtons[key] = button
+        previous = button
+    end
+    local buttonList = {}
+    for _, key in ipairs(ns.Theme.ORDER) do
+        buttonList[#buttonList + 1] = themeButtons[key]
+    end
+    Widgets.NormalizeButtonWidths(buttonList, 12)
     local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -6)
+    subtitle:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD, -(HEADER_HEIGHT + 44))
     subtitle:SetPoint("RIGHT", frame, "RIGHT", -PAD, 0)
     subtitle:SetJustifyH("LEFT")
     subtitle:SetText(L.PICKER_SUBTITLE or "Click a look to preview it live, then click Use This Look to keep it. Change it any time with /cs style.")
@@ -202,10 +256,11 @@ local function Create()
     for index, style in ipairs(styles) do
         local card = CreateFrame("Button", nil, frame)
         card:SetSize(CARD_WIDTH, CARD_HEIGHT)
-        card:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD + (index - 1) * (CARD_WIDTH + CARD_GAP), -64)
+        card:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD + (index - 1) * (CARD_WIDTH + CARD_GAP), -(HEADER_HEIGHT + 68))
         card.bg = card:CreateTexture(nil, "BACKGROUND")
         card.bg:SetAllPoints()
-        card.bg:SetColorTexture(0.09, 0.09, 0.09, 1)
+        card.bg:SetColorTexture(1, 1, 1, 1)
+        Widgets.Paint(card.bg, "surface")
         Widgets.CreateBorder(card, 1)
         local preview = CreateFrame("Frame", nil, card)
         preview:SetPoint("TOPLEFT", card, "TOPLEFT", 8, -8)
@@ -218,7 +273,11 @@ local function Create()
         if draw then
             draw(preview)
         end
+        for _, region in ipairs({ preview:GetRegions() }) do
+            region.themeSkip = true
+        end
         card.name = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        card.name.themeRole = "heading"
         card.name:SetPoint("TOPLEFT", preview, "BOTTOMLEFT", 2, -10)
         card.name:SetText(style.label)
         card.desc = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -238,30 +297,46 @@ local function Create()
         end)
         cards[style.id] = card
     end
-    local useButton = Widgets.CreateFlatButton(frame, 140, 24, L.PICKER_USE or "Use This Look")
+    local useButton = Widgets.CreateFlatButton(frame, 140, 26, L.PICKER_USE or "Use This Look")
     useButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -PAD, PAD)
-    Widgets.ApplyFontColor(useButton.text, "accentGold")
-    Widgets.SetBorderColor(useButton, "accentGold", 0.8)
-    useButton:SetScript("OnLeave", function(self)
-        self.bg:SetColorTexture(0.12, 0.12, 0.12, 1)
-        Widgets.SetBorderColor(self, "accentGold", 0.8)
-        Widgets.ApplyFontColor(self.text, "accentGold")
-    end)
+    StylePrimary(useButton)
     useButton:SetScript("OnClick", Apply)
-    local laterButton = Widgets.CreateFlatButton(frame, 110, 24, L.PICKER_LATER or "Pick Later")
+    local laterButton = Widgets.CreateFlatButton(frame, 110, 26, L.PICKER_LATER or "Pick Later")
     laterButton:SetPoint("RIGHT", useButton, "LEFT", -8, 0)
     laterButton:SetScript("OnClick", function()
         MarkSeen()
         frame:Hide()
     end)
+    Widgets.NormalizeButtonWidths({ useButton, laterButton }, 14)
     Widgets.BindEscapeToClose(frame, function(self)
         MarkSeen()
         self:Hide()
     end)
-    frame:SetScript("OnHide", RevertPreview)
+    frame:SetScript("OnHide", function()
+        if not rebuilding then
+            RevertPreview()
+        end
+    end)
+    ns.Theme.ApplyFonts(frame)
+    UpdateThemeButtons()
     frame:Hide()
     return frame
 end
+local function OnThemeChanged()
+    if not frame or not frame:IsShown() then return end
+    local point, relativeTo, relativePoint, x, y = frame:GetPoint(1)
+    rebuilding = true
+    frame:Hide()
+    rebuilding = false
+    Create()
+    if point then
+        frame:ClearAllPoints()
+        frame:SetPoint(point, relativeTo, relativePoint, x, y)
+    end
+    UpdateCards()
+    frame:Show()
+end
+ns.Theme.OnChange(OnThemeChanged)
 function StylePicker.Show()
     if InCombatLockdown() then
         ns.PrintMsg(ns.L.MSG_COMBAT_OPTIONS or "Cannot open options during combat.", "error")

@@ -28,6 +28,7 @@ Locales\zhCN.lua
 Locales\zhTW.lua
 Core\Stats.lua
 Core\Gear.lua
+UI\Theme.lua
 UI\Styles.lua
 UI\Share.lua
 UI\StatsFrame.lua

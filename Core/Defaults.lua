@@ -1510,6 +1510,7 @@ local GLOBAL_SETTINGS = {
     ui = true,
     stylePickerSeen = true,
     conflictsIgnored = true,
+    uiTheme = true,
 }
 local saveTimer = nil
 local SAVE_DELAY = 1.0

@@ -172,6 +172,7 @@ local function CreateStatsPage(container)
             self.rows[i]:Hide()
         end
         content:SetHeight(math.abs(y) + 4)
+        CS.Theme.ApplyFonts(content)
     end
     buttons[1]:SetScript("OnClick", function()
         if not CS.db then return end

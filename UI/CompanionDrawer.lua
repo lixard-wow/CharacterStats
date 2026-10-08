@@ -1,7 +1,7 @@
 local ADDON_NAME, ns = ...
 local Drawer = {}
 ns.CompanionDrawer = Drawer
-local ipairs = ipairs
+local ipairs, wipe = ipairs, wipe
 local DRAWER_WIDTH = 280
 local TAB_HEIGHT = 22
 local GEAR_ROW_HEIGHT = 30
@@ -307,17 +307,22 @@ local function SelectTab(key)
     pages[key]:Refresh(GetDB())
 end
 local function Create()
-    if frame or not CharacterFrame then return frame end
+    if frame and frame.themeKey == ns.Theme.key then return frame end
+    if not CharacterFrame then return nil end
+    if frame then
+        frame:Hide()
+        if toggleButton then toggleButton:Hide() end
+        wipe(pages)
+        wipe(tabs)
+    end
     local Widgets = ns.ConfigWidgets
     frame = CreateFrame("Frame", "CharacterStatsDrawer", CharacterFrame)
+    frame.themeKey = ns.Theme.key
     frame:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 2, -2)
     frame:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMRIGHT", 2, 2)
     frame:SetWidth(DRAWER_WIDTH)
     frame:EnableMouse(true)
-    frame.bg = frame:CreateTexture(nil, "BACKGROUND")
-    frame.bg:SetAllPoints()
-    frame.bg:SetColorTexture(0.06, 0.06, 0.06, 0.97)
-    Widgets.CreateBorder(frame, 1)
+    ns.Theme.Box(frame, "window", "border", (ns.Theme.Get()).buttonRadius)
     frame.accent = frame:CreateTexture(nil, "ARTWORK")
     frame.accent:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
     frame.accent:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0)
@@ -356,10 +361,7 @@ local function Create()
     frame.body:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 4)
     toggleButton = CreateFrame("Button", nil, CharacterFrame)
     toggleButton:SetSize(22, 44)
-    toggleButton.bg = toggleButton:CreateTexture(nil, "BACKGROUND")
-    toggleButton.bg:SetAllPoints()
-    toggleButton.bg:SetColorTexture(0.06, 0.06, 0.06, 0.97)
-    Widgets.CreateBorder(toggleButton, 1)
+    ns.Theme.Box(toggleButton, "window", "border", (ns.Theme.Get()).buttonRadius)
     toggleButton.icon = toggleButton:CreateTexture(nil, "ARTWORK")
     toggleButton.icon:SetPoint("CENTER")
     toggleButton.icon:SetSize(22, 22)
@@ -375,6 +377,7 @@ local function Create()
         GameTooltip:Show()
     end)
     toggleButton:SetScript("OnLeave", GameTooltip_Hide)
+    ns.Theme.ApplyFonts(frame.tabBar)
     frame:Hide()
     toggleButton:Hide()
     return frame
@@ -406,3 +409,8 @@ function Drawer:SelectTab(key)
         SelectTab(key)
     end
 end
+ns.Theme.OnChange(function()
+    if frame and frame:IsShown() then
+        Drawer:Show()
+    end
+end)

@@ -218,29 +218,25 @@ local function KeepBoth(conflicts)
     RefreshCharacterFrame()
 end
 local popup
+local POPUP_HEADER = 40
 local function CreatePopup()
-    if popup then return popup end
+    if popup and popup.themeKey == ns.Theme.key then return popup end
+    if popup then popup:Hide() end
     local Widgets = ns.ConfigWidgets
     popup = CreateFrame("Frame", "CharacterStatsConflictPopup", UIParent)
+    popup.themeKey = ns.Theme.key
     popup:SetSize(460, 220)
     popup:SetPoint("CENTER", UIParent, "CENTER", 0, 120)
     popup:SetFrameStrata("DIALOG")
     popup:SetClampedToScreen(true)
     popup:EnableMouse(true)
-    popup.bg = popup:CreateTexture(nil, "BACKGROUND")
-    popup.bg:SetAllPoints()
-    popup.bg:SetColorTexture(0.06, 0.06, 0.06, 0.98)
-    Widgets.CreateBorder(popup, 1)
-    popup.accent = popup:CreateTexture(nil, "ARTWORK")
-    popup.accent:SetPoint("TOPLEFT")
-    popup.accent:SetPoint("TOPRIGHT")
-    popup.accent:SetHeight(2)
-    Widgets.ApplyTextureColor(popup.accent, "accentGold", 1)
+    ns.Theme.Window(popup, POPUP_HEADER)
     popup.title = popup:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    popup.title:SetPoint("TOPLEFT", popup, "TOPLEFT", 16, -14)
-    Widgets.ApplyFontColor(popup.title, "textPrimary")
+    popup.title:SetPoint("LEFT", popup, "TOPLEFT", 16, -POPUP_HEADER / 2)
+    popup.title.themeRole = "title"
+    Widgets.ApplyFontColor(popup.title, "title")
     popup.body = popup:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    popup.body:SetPoint("TOPLEFT", popup.title, "BOTTOMLEFT", 0, -10)
+    popup.body:SetPoint("TOPLEFT", popup, "TOPLEFT", 16, -(POPUP_HEADER + 12))
     popup.body:SetPoint("RIGHT", popup, "RIGHT", -16, 0)
     popup.body:SetJustifyH("LEFT")
     popup.body:SetSpacing(2)
@@ -257,7 +253,7 @@ function Integrations.ShowConflictPopup(conflicts)
     if #conflicts == 0 then return false end
     local L = ns.L
     local frame = CreatePopup()
-    frame.title:SetText(L.CONFLICT_TITLE or "Character frame conflict")
+    ns.Theme.SetTitle(frame.title, L.CONFLICT_TITLE or "Character frame conflict")
     local lines = { L.CONFLICT_INTRO or "These addons also change the character frame. Using both can overlap or break the layout, so one of them should be turned off:" }
     local names, seen, wholeUINames = {}, {}, {}
     for _, rule in ipairs(conflicts) do
@@ -309,8 +305,9 @@ function Integrations.ShowConflictPopup(conflicts)
     for _, button in ipairs(buttons) do
         width = width + button:GetWidth() + 8
     end
+    ns.Theme.ApplyFonts(frame)
     frame:SetWidth(math.max(460, width))
-    frame:SetHeight(math.max(160, (frame.body:GetStringHeight() or 80) + 110))
+    frame:SetHeight(math.max(160, (frame.body:GetStringHeight() or 80) + POPUP_HEADER + 80))
     frame:Show()
     return true
 end
