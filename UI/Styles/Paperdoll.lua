@@ -88,7 +88,7 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
     local function AcquireHeader(index)
         local header = r.headers[index]
         if not header then
-            header = Widgets.CreateSectionHeader(r.content, "")
+            header = Widgets.CreateSectionHeader(r.content, "", true)
             r.headers[index] = header
         end
         return header
@@ -246,6 +246,7 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
             headerIndex = headerIndex + 1
             local header = AcquireHeader(headerIndex)
             header.text:SetText(title or "")
+            header.text:SetTextColor(ar, ag, ab)
             header:ClearAllPoints()
             header:SetPoint("TOPLEFT", content, "TOPLEFT", 8, y)
             header:SetPoint("TOPRIGHT", content, "TOPRIGHT", -8, y)

@@ -9,7 +9,6 @@ local NAV_WIDTH = 140
 local TITLE_HEIGHT = 32
 local CONTENT_PAD = 14
 local frame
-local framesByTheme = {}
 local pages = {}
 local pageOrder = {}
 function ConfigPanel.RegisterPage(key, def)
@@ -97,6 +96,10 @@ function ConfigPanel.CreateScrollPage(container)
     local scroll = CS.ConfigWidgets.CreateScrollFrame(container)
     scroll:SetPoint("TOPLEFT", container, "TOPLEFT", 0, 0)
     scroll:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", 0, 0)
+    local width = frame and frame.content and frame.content:GetWidth()
+    if width and width > 1 then
+        scroll.content:SetWidth(width)
+    end
     return scroll, scroll.content
 end
 local function SaveFrameSize()
@@ -133,14 +136,15 @@ local function CreateCloseButton(parent)
 end
 local function CreateMainFrame()
     local themeKey = CS.Theme.Get() and CS.Theme.key
-    if framesByTheme[themeKey] then
-        frame = framesByTheme[themeKey]
+    if frame and frame.themeKey == themeKey then
         return frame
+    end
+    if frame then
+        frame:Hide()
     end
     local Widgets = CS.ConfigWidgets
     local L = CS.L
     frame = CreateFrame("Frame", "CharacterStatsConfigFrame", UIParent)
-    framesByTheme[themeKey] = frame
     frame.themeKey = themeKey
     local savedUi = CS.db and CS.db.ui
     local savedWidth = savedUi and tonumber(savedUi.configWidth)
@@ -186,7 +190,7 @@ local function CreateMainFrame()
     frame.nav:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 0, 0)
     frame.nav:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 1, 1)
     frame.nav:SetWidth(NAV_WIDTH)
-    CS.Theme.CornerFill(frame.nav, "nav", math.max(0, ((CS.Theme.Get()).windowRadius or 0) - 1))
+    CS.Theme.CornerFill(frame.nav, "nav", (CS.Theme.Get()).windowRadius)
     frame.nav.divider = frame.nav:CreateTexture(nil, "ARTWORK")
     frame.nav.divider:SetPoint("TOPRIGHT", frame.nav, "TOPRIGHT", 0, 0)
     frame.nav.divider:SetPoint("BOTTOMRIGHT", frame.nav, "BOTTOMRIGHT", 0, 0)
@@ -233,6 +237,9 @@ end
 function ConfigPanel.OnThemeChanged()
     local current = frame
     if not current or not current:IsShown() then
+        if current then
+            current:Hide()
+        end
         frame = nil
         return
     end

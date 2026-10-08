@@ -669,9 +669,18 @@ function Widgets.CreateScrollFrame(parent)
         local new = math.max(0, math.min(maxScroll, current - delta * 40))
         self:SetVerticalScroll(new)
     end)
-    scroll:HookScript("OnSizeChanged", function(self)
-        self.content:SetWidth(self:GetWidth())
+    local function SyncWidth()
+        local width = scroll:GetWidth()
+        if width and width > 1 then
+            scroll.content:SetWidth(width)
+        end
+    end
+    scroll:HookScript("OnSizeChanged", SyncWidth)
+    scroll:HookScript("OnShow", function()
+        SyncWidth()
+        C_Timer.After(0, SyncWidth)
     end)
+    scroll.SyncWidth = SyncWidth
     return scroll
 end
 function Widgets.OpenColorPicker(r, g, b, onChange, onCancel)
@@ -775,19 +784,24 @@ function Widgets.CreateNavButton(parent, text)
     end)
     return btn
 end
-function Widgets.CreateSectionHeader(parent, text)
+function Widgets.CreateSectionHeader(parent, text, unthemed)
     local header = CreateFrame("Frame", nil, parent)
     header:SetHeight(18)
     header.text = header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     header.text.themeRole = "heading"
     header.text:SetPoint("LEFT", header, "LEFT", 0, 0)
     header.text:SetText(text or "")
-    Widgets.ApplyFontColor(header.text, "accentGold")
-    Widgets.RegisterAccentFontString(header.text, 1)
     header.line = header:CreateTexture(nil, "ARTWORK")
     header.line:SetPoint("LEFT", header.text, "RIGHT", 8, 0)
     header.line:SetPoint("RIGHT", header, "RIGHT", 0, 0)
     header.line:SetHeight(1)
+    if unthemed then
+        header.text.themeSkip = true
+        header.line:SetColorTexture(0.22, 0.22, 0.22, 1)
+        return header
+    end
+    Widgets.ApplyFontColor(header.text, "accentGold")
+    Widgets.RegisterAccentFontString(header.text, 1)
     Widgets.ApplyTextureColor(header.line, "border", 1)
     return header
 end

@@ -108,7 +108,10 @@ function Theme.Set(key)
     ns.db.uiTheme = key
     Theme.Load()
     for _, fn in ipairs(listeners) do
-        pcall(fn, key)
+        local ok, err = pcall(fn, key)
+        if not ok then
+            geterrorhandler()(err)
+        end
     end
 end
 function Theme.Cycle()
@@ -123,6 +126,13 @@ function Theme.Cycle()
 end
 local pendingFonts = {}
 local retrying = false
+local function Redraw(fs)
+    local text = fs:GetText()
+    if text then
+        fs:SetText("")
+        fs:SetText(text)
+    end
+end
 local function RetryFonts()
     retrying = false
     for fs, req in pairs(pendingFonts) do
@@ -130,6 +140,7 @@ local function RetryFonts()
         if fs:SetFont(req.file, req.size, req.flags) or req.tries > 10 then
             pendingFonts[fs] = nil
         end
+        Redraw(fs)
     end
     if next(pendingFonts) then
         retrying = true
@@ -144,9 +155,11 @@ function Theme.SetFont(fs, file, size, flags)
     end
     if fs:SetFont(file, size, flags) then
         pendingFonts[fs] = nil
+        Redraw(fs)
         return
     end
     fs:SetFont(STANDARD_TEXT_FONT, size, flags)
+    Redraw(fs)
     pendingFonts[fs] = { file = file, size = size, flags = flags, tries = 0 }
     if not retrying then
         retrying = true

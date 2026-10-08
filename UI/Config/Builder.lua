@@ -230,12 +230,15 @@ function Builder.Build(parent, entries, opts)
         end
     end
     function page:OnValueChanged(entry, value)
+        local themeBefore = CS.Theme.key
         if entry.onChange then
             entry.onChange(value)
         elseif self.onChange then
             self.onChange(entry, value)
         end
-        self:Refresh()
+        if CS.Theme.key == themeBefore then
+            self:Refresh()
+        end
     end
     return page
 end
