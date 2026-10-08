@@ -24,10 +24,10 @@ if LDB and icon then
                     ns.StatsFrame:ResetPosition()
                     ns.PrintMsg(ns.L.MSG_RESET or "Position reset.")
                 else
-                    ns.StatsFrame:Toggle()
+                    ns.ConfigPanel:Toggle()
                 end
             elseif button == "RightButton" then
-                ns.ConfigPanel:Toggle()
+                ns.StatsFrame:Toggle()
             end
         end,
         OnTooltipShow = function(tooltip)
@@ -35,8 +35,8 @@ if LDB and icon then
             tooltip:AddLine("|cffff8000" .. (ns.L.ADDON_TITLE or "CharacterStats") .. "|r")
             tooltip:AddLine(" ")
             local L = ns.L
-            tooltip:AddDoubleLine(L.TIP_LEFT_CLICK or "Left-click", L.TIP_TOGGLE_STATS or "Toggle stats", 1, 0.8, 0, 0.9, 0.9, 0.9)
-            tooltip:AddDoubleLine(L.TIP_RIGHT_CLICK or "Right-click", L.TIP_OPTIONS or "Options", 1, 0.8, 0, 0.9, 0.9, 0.9)
+            tooltip:AddDoubleLine(L.TIP_LEFT_CLICK or "Left-click", L.TIP_OPTIONS or "Options", 1, 0.8, 0, 0.9, 0.9, 0.9)
+            tooltip:AddDoubleLine(L.TIP_RIGHT_CLICK or "Right-click", L.TIP_TOGGLE_STATS or "Toggle stats", 1, 0.8, 0, 0.9, 0.9, 0.9)
             tooltip:AddDoubleLine(L.TIP_SHIFT_CLICK or "Shift-click", L.TIP_RESET_POSITION or "Reset position", 1, 0.8, 0, 0.9, 0.9, 0.9)
         end,
     })
