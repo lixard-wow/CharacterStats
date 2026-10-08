@@ -177,7 +177,6 @@ ns.DEFAULTS = {
     useShortNames = false,
     showColon = true,
     showSeparator = false,
-    versatilityRealtime = false,
     separatorColor = { r = 0.5, g = 0.5, b = 0.5 },
     clampToScreen = true,
 }
@@ -241,42 +240,6 @@ local CR_CRIT = 9
 local CR_HASTE = 18
 local CR_MASTERY = 26
 local CR_VERSATILITY = 29
-local lastGoodVersatility = nil
-local lastGoodVersatilityBonus = 0
-local versaRatio = nil
-local equippedVersatility = nil
-local equippedVersatilityValid = false
-local function ScanEquippedVersatilityRating()
-    local getStats = (C_Item and C_Item.GetItemStats) or rawget(_G, "GetItemStats")
-    if not getStats then return nil end
-    local total, found = 0, false
-    for slot = 1, 19 do
-        local link = GetInventoryItemLink("player", slot)
-        if link then
-            local ok, stats = pcall(getStats, link)
-            if ok and type(stats) == "table" then
-                for statKey, statValue in pairs(stats) do
-                    if type(statKey) == "string" and statKey:find("VERSATILITY") and type(statValue) == "number" then
-                        total = total + statValue
-                        found = true
-                    end
-                end
-            end
-        end
-    end
-    return found and total or nil
-end
-local function GetEquippedVersatilityRating()
-    if not equippedVersatilityValid then
-        equippedVersatility = ScanEquippedVersatilityRating()
-        equippedVersatilityValid = true
-    end
-    return equippedVersatility
-end
-ns.InvalidateVersatilityCalibration = function()
-    versaRatio = nil
-    equippedVersatilityValid = false
-end
 local CR_HIT_MELEE = 6
 local CR_HIT_RANGED = 7
 local CR_HIT_SPELL = 8
@@ -460,40 +423,11 @@ ns.STAT_DEFS = {
         ratingId = CR_VERSATILITY,
         tooltipKey = "STAT_VERSATILITY_TT",
         api = function()
-            local okBase, base = pcall(GetCombatRatingBonus, CR_VERSATILITY)
-            local okBonus, bonus = false, nil
-            if GetVersatilityBonus then
-                okBonus, bonus = pcall(GetVersatilityBonus, CR_VERSATILITY)
+            local ok, value = pcall(GetCombatRatingBonus, CR_VERSATILITY)
+            if ok and type(value) == "number" then
+                return value
             end
-            local baseSecret = okBase and type(base) == "number" and ns.IsSecretValue(base)
-            local bonusSecret = okBonus and type(bonus) == "number" and ns.IsSecretValue(bonus)
-            if baseSecret or bonusSecret then
-                if baseSecret and ns.db and ns.db.versatilityRealtime then
-                    return base
-                end
-                if versaRatio then
-                    local gearRating = GetEquippedVersatilityRating()
-                    if gearRating then
-                        return versaRatio * gearRating + lastGoodVersatilityBonus
-                    end
-                end
-                if lastGoodVersatility then
-                    return lastGoodVersatility
-                end
-                return baseSecret and base or bonus
-            end
-            base = (okBase and type(base) == "number") and base or 0
-            bonus = (okBonus and type(bonus) == "number") and bonus or 0
-            local total = base + bonus
-            lastGoodVersatility = total
-            lastGoodVersatilityBonus = bonus
-            if not versaRatio then
-                local gearRating = GetEquippedVersatilityRating()
-                if gearRating and gearRating > 0 then
-                    versaRatio = base / gearRating
-                end
-            end
-            return total
+            return 0
         end,
     },
     manaregen = {

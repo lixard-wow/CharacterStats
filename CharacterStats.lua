@@ -421,7 +421,6 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
             if ns.GearBadges then ns.GearBadges.OnEquipmentChanged() end
             ns.InvalidateIlvlColor()
             if ns.InvalidateShieldCache then ns.InvalidateShieldCache() end
-            if ns.InvalidateVersatilityCalibration then ns.InvalidateVersatilityCalibration() end
         end
         ns.QueueRefresh(event, { retryDelay = 0.2 })
         return

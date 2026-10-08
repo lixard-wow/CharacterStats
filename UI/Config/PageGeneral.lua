@@ -53,7 +53,6 @@ local function BuildEntries(L)
             },
             get = function(db) return CS.GetDecimals(db.decimals) end,
         },
-        { kind = "toggle", key = "versatilityRealtime", label = L.LABEL_VERSATILITY_REALTIME or "Real-Time Versatility (Rating Only)", retailOnly = true, fullRow = true },
     }
 end
 ConfigPanel.RegisterPage("general", {

@@ -256,7 +256,6 @@ local L = {
     LABEL_SHORT_NAMES = "Use Abbreviated Names",
     LABEL_SHOW_COLON = "Show Colon After Label",
     LABEL_SHOW_SEPARATOR = "Show Separator (Horizontal)",
-    LABEL_VERSATILITY_REALTIME = "Real-Time Versatility (Rating Only)",
     LABEL_CLAMP = "Clamp to Screen",
     LABEL_LOCK = "Lock Position",
     LABEL_OUTLINE = "Font Outline",
