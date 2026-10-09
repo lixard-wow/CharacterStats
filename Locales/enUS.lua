@@ -158,6 +158,10 @@ local L = {
     PICKER_THEME = "Window theme",
     MSG_THEME_SET = "Window theme: %s",
     CMD_THEME = "/cs theme - Switch window theme",
+    CMD_LOCALE = "/cs locale - Pick the addon language (for testing translations)",
+    LOCALE_TITLE = "Addon Language",
+    LOCALE_GAME = "Game language",
+    LOCALE_HINT = "For testing translations. Picking a language reloads the UI. Blizzard's own text stays in your game language, and Korean and Chinese need a game client in that language to show their letters.",
     STYLE_LEDGER = "Ledger",
     STYLE_ORIGINAL_DESC = "The classic list from earlier versions.",
     STYLE_LEDGER_DESC = "Big item level, stats grouped under headers.",
@@ -405,3 +409,31 @@ local L = {
 ns.L = setmetatable({}, { __index = L })
 
 ns._L_enUS = L
+ns.GAME_LOCALE = GetLocale()
+ns.ACTIVE_LOCALE = ns.GAME_LOCALE
+local registered = {}
+function ns.RegisterLocale(code, translations)
+    if code == ns.GAME_LOCALE then
+        for k, v in pairs(translations) do
+            ns.L[k] = v
+        end
+    end
+    if registered then
+        registered[code] = translations
+    end
+end
+function ns.ApplyLocaleOverride(code)
+    local translations = code and registered and registered[code]
+    if code and code ~= ns.GAME_LOCALE and (translations or code == "enUS") then
+        for k in pairs(ns.L) do
+            ns.L[k] = nil
+        end
+        if translations then
+            for k, v in pairs(translations) do
+                ns.L[k] = v
+            end
+        end
+        ns.ACTIVE_LOCALE = code
+    end
+    registered = nil
+end

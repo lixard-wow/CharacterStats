@@ -1,10 +1,6 @@
 local ADDON_NAME, ns = ...
 
-if GetLocale() ~= "ptBR" then return end
-
-local L = ns.L
-
-local translations = {
+ns.RegisterLocale("ptBR", {
     ADDON_DESC = "Um quadro de estatísticas leve e personalizável para seu personagem.",
 
     STAT_ILVL = "Nível de Item",
@@ -403,8 +399,8 @@ local translations = {
     TRACK_OTHER = "Sem Trilha de Aprimoramento",
     TRACK_VETERAN = "Veterano",
     UNIT_PX = "px",
-}
-
-for k, v in pairs(translations) do
-    L[k] = v
-end
+    CMD_LOCALE = "/cs locale - Escolher o idioma do addon (para testar traduções)",
+    LOCALE_TITLE = "Idioma do Addon",
+    LOCALE_GAME = "Idioma do jogo",
+    LOCALE_HINT = "Para testar traduções. Escolher um idioma recarrega a interface. Os textos da Blizzard continuam no idioma do jogo; coreano e chinês precisam de um cliente nesse idioma para mostrar os caracteres.",
+})

@@ -80,6 +80,7 @@ local HELP_KEYS = {
     "CMD_CONFIG",
     "CMD_STYLE",
     "CMD_THEME",
+    "CMD_LOCALE",
     "CMD_RESET",
     "CMD_RESET_MINIMAP",
     "CMD_SHOW",
@@ -96,6 +97,8 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
         ns.ConfigPanel:Open()
     elseif msg == "style" or msg == "look" then
         ns.StylePicker.Show()
+    elseif msg == "locale" or msg == "language" or msg == "lang" then
+        ns.LocalePicker.Show()
     elseif msg == "theme" then
         ns.Theme.Cycle()
         PrintMsg(string.format(ns.L.MSG_THEME_SET or "Window theme: %s", ns.Theme.GetName(ns.Theme.key)))
@@ -258,6 +261,7 @@ function ns.QueueRefresh(reason, opts)
 end
 eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
+        ns.ApplyLocaleOverride(CharacterStatsDB and CharacterStatsDB.localeOverride)
         local freshInstall = CharacterStatsDB == nil
         if not CharacterStatsDB then
             CharacterStatsDB = {}

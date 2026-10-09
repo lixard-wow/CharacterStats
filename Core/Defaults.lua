@@ -1449,6 +1449,7 @@ local GLOBAL_SETTINGS = {
     stylePickerSeen = true,
     conflictsIgnored = true,
     uiTheme = true,
+    localeOverride = true,
 }
 local saveTimer = nil
 local SAVE_DELAY = 1.0

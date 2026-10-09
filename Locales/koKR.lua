@@ -1,10 +1,6 @@
 local ADDON_NAME, ns = ...
 
-if GetLocale() ~= "koKR" then return end
-
-local L = ns.L
-
-local translations = {
+ns.RegisterLocale("koKR", {
     ADDON_DESC = "가볍고 사용자 정의 가능한 캐릭터 능력치 프레임.",
 
     STAT_ILVL = "아이템 레벨",
@@ -403,8 +399,8 @@ local translations = {
     TRACK_OTHER = "강화 단계 없음",
     TRACK_VETERAN = "노련가",
     UNIT_PX = "px",
-}
-
-for k, v in pairs(translations) do
-    L[k] = v
-end
+    CMD_LOCALE = "/cs locale - 애드온 언어 선택 (번역 테스트용)",
+    LOCALE_TITLE = "애드온 언어",
+    LOCALE_GAME = "게임 언어",
+    LOCALE_HINT = "번역 테스트용입니다. 언어를 선택하면 UI를 다시 불러옵니다. 블리자드 기본 문구는 게임 언어로 유지되며, 한국어와 중국어 글자는 해당 언어의 게임 클라이언트에서만 표시됩니다.",
+})

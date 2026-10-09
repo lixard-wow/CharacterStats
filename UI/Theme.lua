@@ -14,7 +14,9 @@ local CINZEL = FONTS .. "Cinzel-Bold.ttf"
 local SOURCE = FONTS .. "SourceSans3-Regular.ttf"
 local SOURCE_BOLD = FONTS .. "SourceSans3-Bold.ttf"
 local NON_LATIN = { ruRU = true, koKR = true, zhCN = true, zhTW = true }
-local useGameFont = NON_LATIN[GetLocale()] == true
+local function UseGameFont()
+    return NON_LATIN[ns.ACTIVE_LOCALE or GetLocale()] == true or NON_LATIN[GetLocale()] == true
+end
 Theme.ORDER = { "workbench", "ledger", "classic" }
 Theme.THEMES = {
     workbench = {
@@ -149,7 +151,7 @@ local function RetryFonts()
 end
 function Theme.SetFont(fs, file, size, flags)
     flags = flags or ""
-    if not file or useGameFont then
+    if not file or UseGameFont() then
         fs:SetFont(STANDARD_TEXT_FONT, size, flags)
         return
     end
