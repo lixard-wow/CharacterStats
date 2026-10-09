@@ -6,6 +6,15 @@ local function DisplayName(name)
     if name == "Default" then
         return CS.L.PROFILE_DEFAULT or "Default"
     end
+    local className = UnitClass("player")
+    if className and CS.GetSpecNames then
+        local format = CS.L.PROFILE_SPEC_CLASS or "%s %s"
+        for _, specName in ipairs(CS.GetSpecNames()) do
+            if name == string.format(format, specName, className) or name == specName .. " " .. className then
+                return specName
+            end
+        end
+    end
     return name
 end
 local function SetButtonEnabled(btn, enabled)
@@ -217,7 +226,7 @@ local function CreateProfilesPage(container)
         local deletable = {}
         for _, name in ipairs(CS.GetProfileList()) do
             if name ~= "Default" and not reserved[name] then
-                deletable[#deletable + 1] = { value = name, text = name }
+                deletable[#deletable + 1] = { value = name, text = DisplayName(name) }
             end
         end
         if #deletable == 0 then
