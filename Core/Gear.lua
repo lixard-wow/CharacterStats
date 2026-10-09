@@ -3,6 +3,9 @@ local Gear = {}
 ns.Gear = Gear
 local pcall, pairs, ipairs, type, tonumber, wipe = pcall, pairs, ipairs, type, tonumber, wipe
 local SLOTS = { 1, 2, 3, 15, 5, 9, 10, 6, 7, 8, 11, 12, 13, 14, 16, 17 }
+if not ns.IS_RETAIL then
+    SLOTS[#SLOTS + 1] = 18
+end
 local ENCHANT_SLOTS_RETAIL = {
     [1] = true,
     [3] = true,

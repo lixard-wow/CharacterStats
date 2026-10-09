@@ -181,6 +181,7 @@ local L = {
     ENCHANT_DISPLAY_ICON = "Quality icon (name on hover)",
     ENCHANT_DISPLAY_TEXT = "Enchant name",
     GEAR_EMPTY_SOCKET = "Empty socket",
+    HINT_RATINGS_CLASSIC = "Combat ratings from your gear and the bonus they give at your level. Ratings you have none of are hidden.",
     RATING_COL_RATING = "Rating",
     RATING_COL_BONUS = "Bonus",
     RATING_COL_PER_PERCENT = "Per 1%",

@@ -18,16 +18,17 @@ local SLOT_BUTTONS = {
     [14] = "CharacterTrinket1Slot",
     [16] = "CharacterMainHandSlot",
     [17] = "CharacterSecondaryHandSlot",
+    [18] = "CharacterRangedSlot",
 }
 local DETAIL_RIGHT = {
-    [1] = true, [2] = true, [3] = true, [15] = true, [5] = true, [9] = true, [17] = true,
+    [1] = true, [2] = true, [3] = true, [15] = true, [5] = true, [9] = true, [17] = true, [18] = true,
 }
 local GEM_SIZE = 11
 local MAX_GEMS = 3
 local DETAIL_WIDTH = 105
 local WEAPON_DETAIL_WIDTH = 90
 local WEAPON_SLOTS = {
-    [16] = true, [17] = true,
+    [16] = true, [17] = true, [18] = true,
 }
 local EMPTY_SOCKET_TEXTURE = "Interface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic"
 local ENCHANT_COLOR = { 0.35, 0.95, 0.35 }

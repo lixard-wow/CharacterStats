@@ -11,7 +11,7 @@ local SLOT_NAMES = {
     [1] = "HEADSLOT", [2] = "NECKSLOT", [3] = "SHOULDERSLOT", [15] = "BACKSLOT", [5] = "CHESTSLOT",
     [9] = "WRISTSLOT", [10] = "HANDSSLOT", [6] = "WAISTSLOT", [7] = "LEGSSLOT", [8] = "FEETSLOT",
     [11] = "FINGER0SLOT", [12] = "FINGER1SLOT", [13] = "TRINKET0SLOT", [14] = "TRINKET1SLOT",
-    [16] = "MAINHANDSLOT", [17] = "SECONDARYHANDSLOT",
+    [16] = "MAINHANDSLOT", [17] = "SECONDARYHANDSLOT", [18] = "RANGEDSLOT",
 }
 local RATING_STATS = {
     { id = "crit", ratingId = 9 },
@@ -19,6 +19,35 @@ local RATING_STATS = {
     { id = "mastery", ratingId = 26 },
     { id = "versatility", ratingId = 29 },
 }
+local CLASSIC_RATINGS = {
+    { key = "CR_DEFENSE_SKILL", index = 2, id = "defense", name = "Defense Rating" },
+    { key = "CR_DODGE", index = 3, id = "dodge", name = "Dodge Rating" },
+    { key = "CR_PARRY", index = 4, id = "parry", name = "Parry Rating" },
+    { key = "CR_BLOCK", index = 5, id = "block", name = "Block Rating" },
+    { key = "CR_HIT_MELEE", index = 6, id = "hit", name = "Hit Rating" },
+    { key = "CR_HIT_RANGED", index = 7, id = "hit", name = "Ranged Hit Rating", sameAs = 6 },
+    { key = "CR_HIT_SPELL", index = 8, id = "hit", name = "Spell Hit Rating", sameAs = 6 },
+    { key = "CR_CRIT_MELEE", index = 9, id = "crit", name = "Crit Rating" },
+    { key = "CR_CRIT_RANGED", index = 10, id = "crit", name = "Ranged Crit Rating", sameAs = 9 },
+    { key = "CR_CRIT_SPELL", index = 11, id = "crit", name = "Spell Crit Rating", sameAs = 9 },
+    { key = "CR_HASTE_MELEE", index = 18, id = "haste", name = "Haste Rating" },
+    { key = "CR_HASTE_RANGED", index = 19, id = "haste", name = "Ranged Haste Rating", sameAs = 18 },
+    { key = "CR_HASTE_SPELL", index = 20, id = "haste", name = "Spell Haste Rating", sameAs = 18 },
+    { key = "CR_EXPERTISE", index = 24, id = "expertise", name = "Expertise Rating" },
+    { key = "CR_ARMOR_PENETRATION", index = 25, id = "armorpenetration", name = "Armor Penetration Rating" },
+}
+local function UsesClassicRatings()
+    return not ns.IS_RETAIL
+end
+local function ClassicRatingList()
+    local list = {}
+    for _, info in ipairs(CLASSIC_RATINGS) do
+        local index = rawget(_G, info.key) or info.index
+        local label = rawget(_G, "COMBAT_RATING_NAME" .. index) or info.name
+        list[#list + 1] = { id = info.id, ratingId = index, label = label, sameAs = info.sameAs }
+    end
+    return list
+end
 local frame, toggleButton
 local pages = {}
 local tabs = {}
@@ -205,47 +234,74 @@ local function CreateRatingsPage(parent)
     line:SetPoint("TOPRIGHT", header, "BOTTOMRIGHT", 0, -2)
     line:SetHeight(1)
     Widgets.ApplyTextureColor(line, "border", 1)
-    local y = -30
-    for _, def in ipairs(RATING_STATS) do
+    local classic = UsesClassicRatings()
+    local defs = classic and ClassicRatingList() or RATING_STATS
+    for _, def in ipairs(defs) do
         local row = CreateFrame("Frame", nil, parent)
-        row:SetPoint("TOPLEFT", parent, "TOPLEFT", 8, y)
-        row:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -8, y)
         row:SetHeight(RATING_ROW_HEIGHT)
         row.cells = CreateCells(row, 11)
         row.def = def
         page.rows[#page.rows + 1] = row
-        y = y - RATING_ROW_HEIGHT
     end
     local hint = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    hint:SetPoint("TOPLEFT", parent, "TOPLEFT", 8, y - 10)
     hint:SetPoint("RIGHT", parent, "RIGHT", -8, 0)
     hint:SetJustifyH("LEFT")
-    hint:SetText(L.HINT_RATINGS or "Per 1% is the average rating per 1% at your current total, after diminishing returns. Values hidden by the game in combat show as a dash.")
+    if classic then
+        hint:SetText(L.HINT_RATINGS_CLASSIC or "Combat ratings from your gear and the bonus they give at your level. Ratings you have none of are hidden.")
+    else
+        hint:SetText(L.HINT_RATINGS or "Per 1% is the average rating per 1% at your current total, after diminishing returns. Values hidden by the game in combat show as a dash.")
+    end
     Widgets.ApplyFontColor(hint, "textMuted", 0.8)
+    local function ReadRating(ratingId)
+        if not GetCombatRating then return nil, nil end
+        local okRating, rating = pcall(GetCombatRating, ratingId)
+        local okBonus, bonus = false, nil
+        if GetCombatRatingBonus then
+            okBonus, bonus = pcall(GetCombatRatingBonus, ratingId)
+        end
+        return okRating and SafeNumber(rating) or nil, okBonus and SafeNumber(bonus) or nil
+    end
     function page:Refresh()
+        local y = -30
+        local seen = {}
         for _, row in ipairs(self.rows) do
             local def = row.def
-            local statDef = ns.STAT_DEFS[def.id]
-            local label = (statDef and ns.L["STAT_" .. def.id:upper()]) or (statDef and statDef.label) or def.id
-            local r, g, b = ns.GetStatColor(def.id)
-            row.cells.name:SetText(label)
-            row.cells.name:SetTextColor(r, g, b)
-            local okRating, rating = pcall(GetCombatRating, def.ratingId)
-            local okBonus, bonus = pcall(GetCombatRatingBonus, def.ratingId)
-            rating = okRating and SafeNumber(rating) or nil
-            bonus = okBonus and SafeNumber(bonus) or nil
-            row.cells[1]:SetText(rating and BreakUpLargeNumbers(math.floor(rating + 0.5)) or "-")
-            row.cells[2]:SetText(bonus and string.format("%.2f%%", bonus) or "-")
-            if rating and bonus and bonus > 0 then
-                row.cells[3]:SetText(string.format("%.1f", rating / bonus))
+            local rating, bonus = ReadRating(def.ratingId)
+            seen[def.ratingId] = rating
+            local visible
+            local label
+            if classic then
+                visible = rating ~= nil and rating > 0 and not (def.sameAs and seen[def.sameAs] == rating)
+                label = def.label
             else
-                row.cells[3]:SetText("-")
+                local statDef = ns.STAT_DEFS[def.id]
+                visible = statDef ~= nil and ns.IsStatAvailable(def.id)
+                label = (statDef and ns.L["STAT_" .. def.id:upper()]) or (statDef and statDef.label) or def.id
             end
-            for i = 1, 3 do
-                row.cells[i]:SetTextColor(0.9, 0.9, 0.9)
+            if visible then
+                local r, g, b = ns.GetStatColor(def.id)
+                row.cells.name:SetText(label)
+                row.cells.name:SetTextColor(r, g, b)
+                row.cells[1]:SetText(rating and BreakUpLargeNumbers(math.floor(rating + 0.5)) or "-")
+                row.cells[2]:SetText(bonus and string.format("%.2f%%", bonus) or "-")
+                if rating and bonus and bonus > 0 then
+                    row.cells[3]:SetText(string.format("%.1f", rating / bonus))
+                else
+                    row.cells[3]:SetText("-")
+                end
+                for i = 1, 3 do
+                    row.cells[i]:SetTextColor(0.9, 0.9, 0.9)
+                end
+                row:ClearAllPoints()
+                row:SetPoint("TOPLEFT", parent, "TOPLEFT", 8, y)
+                row:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -8, y)
+                y = y - RATING_ROW_HEIGHT
             end
-            row:SetShown(statDef ~= nil and ns.IsStatAvailable(def.id))
+            row:SetShown(visible)
         end
+        hint:ClearAllPoints()
+        hint:SetPoint("TOPLEFT", parent, "TOPLEFT", 8, y - 10)
+        hint:SetPoint("RIGHT", parent, "RIGHT", -8, 0)
     end
     return page
 end
