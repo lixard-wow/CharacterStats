@@ -6,6 +6,7 @@ local function BarRowHeight(db)
     return ROW_HEIGHT + 2 + ns.Styles.BarHeight(db, "paperdollBarHeight", 3)
 end
 local FONT_SIZE = 10
+local RESIST_ICON_SIZE = 16
 local SCHOOL_COLORS = {
     fire = { 1, 0.5, 0 },
     frost = { 0.5, 1, 1 },
@@ -142,7 +143,7 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
     local function FillBlizzardRow(row, item, colon, striped, barScale)
         local labelText = item.label .. colon
         if item.atlas and CreateAtlasMarkup then
-            labelText = CreateAtlasMarkup(item.atlas, 12, 12) .. " " .. labelText
+            labelText = CreateAtlasMarkup(item.atlas, RESIST_ICON_SIZE, RESIST_ICON_SIZE) .. " " .. labelText
         end
         row.label:SetText(labelText)
         row.value:SetText(item.value)
@@ -171,6 +172,9 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
             row.bar:Hide()
         end
         local height = hasBar and BarRowHeight(ns.db) or ROW_HEIGHT
+        if item.atlas then
+            height = math.max(height, RESIST_ICON_SIZE + 3)
+        end
         row:SetHeight(height)
         row.blizzardRow = item
         row.statId = nil
