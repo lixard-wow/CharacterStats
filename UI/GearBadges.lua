@@ -36,7 +36,7 @@ local badges = {}
 local retryPending = false
 local ENCHANT_FALLBACK_ICON = "Interface\\Icons\\Trade_Engraving"
 local ENCHANT_ICON_SIZE = 14
-local SIDE_GAP = 3
+local SIDE_GAP = 7
 local EDGE_INSET = 3
 local function SplitEnchant(text)
     local atlas = text:match("|A:([^:|]+)")
