@@ -54,4 +54,5 @@ UI\Styles\Meters.lua
 UI\Styles\Companion.lua
 UI\CompanionDrawer.lua
 UI\StylePicker.lua
+UI\LocalePicker.lua
 CharacterStats.lua

@@ -1,10 +1,6 @@
 local ADDON_NAME, ns = ...
 
-if GetLocale() ~= "ruRU" then return end
-
-local L = ns.L
-
-local translations = {
+ns.RegisterLocale("ruRU", {
     ADDON_DESC = "Лёгкая настраиваемая панель характеристик персонажа.",
 
     STAT_ILVL = "Уровень предметов",
@@ -403,8 +399,8 @@ local translations = {
     TRACK_OTHER = "Без пути улучшения",
     TRACK_VETERAN = "Ветеран",
     UNIT_PX = "пикс.",
-}
-
-for k, v in pairs(translations) do
-    L[k] = v
-end
+    CMD_LOCALE = "/cs locale - Выбрать язык аддона (для проверки переводов)",
+    LOCALE_TITLE = "Язык аддона",
+    LOCALE_GAME = "Язык игры",
+    LOCALE_HINT = "Для проверки переводов. Выбор языка перезагружает интерфейс. Тексты Blizzard остаются на языке игры; для корейского и китайского нужен клиент игры на этом языке, иначе символы не отобразятся.",
+})

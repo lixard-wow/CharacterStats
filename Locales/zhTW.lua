@@ -1,10 +1,6 @@
 local ADDON_NAME, ns = ...
 
-if GetLocale() ~= "zhTW" then return end
-
-local L = ns.L
-
-local translations = {
+ns.RegisterLocale("zhTW", {
     ADDON_DESC = "一個輕量級、可自訂的角色屬性框架。",
 
     STAT_ILVL = "物品等級",
@@ -403,8 +399,8 @@ local translations = {
     TRACK_OTHER = "無升級軌道",
     TRACK_VETERAN = "老兵",
     UNIT_PX = "像素",
-}
-
-for k, v in pairs(translations) do
-    L[k] = v
-end
+    CMD_LOCALE = "/cs locale - 選擇插件語言（用於測試翻譯）",
+    LOCALE_TITLE = "插件語言",
+    LOCALE_GAME = "遊戲語言",
+    LOCALE_HINT = "用於測試翻譯。選擇語言後會重新載入介面。暴雪內建的文字仍為遊戲語言；韓文和中文需要對應語言的遊戲用戶端才能顯示文字。",
+})
