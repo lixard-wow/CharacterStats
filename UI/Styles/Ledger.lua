@@ -264,6 +264,7 @@ end
 Styles.Register("ledger", {
     order = 1,
     label = ns.L.STYLE_LEDGER or "Ledger",
+    labelKey = "STYLE_LEDGER",
     CreateStatsRenderer = CreateStatsRenderer,
     CreatePaperdollRenderer = function(panel)
         return Styles.CreateListPaperdollRenderer(panel, { gearSummary = true })
@@ -273,6 +274,7 @@ Styles.Register("ledger", {
 Styles.Register("original", {
     order = 0,
     label = ns.L.STYLE_ORIGINAL or "Original",
+    labelKey = "STYLE_ORIGINAL",
     CreateStatsRenderer = function(parent)
         return CreateStatsRenderer(parent, true)
     end,

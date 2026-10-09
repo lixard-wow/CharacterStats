@@ -41,7 +41,7 @@ end
 local function BuildStyleItems()
     local items = {}
     for _, style in ipairs(CS.Styles.List()) do
-        items[#items + 1] = { value = style.id, text = style.label }
+        items[#items + 1] = { value = style.id, text = CS.Styles.Label(style) }
     end
     return items
 end
@@ -201,6 +201,7 @@ local function BuildEntries(L)
 end
 ConfigPanel.RegisterPage("appearance", {
     label = CS.L.NAV_APPEARANCE or "Appearance",
+    labelKey = "NAV_APPEARANCE",
     order = 3,
     create = function(container)
         local _, content = ConfigPanel.CreateScrollPage(container)

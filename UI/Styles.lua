@@ -179,6 +179,9 @@ function Styles.SetBarValue(bar, stat, maxValue)
         bar:SetValue(0)
     end
 end
+function Styles.Label(style)
+    return (style.labelKey and ns.L[style.labelKey]) or style.label
+end
 function Styles.HasBar(stat)
     return stat.percent == true and stat.id ~= "movespeed"
 end

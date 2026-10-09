@@ -270,6 +270,7 @@ local function CreateProfilesPage(container)
 end
 ConfigPanel.RegisterPage("profiles", {
     label = CS.L.NAV_PROFILES or "Profiles",
+    labelKey = "NAV_PROFILES",
     order = 4,
     create = CreateProfilesPage,
 })

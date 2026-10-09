@@ -87,6 +87,7 @@ local function BuildEntries(L)
 end
 ConfigPanel.RegisterPage("character", {
     label = CS.L.NAV_CHARACTER or "Character Frame",
+    labelKey = "NAV_CHARACTER",
     order = 3.5,
     create = function(container)
         local _, content = ConfigPanel.CreateScrollPage(container)

@@ -279,7 +279,7 @@ local function Create()
         card.name = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         card.name.themeRole = "heading"
         card.name:SetPoint("TOPLEFT", preview, "BOTTOMLEFT", 2, -10)
-        card.name:SetText(style.label)
+        card.name:SetText(ns.Styles.Label(style))
         card.desc = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         card.desc:SetPoint("TOPLEFT", card.name, "BOTTOMLEFT", 0, -4)
         card.desc:SetPoint("RIGHT", card, "RIGHT", -10, 0)
