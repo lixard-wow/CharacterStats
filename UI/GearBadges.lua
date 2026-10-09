@@ -47,11 +47,6 @@ end
 local function ShowEnchantTooltip(self)
     if not self.enchantName then return end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    if self.isMissing then
-        GameTooltip:SetText(self.enchantName, self.missingR, self.missingG, self.missingB)
-        GameTooltip:Show()
-        return
-    end
     GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
     if self.enchantAtlas then
         GameTooltip:AddLine(CreateAtlasMarkup and CreateAtlasMarkup(self.enchantAtlas, 16, 16) or "", 1, 1, 1)
@@ -89,15 +84,6 @@ local function CreateDetail(badge, button, side, width)
     end
     detail.enchantIcon.texture = detail.enchantIcon:CreateTexture(nil, "OVERLAY")
     detail.enchantIcon.texture:SetAllPoints()
-    detail.enchantIcon.missing = detail.enchantIcon:CreateTexture(nil, "OVERLAY")
-    detail.enchantIcon.missing:SetSize(10, 10)
-    detail.enchantIcon.missing:SetPoint("CENTER")
-    detail.enchantIcon.missing:SetTexture("Interface\\Buttons\\WHITE8x8")
-    detail.enchantIcon.missingMask = detail.enchantIcon:CreateMaskTexture()
-    detail.enchantIcon.missingMask:SetAllPoints(detail.enchantIcon.missing)
-    detail.enchantIcon.missingMask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-    detail.enchantIcon.missing:AddMaskTexture(detail.enchantIcon.missingMask)
-    detail.enchantIcon.missing:Hide()
     detail.enchantIcon:SetScript("OnEnter", ShowEnchantTooltip)
     detail.enchantIcon:SetScript("OnLeave", GameTooltip_Hide)
     detail.enchantIcon:Hide()
@@ -161,18 +147,9 @@ local function UpdateDetail(detail, entry, db)
     local icon = detail.enchantIcon
     local iconMode = db.enchantDisplay ~= "text"
     icon:Hide()
-    icon.isMissing = false
-    icon.missing:Hide()
     icon.texture:Show()
     if entry.missingEnchant and iconMode and db.gearFlags ~= false then
         local r, g, b = GearBadges.GetColor(db, "gearColorEnchant")
-        icon.isMissing = true
-        icon.enchantName = ns.L.GEAR_NO_ENCHANT or "No enchant"
-        icon.missingR, icon.missingG, icon.missingB = r, g, b
-        icon.texture:Hide()
-        icon.missing:SetVertexColor(r, g, b, 1)
-        icon.missing:Show()
-        icon:Show()
         detail.enchant:SetText(ns.L.GEAR_MISSING_ENCHANT or "Missing enchant")
         detail.enchant:SetTextColor(r, g, b)
         hasContent = true

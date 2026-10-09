@@ -81,7 +81,7 @@ local function BuildEntries(L)
         { kind = "color", key = "gearColorAdventurer", label = L.TRACK_ADVENTURER or "Adventurer", onChange = ApplyGearBadges, disabled = LevelsOff },
         { kind = "color", key = "gearColorExplorer", label = L.TRACK_EXPLORER or "Explorer", onChange = ApplyGearBadges, disabled = LevelsOff },
         { kind = "color", key = "gearColorOther", label = L.TRACK_OTHER or "No Upgrade Track", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorEnchant", label = L.LABEL_GEAR_COLOR_ENCHANT or "Missing Enchant Dot", onChange = ApplyGearBadges, disabled = FlagsOff },
+        { kind = "color", key = "gearColorEnchant", label = L.LABEL_GEAR_COLOR_ENCHANT or "Missing Enchant", onChange = ApplyGearBadges, disabled = FlagsOff },
         { kind = "color", key = "gearColorSocket", label = L.LABEL_GEAR_COLOR_SOCKET or "Empty Gem Socket Dot", onChange = ApplyGearBadges, disabled = FlagsOff },
     }
 end
