@@ -1,13 +1,33 @@
 ﻿# Changelog
 
-## Version 2.1.5 (unreleased)
+## Version 2.2.0
 
 ### Added
 
-- Real-Time Versatility option (Retail): in combat where versatility is hidden, show the live rating-based value instead of an estimate.
+- Four looks for the stats panel and the character window: Original, Ledger, Meters and Companion. A picker shows on first run with a live preview; change it any time with `/cs style`.
+- Three window themes for the options window and popups: Workbench, Artisan Ledger and Lixard Classic. Pick one in Appearance or cycle with `/cs theme`.
+- A new options window with a sidebar of pages.
+- Character window: item level on every gear slot, colored by upgrade track, with enchant and gem icons beside each slot (hover for details) and a "Missing enchant" note on slots that should be enchanted.
+- A drawer beside the character window with Stats, Gear and Ratings tabs.
+- An options button on the character window.
+- Diminishing returns:
+  - In the Meters look, crit, haste, mastery and versatility bars fill up to the point where the penalty starts; past it, a darker shade fills back in to show how far over you are. Leech, avoidance and speed use their own, earlier start point.
+  - Hovering those stats (stats panel or character window) shows your current penalty, the rating until the next penalty, and your effective rating.
+  - Item tooltips show what each stat on an item is worth after diminishing returns, and how much the penalty takes away. Can be turned off under General.
+  - The drawer's Ratings tab shows the rating needed for 1% more at your current penalty.
+- Bar thickness settings for the stats panel and the character window (Meters look).
+- Detection of other addons that restyle the character window (ElvUI, EllesmereUI, Chonky Character Sheet and others), with a popup that offers to turn off the conflicting part or the other addon.
+- WoW Classic Forever support: Blizzard's own stat list on the character window, resistances colored by school, the ranged slot, and a Ratings tab with the combat ratings that client uses. The drawer sits clear of the character window's side tabs.
+
+### Changed
+
+- Versatility now always shows the value from your versatility rating, live in combat. Flat bonuses such as Mark of the Wild are not included, because the game hides them from addons in combat. The Real-Time Versatility option is gone.
+- Minimap button: left-click opens the options, right-click shows or hides the stats panel.
 
 ### Fixed
 
+- An error from the character window's stat tooltips (secret values, taint) no longer appears.
+- The character window no longer takes several seconds to show its stats when opened.
 - Switching profiles no longer carries settings over from the previous profile, and "Reset Colors" no longer comes back after a reload.
 - Block chance now shows on non-English game clients.
 - Specialization profiles no longer get shared between classes with the same spec name (for example Holy Priest and Holy Paladin). Existing profiles are copied over automatically.
@@ -15,15 +35,15 @@
 - The Share menu no longer errors after a friend comes online, skips values the game currently hides, and tells you when chat is restricted instead of failing silently.
 - The options window now remembers its size.
 - The "UI Scale" slider is now labeled "Options Window Scale", since it only ever scaled the options window.
-- The stats panel no longer briefly shows stats you disabled while the character panel is open.
+- The stats panel no longer briefly shows stats you disabled while the character window is open.
 - On Classic, the addon no longer replaces game functions that other addons and the default UI rely on.
-- Versatility estimates in restricted content are more accurate when buffs were active at login.
 
 ### Improved
 
 - Movement speed updates only run while you are moving or in the air, instead of all the time.
 - Buff and debuff changes in combat are grouped into fewer refreshes.
-- Less work done on every refresh (gear versatility is cached, fewer temporary tables).
+- Less work done on every refresh.
+- All new text is translated into German, Spanish, French, Italian, Brazilian Portuguese, Russian, Korean and Chinese.
 
 ## Version 2.1.4
 
