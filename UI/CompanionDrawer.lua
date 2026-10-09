@@ -324,14 +324,29 @@ local TAB_LABEL_KEYS = {
     ratings = "DRAWER_TAB_RATINGS",
 }
 local TAB_FALLBACKS = { stats = "Stats", gear = "Gear", ratings = "Ratings" }
+local function SideOffset()
+    local modeTabs = CharacterFrame and rawget(CharacterFrame, "ModeTabs")
+    if modeTabs and modeTabs.IsShown and modeTabs:IsShown() then
+        return modeTabs:GetWidth() or 0
+    end
+    return 0
+end
+local function AnchorFrame()
+    if not frame then return end
+    local offset = SideOffset()
+    frame:ClearAllPoints()
+    frame:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 2 + offset, -2)
+    frame:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMRIGHT", 2 + offset, 2)
+end
 local function UpdateToggleButton()
     if not toggleButton then return end
+    AnchorFrame()
     toggleButton:ClearAllPoints()
     if IsOpen() then
         toggleButton:SetPoint("TOPLEFT", frame, "TOPRIGHT", 0, -40)
         toggleButton.icon:SetTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
     else
-        toggleButton:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 0, -40)
+        toggleButton:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", SideOffset(), -40)
         toggleButton.icon:SetTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
     end
 end
@@ -374,8 +389,7 @@ local function Create()
     local Widgets = ns.ConfigWidgets
     frame = CreateFrame("Frame", "CharacterStatsDrawer", CharacterFrame)
     frame.themeKey = ns.Theme.key
-    frame:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", 2, -2)
-    frame:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMRIGHT", 2, 2)
+    AnchorFrame()
     frame:SetWidth(DRAWER_WIDTH)
     frame:EnableMouse(true)
     ns.Theme.Box(frame, "window", "border", (ns.Theme.Get()).buttonRadius)
