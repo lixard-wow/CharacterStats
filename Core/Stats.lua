@@ -112,6 +112,9 @@ local function ShouldFilterStatByRole(statId, def, ctx)
     end
     return false
 end
+ns.IsStatFilteredByRole = function(statId)
+    return ShouldFilterStatByRole(statId, ns.STAT_DEFS and ns.STAT_DEFS[statId], GetRoleContext())
+end
 local function ShouldShowStat(statId, statValue, def, ctx)
     if def and def.alwaysShow then
         return true

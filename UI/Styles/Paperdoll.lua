@@ -270,7 +270,7 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
             row:Show()
             return row
         end
-        if Paperdoll.UsesBlizzardStatList() then
+        if Paperdoll.UsesBlizzardStatList() or Paperdoll.UsesBlizzardCategories() then
             local sections = Paperdoll.CollectBlizzardSections()
             local barScale = opts.bars and GetBlizzardBarScale(sections) or 100
             for _, section in ipairs(sections) do

@@ -43,6 +43,33 @@ function BlizzardStats.Capture(key, unit, id)
     end
     return BlizzardStats.StripColon(capturedLabel), capturedValue, numeric
 end
+local probe
+local function GetProbe()
+    if probe then return probe end
+    local holder = CreateFrame("Frame")
+    holder:Hide()
+    probe = CreateFrame("Frame", "CharacterStatsStatProbe", holder)
+    probe.Label = probe:CreateFontString("CharacterStatsStatProbeLabel", "OVERLAY", "GameFontNormalSmall")
+    probe.Value = probe:CreateFontString("CharacterStatsStatProbeStatText", "OVERLAY", "GameFontHighlightSmall")
+    return probe
+end
+function BlizzardStats.CaptureNamed(key, unit)
+    local info = PAPERDOLL_STATINFO and PAPERDOLL_STATINFO[key]
+    if not info or not info.updateFunc then return nil end
+    local frame = GetProbe()
+    frame:Show()
+    frame.Label:SetText("")
+    frame.Value:SetText("")
+    frame.numericValue, frame.tooltip, frame.tooltip2 = nil, nil, nil
+    local ok, numeric = pcall(info.updateFunc, frame, unit or "player")
+    if not ok or not frame:IsShown() then return nil end
+    if type(numeric) ~= "number" then
+        numeric = frame.numericValue
+    end
+    local label, value = frame.Label:GetText(), frame.Value:GetText()
+    if not label or label == "" or not value or value == "" then return nil end
+    return BlizzardStats.StripColon(label), value, numeric, frame.tooltip, frame.tooltip2
+end
 function BlizzardStats.IsPercentText(key, text)
     if text and not ns.IsSecretValue(text) and type(text) == "string" then
         percentByKey[key] = text:find("%%%s*$") ~= nil
