@@ -1,4 +1,4 @@
-## Interface: 50503, 16001
+## Interface: 50503, 50504, 16001
 ## Title: |cffff8000CharacterStats|r
 ## Notes: Display character statistics in a clean, minimal panel.
 ## Author: Lixard
