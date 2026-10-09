@@ -342,11 +342,15 @@ local function UpdateToggleButton()
     if not toggleButton then return end
     AnchorFrame()
     toggleButton:ClearAllPoints()
+    local anchor = IsOpen() and frame or CharacterFrame
+    if SideOffset() > 0 then
+        toggleButton:SetPoint("BOTTOMLEFT", anchor, "BOTTOMRIGHT", 0, 40)
+    else
+        toggleButton:SetPoint("TOPLEFT", anchor, "TOPRIGHT", 0, -40)
+    end
     if IsOpen() then
-        toggleButton:SetPoint("TOPLEFT", frame, "TOPRIGHT", 0, -40)
         toggleButton.icon:SetTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
     else
-        toggleButton:SetPoint("TOPLEFT", CharacterFrame, "TOPRIGHT", SideOffset(), -40)
         toggleButton.icon:SetTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
     end
 end
