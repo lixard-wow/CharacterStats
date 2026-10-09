@@ -39,10 +39,29 @@ local BLIZZARD_STAT_KEYS = {
     defense     = "DEFENSE",
     spirit      = "SPIRIT",
 }
-local STAT_ID_BY_BLIZZARD_KEY = {}
+local STAT_ID_BY_BLIZZARD_KEY = {
+    MELEE_AP = "attackpower",
+    RANGED_AP = "rangedattackpower",
+    SPELLDAMAGE = "spellpower",
+    SPELLHEALING = "spellpower",
+    SPELLCRIT = "crit",
+    RANGED_CRITCHANCE = "crit",
+    SPELL_HASTE = "haste",
+    RANGED_HASTE = "haste",
+    SPELL_HITCHANCE = "hit",
+    RANGED_HITCHANCE = "hit",
+    MANAREGEN = "manaregen",
+    COMBATMANAREGEN = "manaregen",
+    PVP_POWER = "pvppower",
+    RESILIENCE_REDUCTION = "pvpresilience",
+    MELEE_DAMAGE = "mainhanddamage",
+    RANGED_DAMAGE = "rangeddamage",
+}
 for statId, key in pairs(BLIZZARD_STAT_KEYS) do
     STAT_ID_BY_BLIZZARD_KEY[key] = statId
 end
+local CATEGORY_ORDER = { "GENERAL", "ATTRIBUTES", "MELEE", "RANGED", "SPELL", "DEFENSE", "RESISTANCE" }
+local RESISTANCE_SCHOOLS = { ARCANE = "arcane", FIRE = "fire", FROST = "frost", NATURE = "nature", SHADOW = "shadow" }
 local noop = function() end
 local mockFontString = { SetText = noop, SetShown = noop, SetTextColor = noop }
 local statProxy = {}
@@ -105,8 +124,77 @@ end
 local sections = {}
 local sectionPool = {}
 local rowPool = {}
+function PaperdollPanel.UsesBlizzardCategories()
+    return ns.IS_CLASSIC and not ns.BlizzardStats.IsAvailable()
+        and type(PAPERDOLL_STATCATEGORIES) == "table" and type(PAPERDOLL_STATINFO) == "table"
+end
+local function CategoryRelevant(key, ctx)
+    if key == "MELEE" then
+        return not ctx.isCaster and not ctx.isHealer and not ctx.isRanged
+    elseif key == "RANGED" then
+        return ctx.isRanged
+    elseif key == "SPELL" then
+        return ctx.isCaster or ctx.isHealer
+    end
+    return true
+end
+local function CanShow(info)
+    if not info or not info.canShowFunc then return true end
+    local ok, result = pcall(info.canShowFunc)
+    return not ok or result ~= false
+end
+local function IsZero(numeric, text)
+    if type(numeric) == "number" then
+        return math.abs(numeric) < 0.005
+    end
+    return type(text) == "string" and text:match("^%s*0[%.,]?0*%s*%%?%s*$") ~= nil
+end
+local function CollectCategorySections()
+    local ctx = ns.GetCachedRoleContext and ns.GetCachedRoleContext() or {}
+    local seen = {}
+    local sectionCount, rowCount = 0, 0
+    for _, key in ipairs(CATEGORY_ORDER) do
+        local category = PAPERDOLL_STATCATEGORIES[key]
+        if category and type(category.stats) == "table" and CategoryRelevant(key, ctx) and CanShow(category) then
+            local section
+            for _, statKey in ipairs(category.stats) do
+                local statId = STAT_ID_BY_BLIZZARD_KEY[statKey]
+                if not seen[statKey] and CanShow(PAPERDOLL_STATINFO[statKey])
+                    and not (statId and ns.IsStatFilteredByRole and ns.IsStatFilteredByRole(statId)) then
+                    local label, value, numeric, tooltip, tooltip2 = ns.BlizzardStats.CaptureNamed(statKey, "player")
+                    if label and not (key ~= "GENERAL" and IsZero(numeric, value)) then
+                        seen[statKey] = true
+                        if not section then
+                            sectionCount = sectionCount + 1
+                            section = sectionPool[sectionCount] or {}
+                            sectionPool[sectionCount] = section
+                            section.title = rawget(_G, "STAT_CATEGORY_" .. key) or key
+                            section.rows = section.rows or {}
+                            wipe(section.rows)
+                            sections[#sections + 1] = section
+                        end
+                        rowCount = rowCount + 1
+                        local row = rowPool[rowCount] or {}
+                        rowPool[rowCount] = row
+                        wipe(row)
+                        row.label, row.value, row.numericValue = label, value, numeric
+                        row.tooltip, row.tooltip2 = tooltip, tooltip2
+                        row.isPercent = ns.BlizzardStats.IsPercentText(statKey, value)
+                        row.statId = statId
+                        row.school = key == "RESISTANCE" and RESISTANCE_SCHOOLS[statKey] or nil
+                        section.rows[#section.rows + 1] = row
+                    end
+                end
+            end
+        end
+    end
+    return sections
+end
 function PaperdollPanel.CollectBlizzardSections()
     wipe(sections)
+    if PaperdollPanel.UsesBlizzardCategories() then
+        return CollectCategorySections()
+    end
     if not PaperdollPanel.UsesBlizzardStatList() then return sections end
     local ok, pane = pcall(CharacterFrame.GetStatsPane, CharacterFrame)
     local elements = ok and pane and pane.elementData
@@ -412,7 +500,7 @@ function PaperdollPanel:Init()
         hooksecurefunc("PaperDollFrame_UpdateStats", function()
             if isAttached then
                 HideStatsPaneChildren(false)
-                if PaperdollPanel.UsesBlizzardStatList() then
+                if PaperdollPanel.UsesBlizzardStatList() or PaperdollPanel.UsesBlizzardCategories() then
                     PaperdollPanel:Refresh()
                 end
             end
