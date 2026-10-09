@@ -36,6 +36,8 @@ local badges = {}
 local retryPending = false
 local ENCHANT_FALLBACK_ICON = "Interface\\Icons\\Trade_Engraving"
 local ENCHANT_ICON_SIZE = 14
+local SIDE_GAP = 3
+local EDGE_INSET = 3
 local function SplitEnchant(text)
     local atlas = text:match("|A:([^:|]+)")
     local name = text:gsub("%s*|A:.-|a", "")
@@ -65,24 +67,26 @@ local function ShowGemTooltip(self)
     end
     GameTooltip:Show()
 end
-local function CreateDetail(badge, button, onRight, width)
+local function CreateDetail(badge, button, side, width)
     local detail = CreateFrame("Frame", nil, badge)
     detail:SetAllPoints(badge)
+    detail.side = side
+    detail.button = button
     detail.enchant = detail:CreateFontString(nil, "OVERLAY")
     detail.enchant:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
     detail.enchant:SetWidth(width)
     detail.enchant:SetWordWrap(false)
-    if onRight then
-        detail.enchant:SetJustifyH("LEFT")
-        detail.enchant:SetPoint("LEFT", button, "RIGHT", 5, 0)
-    else
-        detail.enchant:SetJustifyH("RIGHT")
-        detail.enchant:SetPoint("RIGHT", button, "LEFT", -5, 0)
-    end
+    detail.enchant:SetJustifyH(side == "left" and "RIGHT" or "LEFT")
     detail.enchantIcon = CreateFrame("Frame", nil, detail)
     detail.enchantIcon:SetSize(ENCHANT_ICON_SIZE, ENCHANT_ICON_SIZE)
     detail.enchantIcon:EnableMouse(true)
-    detail.enchantIcon:SetPoint("CENTER", button, "BOTTOMLEFT", 2, 2)
+    if side == "top" then
+        detail.enchantIcon:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP)
+    elseif side == "left" then
+        detail.enchantIcon:SetPoint("TOPRIGHT", button, "TOPLEFT", -SIDE_GAP, -EDGE_INSET)
+    else
+        detail.enchantIcon:SetPoint("TOPLEFT", button, "TOPRIGHT", SIDE_GAP, -EDGE_INSET)
+    end
     detail.enchantIcon.texture = detail.enchantIcon:CreateTexture(nil, "OVERLAY")
     detail.enchantIcon.texture:SetAllPoints()
     detail.enchantIcon.missing = detail.enchantIcon:CreateTexture(nil, "OVERLAY")
@@ -107,11 +111,38 @@ local function CreateDetail(badge, button, onRight, width)
         gem.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         gem:SetScript("OnEnter", ShowGemTooltip)
         gem:SetScript("OnLeave", GameTooltip_Hide)
-        gem:SetPoint("CENTER", button, "BOTTOMRIGHT", -2 - (index - 1) * (GEM_SIZE + 1), 2)
+        local offset = (index - 1) * (GEM_SIZE + 1)
+        if side == "top" then
+            gem:SetPoint("BOTTOMLEFT", button, "TOPLEFT", ENCHANT_ICON_SIZE + 3 + offset, SIDE_GAP + (ENCHANT_ICON_SIZE - GEM_SIZE) / 2)
+        elseif side == "left" then
+            gem:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -SIDE_GAP - offset, EDGE_INSET)
+        else
+            gem:SetPoint("BOTTOMLEFT", button, "BOTTOMRIGHT", SIDE_GAP + offset, EDGE_INSET)
+        end
         gem:Hide()
         detail.gems[index] = gem
     end
     return detail
+end
+local function PlaceEnchantText(detail, afterIcon)
+    local text, button, icon = detail.enchant, detail.button, detail.enchantIcon
+    text:ClearAllPoints()
+    if detail.side == "top" then
+        text:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP + ENCHANT_ICON_SIZE + 2)
+    elseif afterIcon then
+        if detail.side == "left" then
+            text:SetPoint("RIGHT", icon, "LEFT", -SIDE_GAP, 0)
+        else
+            text:SetPoint("LEFT", icon, "RIGHT", SIDE_GAP, 0)
+        end
+    else
+        local y = -EDGE_INSET - ENCHANT_ICON_SIZE / 2
+        if detail.side == "left" then
+            text:SetPoint("RIGHT", button, "TOPLEFT", -SIDE_GAP, y)
+        else
+            text:SetPoint("LEFT", button, "TOPRIGHT", SIDE_GAP, y)
+        end
+    end
 end
 local function GetGemIcon(gemId)
     if C_Item and C_Item.GetItemIconByID then
@@ -181,6 +212,7 @@ local function UpdateDetail(detail, entry, db)
             hasContent = true
         end
     end
+    PlaceEnchantText(detail, icon:IsShown())
     detail:SetShown(hasContent)
 end
 local function GetBadge(slot)
@@ -202,7 +234,11 @@ local function GetBadge(slot)
     badge.flagMask:SetAllPoints(badge.flag)
     badge.flagMask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     badge.flag:AddMaskTexture(badge.flagMask)
-    badge.detail = CreateDetail(badge, button, DETAIL_RIGHT[slot] == true, WEAPON_SLOTS[slot] and WEAPON_DETAIL_WIDTH or DETAIL_WIDTH)
+    local side = DETAIL_RIGHT[slot] and "right" or "left"
+    if WEAPON_SLOTS[slot] and rawget(_G, SLOT_BUTTONS[18]) then
+        side = "top"
+    end
+    badge.detail = CreateDetail(badge, button, side, WEAPON_SLOTS[slot] and WEAPON_DETAIL_WIDTH or DETAIL_WIDTH)
     badges[slot] = badge
     return badge
 end
