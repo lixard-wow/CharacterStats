@@ -183,6 +183,7 @@ end
 Styles.Register("meters", {
     order = 2,
     label = ns.L.STYLE_METERS or "Meters",
+    labelKey = "STYLE_METERS",
     CreateStatsRenderer = CreateStatsRenderer,
     CreatePaperdollRenderer = function(panel)
         return Styles.CreateListPaperdollRenderer(panel, { bars = true, gearSummary = true })

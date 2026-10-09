@@ -114,6 +114,7 @@ end
 Styles.Register("companion", {
     order = 3,
     label = ns.L.STYLE_COMPANION or "Companion",
+    labelKey = "STYLE_COMPANION",
     CreateStatsRenderer = CreateStatsRenderer,
     replacesPaperdollPane = false,
     usesDrawer = true,

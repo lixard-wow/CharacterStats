@@ -199,7 +199,7 @@ local function CreateMainFrame()
     frame.navButtons = {}
     local navY = -8
     for _, def in ipairs(pageOrder) do
-        local btn = Widgets.CreateNavButton(frame.nav, def.label)
+        local btn = Widgets.CreateNavButton(frame.nav, (def.labelKey and CS.L[def.labelKey]) or def.label)
         btn:SetPoint("TOPLEFT", frame.nav, "TOPLEFT", 0, navY)
         btn:SetPoint("TOPRIGHT", frame.nav, "TOPRIGHT", -1, navY)
         btn:SetScript("OnClick", function()

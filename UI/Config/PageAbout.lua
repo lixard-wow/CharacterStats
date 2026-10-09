@@ -26,6 +26,7 @@ local function CreateAboutPage(container)
 end
 ConfigPanel.RegisterPage("about", {
     label = CS.L.NAV_ABOUT or "About",
+    labelKey = "NAV_ABOUT",
     order = 5,
     create = CreateAboutPage,
 })

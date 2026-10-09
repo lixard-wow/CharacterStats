@@ -217,6 +217,7 @@ local function CreateStatsPage(container)
 end
 ConfigPanel.RegisterPage("stats", {
     label = CS.L.NAV_STATS or "Stats",
+    labelKey = "NAV_STATS",
     order = 2,
     create = CreateStatsPage,
 })

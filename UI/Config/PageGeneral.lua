@@ -58,6 +58,7 @@ local function BuildEntries(L)
 end
 ConfigPanel.RegisterPage("general", {
     label = CS.L.NAV_GENERAL or "General",
+    labelKey = "NAV_GENERAL",
     order = 1,
     create = function(container)
         local _, content = ConfigPanel.CreateScrollPage(container)
