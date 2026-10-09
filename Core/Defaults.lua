@@ -5,6 +5,7 @@ ns.IsSecretValue = function(value)
     return ok and result == true
 end
 ns.GetPixelPerfectScale = function()
+    if not GetPhysicalScreenSize then return 1 end
     local physicalHeight = select(2, GetPhysicalScreenSize())
     if not physicalHeight or physicalHeight == 0 then
         return 1
@@ -47,6 +48,19 @@ ns.DEFAULT_STAT_COLORS = {
     pvppower = {0.00, 0.70, 0.00},
     pvpresilience = {0.70, 0.00, 0.70},
     rangedattackpower = {0.67, 0.83, 0.45},
+    health = {0.20, 0.90, 0.20},
+    power = {0.35, 0.60, 1.00},
+    mainhanddamage = {1.00, 0.45, 0.30},
+    offhanddamage = {1.00, 0.45, 0.30},
+    rangeddamage = {0.67, 0.83, 0.45},
+    spellhealing = {0.45, 1.00, 0.65},
+    spellpenetration = {0.65, 0.55, 1.00},
+    armorpenetration = {0.75, 0.78, 0.82},
+    resarcane = {1.00, 0.50, 1.00},
+    resfire = {1.00, 0.50, 0.00},
+    resfrost = {0.50, 1.00, 1.00},
+    resnature = {0.30, 1.00, 0.30},
+    resshadow = {0.50, 0.50, 1.00},
 }
 ns.DEFAULTS = {
     anchor = "LEFT",
@@ -76,8 +90,32 @@ ns.DEFAULTS = {
     alignMode = "justify",
     orientation = "vertical",
     rowPadding = 0,
+    statBarHeight = 4,
+    paperdollBarHeight = 3,
+    showDiminishing = true,
+    itemTooltipDR = true,
     decimals = nil,
     ratingMode = "percent",
+    style = "original",
+    groupedLayout = true,
+    gearBadges = true,
+    gearFlags = true,
+    gearDetails = true,
+    enchantDisplay = "icon",
+    characterButton = true,
+    yieldToOtherAddons = true,
+    drawerOpen = true,
+    drawerTab = "stats",
+    gearColorMyth = { r = 1, g = 0.5, b = 0 },
+    gearColorCrafted = { r = 1, g = 0.5, b = 0 },
+    gearColorHero = { r = 0.64, g = 0.21, b = 0.93 },
+    gearColorChampion = { r = 0.12, g = 1, b = 0 },
+    gearColorVeteran = { r = 0.2, g = 0.85, b = 0.8 },
+    gearColorAdventurer = { r = 0.25, g = 0.6, b = 1 },
+    gearColorExplorer = { r = 0.62, g = 0.62, b = 0.62 },
+    gearColorOther = { r = 1, g = 1, b = 1 },
+    gearColorEnchant = { r = 0.88, g = 0.33, b = 0.24 },
+    gearColorSocket = { r = 0.9, g = 0.64, b = 0.24 },
     stats = {
         ilvl = true,
         str = true,
@@ -108,19 +146,36 @@ ns.DEFAULTS = {
         defense = true,
         pvpresilience = true,
         movespeed = true,
+        health = true,
+        power = true,
+        mainhanddamage = true,
+        offhanddamage = true,
+        rangeddamage = true,
+        spellhealing = false,
+        spellpenetration = false,
+        armorpenetration = false,
+        resarcane = false,
+        resfire = false,
+        resfrost = false,
+        resnature = false,
+        resshadow = false,
     },
     statOrder = {
         "ilvl",
+        "health", "power",
         "str", "agi", "int", "sta",
         "armor", "stagger",
         "manaregen", "spirit",
-        "spellpower", "attackpower", "rangedattackpower",
+        "spellpower", "spellhealing", "attackpower", "rangedattackpower",
+        "mainhanddamage", "offhanddamage", "rangeddamage",
         "crit", "haste", "hit", "expertise", "mastery",
         "versatility",
         "leech", "avoidance", "speed",
         "dodge", "parry", "block",
         "pvpresilience", "pvppower",
+        "spellpenetration", "armorpenetration",
         "movespeed",
+        "resarcane", "resfire", "resfrost", "resnature", "resshadow",
     },
     statColors = nil,
     useShortNames = false,
@@ -189,32 +244,6 @@ local CR_CRIT = 9
 local CR_HASTE = 18
 local CR_MASTERY = 26
 local CR_VERSATILITY = 29
-local lastGoodVersatility = nil
-
-local versaRatio = nil
-ns.InvalidateVersatilityCalibration = function()
-    versaRatio = nil
-end
-local function GetEquippedVersatilityRating()
-    local getStats = (C_Item and C_Item.GetItemStats) or rawget(_G, "GetItemStats")
-    if not getStats then return nil end
-    local total, found = 0, false
-    for slot = 1, 19 do
-        local link = GetInventoryItemLink("player", slot)
-        if link then
-            local ok, stats = pcall(getStats, link)
-            if ok and type(stats) == "table" then
-                for statKey, statValue in pairs(stats) do
-                    if type(statKey) == "string" and statKey:find("VERSATILITY") and type(statValue) == "number" then
-                        total = total + statValue
-                        found = true
-                    end
-                end
-            end
-        end
-    end
-    return found and total or nil
-end
 local CR_HIT_MELEE = 6
 local CR_HIT_RANGED = 7
 local CR_HIT_SPELL = 8
@@ -398,37 +427,11 @@ ns.STAT_DEFS = {
         ratingId = CR_VERSATILITY,
         tooltipKey = "STAT_VERSATILITY_TT",
         api = function()
-            local okBase, base = pcall(GetCombatRatingBonus, CR_VERSATILITY)
-            local okBonus, bonus = false, nil
-            if GetVersatilityBonus then
-                okBonus, bonus = pcall(GetVersatilityBonus, CR_VERSATILITY)
+            local ok, value = pcall(GetCombatRatingBonus, CR_VERSATILITY)
+            if ok and type(value) == "number" then
+                return value
             end
-            local baseSecret = okBase and type(base) == "number" and ns.IsSecretValue(base)
-            local bonusSecret = okBonus and type(bonus) == "number" and ns.IsSecretValue(bonus)
-            if baseSecret or bonusSecret then
-
-                if versaRatio then
-                    local gearRating = GetEquippedVersatilityRating()
-                    if gearRating then
-                        return versaRatio * gearRating
-                    end
-                end
-                if lastGoodVersatility then
-                    return lastGoodVersatility
-                end
-                return baseSecret and base or bonus
-            end
-            base = (okBase and type(base) == "number") and base or 0
-            bonus = (okBonus and type(bonus) == "number") and bonus or 0
-            local total = base + bonus
-            lastGoodVersatility = total
-            if not versaRatio then
-                local gearRating = GetEquippedVersatilityRating()
-                if gearRating and gearRating > 0 then
-                    versaRatio = total / gearRating
-                end
-            end
-            return total
+            return 0
         end,
     },
     manaregen = {
@@ -483,7 +486,7 @@ ns.STAT_DEFS = {
         hideIfZero = true,
         tooltipKey = "STAT_LEECH_TT",
         api = function()
-            return GetLifesteal() or 0
+            return GetLifesteal and GetLifesteal() or 0
         end,
     },
     avoidance = {
@@ -494,7 +497,7 @@ ns.STAT_DEFS = {
         hideIfZero = true,
         tooltipKey = "STAT_AVOIDANCE_TT",
         api = function()
-            return GetAvoidance() or 0
+            return GetAvoidance and GetAvoidance() or 0
         end,
     },
     speed = {
@@ -505,7 +508,7 @@ ns.STAT_DEFS = {
         hideIfZero = true,
         tooltipKey = "STAT_SPEED_TT",
         api = function()
-            return GetSpeed()
+            return GetSpeed and GetSpeed() or 0
         end,
     },
     armor = {
@@ -870,6 +873,51 @@ ns.STAT_DEFS = {
         end,
     },
 }
+local FOREVER_BLIZZARD_STATS = {
+    { id = "health", key = "HEALTH", label = "Health", short = "HP", category = "general", alwaysShow = true },
+    { id = "power", key = "POWER", label = "Power", short = "Power", category = "general", alwaysShow = true, useBlizzardLabel = true },
+    { id = "mainhanddamage", key = "MAINHAND_DAMAGE", label = "Main Hand Damage", short = "MH Dmg", category = "weapons", alwaysShow = true },
+    { id = "offhanddamage", key = "OFFHAND_DAMAGE", label = "Off Hand Damage", short = "OH Dmg", category = "weapons", hideIfZero = true },
+    { id = "rangeddamage", key = "RANGED_DAMAGE", label = "Ranged Damage", short = "Rng Dmg", category = "weapons", hideIfZero = true },
+    { id = "spellhealing", key = "SPELLHEALING", label = "Bonus Healing", short = "Heal", category = "secondary", hideIfZero = true },
+    { id = "spellpenetration", key = "SPELLPENETRATION", label = "Spell Penetration", short = "SPen", category = "secondary", hideIfZero = true },
+    { id = "armorpenetration", key = "ARMORPEN", label = "Armor Penetration", short = "ArPen", category = "secondary", hideIfZero = true },
+}
+for _, info in ipairs(FOREVER_BLIZZARD_STATS) do
+    local key = info.key
+    ns.STAT_DEFS[info.id] = {
+        label = info.label,
+        shortLabel = info.short,
+        category = info.category,
+        foreverOnly = true,
+        alwaysShow = info.alwaysShow,
+        hideIfZero = info.hideIfZero,
+        useBlizzardLabel = info.useBlizzardLabel,
+        api = function()
+            return ns.BlizzardStats.ReadForStat(key)
+        end,
+    }
+end
+local FOREVER_RESISTANCES = {
+    { id = "resarcane", school = "Arcane", label = "Arcane Resistance", short = "Arc" },
+    { id = "resfire", school = "Fire", label = "Fire Resistance", short = "Fire" },
+    { id = "resfrost", school = "Frost", label = "Frost Resistance", short = "Frost" },
+    { id = "resnature", school = "Nature", label = "Nature Resistance", short = "Nat" },
+    { id = "resshadow", school = "Shadow", label = "Shadow Resistance", short = "Shad" },
+}
+for _, info in ipairs(FOREVER_RESISTANCES) do
+    local school = info.school
+    ns.STAT_DEFS[info.id] = {
+        label = info.label,
+        shortLabel = info.short,
+        category = "resistance",
+        foreverOnly = true,
+        alwaysShow = true,
+        api = function()
+            return ns.BlizzardStats.ReadResistance(school)
+        end,
+    }
+end
 local CLASS_PRIMARY = {
     WARRIOR = "str",
     DEATHKNIGHT = "str",
@@ -1012,6 +1060,22 @@ ns.GetAverageItemQualityColor = function()
     ns._ilvlColorDirty = false
     return ns._ilvlColorCache[1], ns._ilvlColorCache[2], ns._ilvlColorCache[3]
 end
+local POWER_TYPE_COLORS = {
+    MANA = { 0.35, 0.60, 1.00 },
+    RAGE = { 1.00, 0.30, 0.30 },
+    ENERGY = { 1.00, 0.90, 0.30 },
+    FOCUS = { 1.00, 0.60, 0.25 },
+    RUNIC_POWER = { 0.00, 0.82, 1.00 },
+}
+local function GetPowerTypeColor()
+    if not UnitPowerType then return nil end
+    local ok, _, token = pcall(UnitPowerType, "player")
+    local color = ok and token and POWER_TYPE_COLORS[token]
+    if color then
+        return color[1], color[2], color[3]
+    end
+    return nil
+end
 ns.GetStatColor = function(statId)
     local db = ns.db
     if db and db.statColors and db.statColors[statId] then
@@ -1020,6 +1084,10 @@ ns.GetStatColor = function(statId)
     end
     if statId == "ilvl" then
         return ns.GetAverageItemQualityColor()
+    end
+    if statId == "power" then
+        local r, g, b = GetPowerTypeColor()
+        if r then return r, g, b end
     end
     local default = ns.DEFAULT_STAT_COLORS[statId]
     if default then
@@ -1055,6 +1123,15 @@ ns.GetDecimals = function(dbValue)
     end
     return ns.IS_RETAIL and 0 or 2
 end
+local ITEM_CLASS_ARMOR = (Enum and Enum.ItemClass and Enum.ItemClass.Armor) or 4
+local ITEM_SUBCLASS_SHIELD = (Enum and Enum.ItemArmorSubclass and Enum.ItemArmorSubclass.Shield) or 6
+ns.IsShieldItem = function(itemLink)
+    if not itemLink then return false end
+    local getInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
+    if not getInstant then return false end
+    local ok, _, _, _, _, _, classId, subclassId = pcall(getInstant, itemLink)
+    return ok and classId == ITEM_CLASS_ARMOR and subclassId == ITEM_SUBCLASS_SHIELD
+end
 local shieldCache = nil
 ns.HasShieldEquipped = function()
     if shieldCache ~= nil then return shieldCache end
@@ -1063,16 +1140,7 @@ ns.HasShieldEquipped = function()
         shieldCache = false
         return false
     end
-    local subType
-    if C_Item and C_Item.GetItemInfo then
-        local _, _, _, _, _, _, itemSubType = C_Item.GetItemInfo(offhandLink)
-        subType = itemSubType
-    end
-    if not subType then
-        local _, _, _, _, _, _, itemSubType = GetItemInfo(offhandLink)
-        subType = itemSubType
-    end
-    shieldCache = subType and (subType == "Shields" or subType == "Shield") or false
+    shieldCache = ns.IsShieldItem(offhandLink)
     return shieldCache
 end
 ns.InvalidateShieldCache = function()
@@ -1202,18 +1270,76 @@ local CLASS_SPECS = {
     DEMONHUNTER = { "Havoc", "Vengeance" },
     EVOKER = { "Devastation", "Preservation", "Augmentation" },
 }
+local otherClassSpecNames = nil
+local function GetOtherClassSpecNames()
+    if otherClassSpecNames then return otherClassSpecNames end
+    local names = {}
+    local _, myToken, myClassId = UnitClass("player")
+    local getForClass = rawget(_G, "GetSpecializationInfoForClassID")
+    local getNumForClass = (C_SpecializationInfo and C_SpecializationInfo.GetNumSpecializationsForClassID) or rawget(_G, "GetNumSpecializationsForClassID")
+    local numClasses = GetNumClasses and GetNumClasses() or 0
+    if getForClass and numClasses > 0 then
+        for classId = 1, numClasses do
+            if classId ~= myClassId then
+                local okNum, numSpecs = false, nil
+                if getNumForClass then
+                    okNum, numSpecs = pcall(getNumForClass, classId)
+                end
+                if not okNum or type(numSpecs) ~= "number" then numSpecs = 4 end
+                for specIndex = 1, numSpecs do
+                    local ok, _, name = pcall(getForClass, classId, specIndex)
+                    if ok and name then
+                        names[name] = true
+                    end
+                end
+            end
+        end
+    end
+    if not next(names) then
+        for token, classSpecs in pairs(CLASS_SPECS) do
+            if token ~= myToken then
+                for _, specName in ipairs(classSpecs) do
+                    names[specName] = true
+                end
+            end
+        end
+    end
+    otherClassSpecNames = names
+    return names
+end
+local function GetSpecMapKey(specName)
+    local _, classToken = UnitClass("player")
+    if not classToken or not specName then return specName end
+    return classToken .. ":" .. specName
+end
+local function GetQualifiedSpecProfileName(specName)
+    local className = UnitClass("player")
+    if not className then return specName end
+    return string.format(ns.L.PROFILE_SPEC_CLASS or "%s %s", specName, className)
+end
 ns.IsOtherClassSpecName = function(name)
     if not name then return false end
     local mySpecs = ns.GetSpecNames and ns.GetSpecNames() or {}
     for _, specName in ipairs(mySpecs) do
         if specName == name then return false end
     end
-    for _, classSpecs in pairs(CLASS_SPECS) do
-        for _, specName in ipairs(classSpecs) do
-            if specName == name then return true end
+    local db = ns.db
+    local map = db and db.specProfiles and db.specProfiles.map
+    if map then
+        local _, myToken = UnitClass("player")
+        local prefix = myToken and (myToken .. ":") or nil
+        local usedByOther = false
+        for key, profileName in pairs(map) do
+            if profileName == name and type(key) == "string" and key:find(":", 1, true) then
+                if prefix and key:sub(1, #prefix) == prefix then
+                    return false
+                end
+                usedByOther = true
+            end
         end
+        if usedByOther then return true end
     end
-    return false
+    return GetOtherClassSpecNames()[name] == true
 end
 ns.GetCurrentSpecName = function()
     if GetSpecialization and GetSpecializationInfo then
@@ -1306,7 +1432,7 @@ ns.CopyProfile = function(sourceName, destName)
     if db.profiles[destName] then return false end
     local source = db.profiles[sourceName]
     if not source then
-        ns.PrintMsg(string.format("Source profile '%s' not found, using default settings", sourceName or "nil"), "warning")
+        ns.PrintMsg(string.format(ns.L.MSG_PROFILE_MISSING or "Profile '%s' not found, using default settings.", sourceName or "?"), "warning")
         source = ns.DEFAULTS
     end
     db.profiles[destName] = DeepCopy(source)
@@ -1319,6 +1445,10 @@ local GLOBAL_SETTINGS = {
     minimap = true,
     theme = true,
     themeUseClassColor = true,
+    ui = true,
+    stylePickerSeen = true,
+    conflictsIgnored = true,
+    uiTheme = true,
 }
 local saveTimer = nil
 local SAVE_DELAY = 1.0
@@ -1358,20 +1488,19 @@ ns.SaveToActiveProfile = function()
     if not db then return end
     local profileName = db.activeProfile or "Default"
     db.profiles = db.profiles or {}
-    if not db.profiles[profileName] then
-        db.profiles[profileName] = DeepCopy(ns.DEFAULTS)
-    end
+    local profile = {}
     for k, v in pairs(db) do
         if not GLOBAL_SETTINGS[k] then
             if k == "statColors" and type(v) == "table" then
                 local colorsCopy = DeepCopy(v)
                 colorsCopy.ilvl = nil
-                db.profiles[profileName][k] = colorsCopy
+                profile[k] = colorsCopy
             else
-                db.profiles[profileName][k] = DeepCopy(v)
+                profile[k] = DeepCopy(v)
             end
         end
     end
+    db.profiles[profileName] = profile
 end
 ns.MarkProfileDirty = function()
     if saveTimer then
@@ -1409,10 +1538,45 @@ ns.SwitchProfile = function(name)
     end
     ns.FlushProfileSave()
     local profile = db.profiles[name]
+    local keysToRemove = {}
+    for k in pairs(db) do
+        if not GLOBAL_SETTINGS[k] then
+            keysToRemove[#keysToRemove + 1] = k
+        end
+    end
+    for _, k in ipairs(keysToRemove) do
+        db[k] = nil
+    end
+    for k, v in pairs(ns.DEFAULTS) do
+        if not GLOBAL_SETTINGS[k] then
+            db[k] = DeepCopy(v)
+        end
+    end
     if profile then
         for k, v in pairs(profile) do
             if not GLOBAL_SETTINGS[k] then
-                db[k] = DeepCopy(v)
+                if k == "stats" and type(v) == "table" then
+                    for statId, enabled in pairs(v) do
+                        db.stats[statId] = enabled
+                    end
+                elseif k == "statOrder" and type(v) == "table" then
+                    local order, seen = {}, {}
+                    for _, statId in ipairs(v) do
+                        if ns.STAT_DEFS[statId] and not seen[statId] then
+                            order[#order + 1] = statId
+                            seen[statId] = true
+                        end
+                    end
+                    for _, statId in ipairs(ns.DEFAULTS.statOrder) do
+                        if not seen[statId] and ns.STAT_DEFS[statId] then
+                            order[#order + 1] = statId
+                            seen[statId] = true
+                        end
+                    end
+                    db.statOrder = order
+                else
+                    db[k] = DeepCopy(v)
+                end
             end
         end
     end
@@ -1454,16 +1618,12 @@ ns.SetSpecProfilesEnabled = function(enabled)
         end
         for _, specName in ipairs(specs) do
             if specName then
-                ns.CreateProfile(specName)
-                db.specProfiles.map = db.specProfiles.map or {}
-                if not db.specProfiles.map[specName] then
-                    db.specProfiles.map[specName] = specName
-                end
+                ns.GetSpecProfile(specName)
             end
         end
         local currentSpec = ns.GetCurrentSpecName()
-        if currentSpec and db.specProfiles.map[currentSpec] then
-            ns.SwitchProfile(db.specProfiles.map[currentSpec])
+        if currentSpec then
+            ns.SwitchProfile(ns.GetSpecProfile(currentSpec))
             if ns.StatsFrame and ns.StatsFrame.RestorePosition then
                 ns.StatsFrame:RestorePosition()
             end
@@ -1484,18 +1644,34 @@ ns.GetSpecProfile = function(specName)
     if not db or not specName then return specName end
     db.specProfiles = db.specProfiles or { enabled = false, map = {} }
     db.specProfiles.map = db.specProfiles.map or {}
-    if not db.specProfiles.map[specName] then
-        ns.CreateProfile(specName)
-        db.specProfiles.map[specName] = specName
+    db.profiles = db.profiles or {}
+    local map = db.specProfiles.map
+    local key = GetSpecMapKey(specName)
+    if map[key] then return map[key] end
+    local sharedName = GetOtherClassSpecNames()[specName] == true
+    local legacy = map[specName]
+    local profileName
+    if legacy and db.profiles[legacy] and (legacy ~= specName or not sharedName) then
+        profileName = legacy
+    else
+        profileName = sharedName and GetQualifiedSpecProfileName(specName) or specName
+        if not db.profiles[profileName] then
+            if legacy and db.profiles[legacy] then
+                ns.CopyProfile(legacy, profileName)
+            else
+                ns.CreateProfile(profileName)
+            end
+        end
     end
-    return db.specProfiles.map[specName]
+    map[key] = profileName
+    return profileName
 end
 ns.SetSpecProfile = function(specName, profileName)
     local db = ns.db
-    if not db then return end
+    if not db or not specName then return end
     db.specProfiles = db.specProfiles or { enabled = false, map = {} }
     db.specProfiles.map = db.specProfiles.map or {}
-    db.specProfiles.map[specName] = profileName
+    db.specProfiles.map[GetSpecMapKey(specName)] = profileName
 end
 ns.OnSpecChanged = function()
     if not ns.IsSpecProfilesEnabled() then return end

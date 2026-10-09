@@ -21,7 +21,7 @@ Keep your item level and stats on screen without opening the character window. C
 1. Install the addon and log in.
 2. Choose a look in the window that opens.
 3. Drag the stat panel where you want it.
-4. Open the options with `/cs config`, right-click the minimap button, or use the options button on the character window.
+4. Open the options with `/cs config`, click the minimap button, or use the options button on the character window.
 
 ## Commands
 | Command | What it does |

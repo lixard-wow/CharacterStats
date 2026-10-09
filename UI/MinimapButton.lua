@@ -22,21 +22,22 @@ if LDB and icon then
             if button == "LeftButton" then
                 if IsShiftKeyDown() then
                     ns.StatsFrame:ResetPosition()
-                    ns.PrintMsg("Position reset.")
+                    ns.PrintMsg(ns.L.MSG_RESET or "Position reset.")
                 else
-                    ns.StatsFrame:Toggle()
+                    ns.ConfigPanel:Toggle()
                 end
             elseif button == "RightButton" then
-                ns.ConfigPanel:Toggle()
+                ns.StatsFrame:Toggle()
             end
         end,
         OnTooltipShow = function(tooltip)
             if not tooltip or not tooltip.AddLine then return end
-            tooltip:AddLine("|cffff8000CharacterStats|r")
+            tooltip:AddLine("|cffff8000" .. (ns.L.ADDON_TITLE or "CharacterStats") .. "|r")
             tooltip:AddLine(" ")
-            tooltip:AddDoubleLine("|cffffcc00Left-click|r", "Toggle stats", 1, 0.8, 0, 0.9, 0.9, 0.9)
-            tooltip:AddDoubleLine("|cffffcc00Right-click|r", "Options", 1, 0.8, 0, 0.9, 0.9, 0.9)
-            tooltip:AddDoubleLine("|cffffcc00Shift-click|r", "Reset position", 1, 0.8, 0, 0.9, 0.9, 0.9)
+            local L = ns.L
+            tooltip:AddDoubleLine(L.TIP_LEFT_CLICK or "Left-click", L.TIP_OPTIONS or "Options", 1, 0.8, 0, 0.9, 0.9, 0.9)
+            tooltip:AddDoubleLine(L.TIP_RIGHT_CLICK or "Right-click", L.TIP_TOGGLE_STATS or "Toggle stats", 1, 0.8, 0, 0.9, 0.9, 0.9)
+            tooltip:AddDoubleLine(L.TIP_SHIFT_CLICK or "Shift-click", L.TIP_RESET_POSITION or "Reset position", 1, 0.8, 0, 0.9, 0.9, 0.9)
         end,
     })
     function MinimapButton:Show()

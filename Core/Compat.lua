@@ -3,50 +3,6 @@ local PROJECT_MAINLINE = 1
 local projectId = WOW_PROJECT_ID or PROJECT_MAINLINE
 ns.IS_RETAIL = (projectId == PROJECT_MAINLINE)
 ns.IS_CLASSIC = (projectId ~= PROJECT_MAINLINE)
-if ns.IS_CLASSIC then
-    if not GetVersatilityBonus then
-        GetVersatilityBonus = function() return 0 end
-    end
-    if not GetAvoidance then
-        GetAvoidance = function() return 0 end
-    end
-    if not GetLifesteal then
-        GetLifesteal = function() return 0 end
-    end
-    if not GetSpeed then
-        GetSpeed = function() return 0 end
-    end
-    if not C_PlayerInfo then
-        C_PlayerInfo = {}
-    end
-    if not C_PlayerInfo.GetGlidingInfo then
-        C_PlayerInfo.GetGlidingInfo = function() return false, false, 0 end
-    end
-    if not GetPhysicalScreenSize then
-        GetPhysicalScreenSize = function()
-            return GetScreenWidth(), GetScreenHeight()
-        end
-    end
-    if not CR_CRIT_MELEE then CR_CRIT_MELEE = 9 end
-    if not CR_CRIT_RANGED then CR_CRIT_RANGED = 10 end
-    if not CR_CRIT_SPELL then CR_CRIT_SPELL = 11 end
-    if not CR_HASTE_MELEE then CR_HASTE_MELEE = 18 end
-    if not CR_HASTE_RANGED then CR_HASTE_RANGED = 19 end
-    if not CR_HASTE_SPELL then CR_HASTE_SPELL = 20 end
-    local originalGetCombatRating = GetCombatRating
-    if originalGetCombatRating then
-        GetCombatRating = function(ratingId)
-            local ok, result = pcall(originalGetCombatRating, ratingId)
-            if ok then return result end
-            return 0
-        end
-    else
-        GetCombatRating = function() return 0 end
-    end
-    if not GetCombatRatingBonus then
-        GetCombatRatingBonus = function() return 0 end
-    end
-end
 ns.STAT_AVAILABILITY = {
     ilvl        = { true, true },
     str         = { true, true },
@@ -79,6 +35,10 @@ ns.STAT_AVAILABILITY = {
     movespeed   = { true, true },
 }
 ns.IsStatAvailable = function(statId)
+    local def = ns.STAT_DEFS and ns.STAT_DEFS[statId]
+    if def and def.foreverOnly then
+        return ns.BlizzardStats ~= nil and ns.BlizzardStats.IsAvailable()
+    end
     local avail = ns.STAT_AVAILABILITY[statId]
     if not avail then return true end
     if ns.IS_RETAIL then
@@ -332,8 +292,7 @@ ns.GetPlayerRole = function()
     local _, classToken = UnitClass("player")
     local offhandLink = GetInventoryItemLink("player", 17)
     if offhandLink then
-        local _, _, _, _, _, _, subType = GetItemInfo(offhandLink)
-        if subType and (subType == "Shields" or subType == "Shield") then
+        if ns.IsShieldItem and ns.IsShieldItem(offhandLink) then
             if TANK_CLASSES[classToken] then
                 return "TANK"
             end
