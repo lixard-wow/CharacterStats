@@ -53,6 +53,7 @@ local function BuildEntries(L)
             },
             get = function(db) return CS.GetDecimals(db.decimals) end,
         },
+        { kind = "toggle", key = "itemTooltipDR", label = L.LABEL_ITEM_TOOLTIP_DR or "Show Value After Diminishing Returns on Item Tooltips", retailOnly = true, fullRow = true },
     }
 end
 ConfigPanel.RegisterPage("general", {

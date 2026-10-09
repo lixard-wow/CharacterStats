@@ -93,6 +93,7 @@ ns.DEFAULTS = {
     statBarHeight = 4,
     paperdollBarHeight = 3,
     showDiminishing = true,
+    itemTooltipDR = true,
     decimals = nil,
     ratingMode = "percent",
     style = "original",

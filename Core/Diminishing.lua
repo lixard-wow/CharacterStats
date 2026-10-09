@@ -144,3 +144,17 @@ function Diminishing.AddTooltipLines(tooltip, statId)
     end
     return true
 end
+function Diminishing.RatingPerPercent(ratingId)
+    return RatingPerPercent(ratingId)
+end
+function Diminishing.EffectivePercent(ratingId, rating)
+    local perPercent = RatingPerPercent(ratingId)
+    if not perPercent or not BRACKETS_BY_RATING[ratingId] or type(rating) ~= "number" then return nil end
+    return Compute(ratingId, math.max(0, rating), perPercent).effective
+end
+function Diminishing.MarginalPerPercent(ratingId)
+    local info = Diminishing.Info(ratingId)
+    local perPercent = RatingPerPercent(ratingId)
+    if not info or not perPercent or info.penalty >= 1 then return nil end
+    return perPercent / (1 - info.penalty)
+end

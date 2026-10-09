@@ -80,6 +80,41 @@ local function GetBorderColor(db)
     end
     return 1, 1, 1
 end
+local HOVER_INTERVAL = 0.1
+local function HoveredStat()
+    if not activeRenderer or not activeRenderer.byId then return nil end
+    for statId, row in pairs(activeRenderer.byId) do
+        local region = row.frame
+        if region and region:IsShown() and region:IsMouseOver() then
+            return statId
+        end
+    end
+    return nil
+end
+local function UpdateHover(self, elapsed)
+    self.elapsed = (self.elapsed or 0) + (elapsed or 0)
+    if self.elapsed < HOVER_INTERVAL then return end
+    self.elapsed = 0
+    local owner = self:GetParent()
+    local statId = not owner._isUserMoving and HoveredStat() or nil
+    local DR = ns.Diminishing
+    if statId and not (DR and DR.RatingFor(statId)) then
+        statId = nil
+    end
+    if statId == self.statId then return end
+    self.statId = statId
+    if not statId then
+        if GameTooltip:IsOwned(owner) then
+            GameTooltip:Hide()
+        end
+        return
+    end
+    local def = ns.STAT_DEFS[statId]
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    GameTooltip:SetText(ns.L["STAT_" .. statId:upper()] or (def and def.label) or statId, 1, 1, 1)
+    DR.AddTooltipLines(GameTooltip, statId)
+    GameTooltip:Show()
+end
 function StatsFrame:Create()
     if frame then return frame end
     local db = ns.db or ns.DEFAULTS
@@ -109,6 +144,19 @@ function StatsFrame:Create()
         elseif button == "RightButton" and ns.Share then
             ns.Share.TogglePopup()
         end
+    end)
+    frame.hover = CreateFrame("Frame", nil, frame)
+    frame:SetScript("OnEnter", function()
+        frame.hover.elapsed = HOVER_INTERVAL
+        frame.hover.statId = nil
+        frame.hover:SetScript("OnUpdate", UpdateHover)
+    end)
+    frame:SetScript("OnLeave", function()
+        frame.hover:SetScript("OnUpdate", nil)
+        if frame.hover.statId and GameTooltip:IsOwned(frame) then
+            GameTooltip:Hide()
+        end
+        frame.hover.statId = nil
     end)
     self:ApplyStyle()
     frame:SetScript("OnShow", function()

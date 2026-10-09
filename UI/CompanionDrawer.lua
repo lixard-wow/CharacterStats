@@ -284,8 +284,12 @@ local function CreateRatingsPage(parent)
                 row.cells.name:SetTextColor(r, g, b)
                 row.cells[1]:SetText(rating and BreakUpLargeNumbers(math.floor(rating + 0.5)) or "-")
                 row.cells[2]:SetText(bonus and string.format("%.2f%%", bonus) or "-")
-                if rating and bonus and bonus > 0 then
-                    row.cells[3]:SetText(string.format("%.1f", rating / bonus))
+                local perPercent = not classic and rating and ns.Diminishing and ns.Diminishing.MarginalPerPercent(def.ratingId) or nil
+                if not perPercent and rating and bonus and bonus > 0 then
+                    perPercent = rating / bonus
+                end
+                if perPercent then
+                    row.cells[3]:SetText(string.format("%.1f", perPercent))
                 else
                     row.cells[3]:SetText("-")
                 end

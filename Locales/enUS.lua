@@ -185,7 +185,7 @@ local L = {
     RATING_COL_RATING = "Rating",
     RATING_COL_BONUS = "Bonus",
     RATING_COL_PER_PERCENT = "Per 1%",
-    HINT_RATINGS = "Per 1% is the average rating per 1% at your current total, after diminishing returns. Values the game hides in combat show as a dash.",
+    HINT_RATINGS = "Per 1% is how much rating you need for 1% more at your current diminishing returns penalty. Values the game hides in combat show as a dash.",
     NAV_CHARACTER = "Character Frame",
     SECTION_STYLE = "Style",
     LABEL_STYLE = "Look",
@@ -238,6 +238,8 @@ local L = {
 
     LABEL_FONT_SIZE = "Font Size",
     DR_TITLE = "Diminishing Returns",
+    ITEM_TRUE_VALUE = "After diminishing returns",
+    LABEL_ITEM_TOOLTIP_DR = "Show Value After Diminishing Returns on Item Tooltips",
     DR_PENALTY = "Current penalty",
     DR_NONE = "None",
     DR_NEXT = "Rating until %s penalty",
