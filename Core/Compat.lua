@@ -37,7 +37,10 @@ ns.STAT_AVAILABILITY = {
 ns.IsStatAvailable = function(statId)
     local def = ns.STAT_DEFS and ns.STAT_DEFS[statId]
     if def and def.foreverOnly then
-        return ns.BlizzardStats ~= nil and ns.BlizzardStats.IsAvailable()
+        local BlizzardStats = ns.BlizzardStats
+        if not BlizzardStats then return false end
+        if BlizzardStats.IsAvailable() then return true end
+        return def.mopKey ~= nil and BlizzardStats.UsesCategories()
     end
     local avail = ns.STAT_AVAILABILITY[statId]
     if not avail then return true end

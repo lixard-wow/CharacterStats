@@ -874,17 +874,17 @@ ns.STAT_DEFS = {
     },
 }
 local FOREVER_BLIZZARD_STATS = {
-    { id = "health", key = "HEALTH", label = "Health", short = "HP", category = "general", alwaysShow = true },
-    { id = "power", key = "POWER", label = "Power", short = "Power", category = "general", alwaysShow = true, useBlizzardLabel = true },
-    { id = "mainhanddamage", key = "MAINHAND_DAMAGE", label = "Main Hand Damage", short = "MH Dmg", category = "weapons", alwaysShow = true },
+    { id = "health", key = "HEALTH", mopKey = "HEALTH", label = "Health", short = "HP", category = "general", alwaysShow = true },
+    { id = "power", key = "POWER", mopKey = "POWER", label = "Power", short = "Power", category = "general", alwaysShow = true, useBlizzardLabel = true },
+    { id = "mainhanddamage", key = "MAINHAND_DAMAGE", mopKey = "MELEE_DAMAGE", label = "Main Hand Damage", short = "MH Dmg", category = "weapons", alwaysShow = true },
     { id = "offhanddamage", key = "OFFHAND_DAMAGE", label = "Off Hand Damage", short = "OH Dmg", category = "weapons", hideIfZero = true },
-    { id = "rangeddamage", key = "RANGED_DAMAGE", label = "Ranged Damage", short = "Rng Dmg", category = "weapons", hideIfZero = true },
-    { id = "spellhealing", key = "SPELLHEALING", label = "Bonus Healing", short = "Heal", category = "secondary", hideIfZero = true },
-    { id = "spellpenetration", key = "SPELLPENETRATION", label = "Spell Penetration", short = "SPen", category = "secondary", hideIfZero = true },
+    { id = "rangeddamage", key = "RANGED_DAMAGE", mopKey = "RANGED_DAMAGE", label = "Ranged Damage", short = "Rng Dmg", category = "weapons", hideIfZero = true },
+    { id = "spellhealing", key = "SPELLHEALING", mopKey = "SPELLHEALING", label = "Bonus Healing", short = "Heal", category = "secondary", hideIfZero = true },
+    { id = "spellpenetration", key = "SPELLPENETRATION", mopKey = "SPELL_PENETRATION", label = "Spell Penetration", short = "SPen", category = "secondary", hideIfZero = true },
     { id = "armorpenetration", key = "ARMORPEN", label = "Armor Penetration", short = "ArPen", category = "secondary", hideIfZero = true },
 }
 for _, info in ipairs(FOREVER_BLIZZARD_STATS) do
-    local key = info.key
+    local key, mopKey = info.key, info.mopKey
     ns.STAT_DEFS[info.id] = {
         label = info.label,
         shortLabel = info.short,
@@ -893,8 +893,9 @@ for _, info in ipairs(FOREVER_BLIZZARD_STATS) do
         alwaysShow = info.alwaysShow,
         hideIfZero = info.hideIfZero,
         useBlizzardLabel = info.useBlizzardLabel,
+        mopKey = mopKey,
         api = function()
-            return ns.BlizzardStats.ReadForStat(key)
+            return ns.BlizzardStats.ReadForStat(key, mopKey)
         end,
     }
 end
@@ -912,6 +913,7 @@ for _, info in ipairs(FOREVER_RESISTANCES) do
         shortLabel = info.short,
         category = "resistance",
         foreverOnly = true,
+        mopKey = "RESISTANCE",
         alwaysShow = true,
         api = function()
             return ns.BlizzardStats.ReadResistance(school)

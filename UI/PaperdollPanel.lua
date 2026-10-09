@@ -139,8 +139,7 @@ local sections = {}
 local sectionPool = {}
 local rowPool = {}
 function PaperdollPanel.UsesBlizzardCategories()
-    return ns.IS_CLASSIC and not ns.BlizzardStats.IsAvailable()
-        and type(PAPERDOLL_STATCATEGORIES) == "table" and type(PAPERDOLL_STATINFO) == "table"
+    return ns.BlizzardStats.UsesCategories()
 end
 local function CategoryRelevant(key, ctx)
     if key == "MELEE" then

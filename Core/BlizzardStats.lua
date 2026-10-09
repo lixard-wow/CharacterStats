@@ -43,6 +43,7 @@ function BlizzardStats.Capture(key, unit, id)
     end
     return BlizzardStats.StripColon(capturedLabel), capturedValue, numeric
 end
+local RESISTANCE_INDEX = { Fire = 2, Nature = 3, Frost = 4, Shadow = 5, Arcane = 6 }
 local probe
 local function GetProbe()
     if probe then return probe end
@@ -76,8 +77,18 @@ function BlizzardStats.IsPercentText(key, text)
     end
     return percentByKey[key] == true
 end
-function BlizzardStats.ReadForStat(key)
-    local label, text, numeric = BlizzardStats.Capture(key, "player")
+function BlizzardStats.UsesCategories()
+    return ns.IS_CLASSIC and not BlizzardStats.IsAvailable()
+        and type(PAPERDOLL_STATCATEGORIES) == "table" and type(PAPERDOLL_STATINFO) == "table"
+end
+function BlizzardStats.ReadForStat(key, mopKey)
+    local label, text, numeric
+    if BlizzardStats.UsesCategories() then
+        if not mopKey then return nil end
+        label, text, numeric = BlizzardStats.CaptureNamed(mopKey, "player")
+    else
+        label, text, numeric = BlizzardStats.Capture(key, "player")
+    end
     if not text then return nil end
     if type(numeric) ~= "number" then
         numeric = 1
@@ -85,7 +96,7 @@ function BlizzardStats.ReadForStat(key)
     return numeric, text, label
 end
 function BlizzardStats.ReadResistance(damageClassName)
-    local damageClass = Enum and Enum.Damageclass and Enum.Damageclass[damageClassName]
+    local damageClass = (Enum and Enum.Damageclass and Enum.Damageclass[damageClassName]) or RESISTANCE_INDEX[damageClassName]
     if not damageClass or not UnitResistance then return nil end
     local ok, _, effective = pcall(UnitResistance, "player", damageClass)
     if not ok or type(effective) ~= "number" then return nil end
