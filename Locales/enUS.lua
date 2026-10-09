@@ -236,6 +236,9 @@ local L = {
     HEADER_ENHANCEMENTS = "Enhancements",
 
     LABEL_FONT_SIZE = "Font Size",
+    LABEL_BAR_HEIGHT = "Bar Thickness",
+    LABEL_PAPERDOLL_BAR_HEIGHT = "Stat Bar Thickness",
+    LABEL_SHOW_DIMINISHING = "Show Diminishing Returns on Bars",
     LABEL_ROW_SPACING = "Row Spacing",
     LABEL_BG_OPACITY = "Background Opacity",
     LABEL_BORDER_OPACITY = "Border Opacity",

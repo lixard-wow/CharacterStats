@@ -2,7 +2,9 @@ local ADDON_NAME, ns = ...
 local Styles = ns.Styles
 local ipairs = ipairs
 local ROW_HEIGHT = 15
-local BAR_ROW_HEIGHT = 20
+local function BarRowHeight(db)
+    return ROW_HEIGHT + 2 + ns.Styles.BarHeight(db, "paperdollBarHeight", 3)
+end
 local FONT_SIZE = 10
 local SCHOOL_COLORS = {
     fire = { 1, 0.5, 0 },
@@ -117,13 +119,14 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
         row.highlight:SetShown(striped)
         local hasBar = opts.bars and Styles.HasBar(stat)
         if hasBar then
+            row.bar:SetHeight(Styles.BarHeight(db, "paperdollBarHeight", 3))
             row.bar:SetStatusBarColor(sr, sg, sb, 0.9)
             Styles.SetBarValue(row.bar, stat, barScale)
             row.bar:Show()
         else
             row.bar:Hide()
         end
-        row:SetHeight(hasBar and BAR_ROW_HEIGHT or ROW_HEIGHT)
+        row:SetHeight(hasBar and BarRowHeight(db) or ROW_HEIGHT)
         row.blizzardRow = nil
         row.statId = stat.id
         row.tooltipTitle = stat.label
@@ -133,7 +136,7 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
         else
             row.tooltipValue = ns.FormatNumber(stat.value, 0)
         end
-        return hasBar and BAR_ROW_HEIGHT or ROW_HEIGHT
+        return hasBar and BarRowHeight(db) or ROW_HEIGHT
     end
     local barProxy = {}
     local function FillBlizzardRow(row, item, colon, striped, barScale)
@@ -160,13 +163,14 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
         if hasBar then
             local sr, sg, sb = ns.GetStatColor(item.statId or "crit")
             barProxy.value = item.numericValue
+            row.bar:SetHeight(Styles.BarHeight(ns.db, "paperdollBarHeight", 3))
             row.bar:SetStatusBarColor(sr, sg, sb, 0.9)
             Styles.SetBarValue(row.bar, barProxy, barScale)
             row.bar:Show()
         else
             row.bar:Hide()
         end
-        local height = hasBar and BAR_ROW_HEIGHT or ROW_HEIGHT
+        local height = hasBar and BarRowHeight(ns.db) or ROW_HEIGHT
         row:SetHeight(height)
         row.blizzardRow = item
         row.statId = nil

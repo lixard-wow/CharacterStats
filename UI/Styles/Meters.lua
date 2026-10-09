@@ -5,7 +5,6 @@ local PAD = 10
 local MIN_WIDTH = 170
 local CELL_WIDTH = 74
 local CELL_GAP = 8
-local BAR_HEIGHT = 4
 local BAR_GAP = 3
 local HEADER_GAP = 4
 local function CreateMeter(parent)
@@ -15,7 +14,6 @@ local function CreateMeter(parent)
     meter.value = meter.frame:CreateFontString(nil, "OVERLAY")
     meter.bar = CreateFrame("StatusBar", nil, meter.frame)
     meter.bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8x8")
-    meter.bar:SetHeight(BAR_HEIGHT)
     meter.bar.bg = meter.bar:CreateTexture(nil, "BACKGROUND")
     meter.bar.bg:SetAllPoints()
     meter.bar.bg:SetColorTexture(1, 1, 1, 0.08)
@@ -57,6 +55,7 @@ local function CreateStatsRenderer(parent)
         Styles.ApplyStatColor(stat, db, meter.label, meter.value)
         local hasBar = Styles.HasBar(stat)
         if hasBar then
+            meter.bar:SetHeight(Styles.BarHeight(db, "statBarHeight", 4))
             local sr, sg, sb = ns.GetStatColor(stat.id)
             meter.bar:SetStatusBarColor(sr, sg, sb, 0.9 * (db.textAlpha or 1))
             Styles.SetBarValue(meter.bar, stat, r.barScale)
@@ -115,7 +114,7 @@ local function CreateStatsRenderer(parent)
             local isIlvl = stat.id == "ilvl"
             local labelWidth, valueWidth = FillMeter(meter, stat, db, fontPath, isIlvl and (db.fontSize + 4) or nil)
             local textHeight = isIlvl and (db.fontSize + 6) or (db.fontSize + 2)
-            local height = textHeight + (meter.hasBar and (BAR_GAP + BAR_HEIGHT) or 0)
+            local height = textHeight + (meter.hasBar and (BAR_GAP + Styles.BarHeight(db, "statBarHeight", 4)) or 0)
             meter.frame:ClearAllPoints()
             meter.frame:SetPoint("TOPLEFT", self.container, "TOPLEFT", PAD, y)
             meter.frame:SetPoint("TOPRIGHT", self.container, "TOPRIGHT", -PAD, y)
@@ -145,7 +144,7 @@ local function CreateStatsRenderer(parent)
     local function LayoutHorizontal(self, stats, db, fontPath)
         local x = PAD
         local count = 0
-        local cellHeight = db.fontSize * 2 + 6 + BAR_GAP + BAR_HEIGHT
+        local cellHeight = db.fontSize * 2 + 6 + BAR_GAP + Styles.BarHeight(db, "statBarHeight", 4)
         for _, stat in ipairs(stats) do
             count = count + 1
             local meter = AcquireMeter(count)

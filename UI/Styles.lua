@@ -127,7 +127,51 @@ function Styles.PlaceHeader(header, container, pad, y, label, fontPath, db)
     header.frame:Show()
     return height, Styles.SafeStringWidth(header.text, 0) + 20
 end
+local DR_START = 30
+local DR_RATINGS = { [9] = true, [18] = true, [26] = true, [29] = true }
+local function EnsureOverflow(bar)
+    local existing = rawget(bar, "over")
+    if existing then return existing end
+    local over = CreateFrame("StatusBar", nil, bar)
+    over:SetAllPoints(bar)
+    over:SetStatusBarTexture("Interface\\Buttons\\WHITE8x8")
+    over:SetFrameLevel(bar:GetFrameLevel() + 1)
+    bar.over = over
+    return over
+end
+local function SetDiminishingBar(bar, ratingId)
+    local db = ns.db
+    if not ns.IS_RETAIL or not ratingId or not DR_RATINGS[ratingId] or not GetCombatRatingBonus then return false end
+    if db and db.showDiminishing == false then return false end
+    local ok, bonus = pcall(GetCombatRatingBonus, ratingId)
+    if not ok or type(bonus) ~= "number" then return false end
+    local over = EnsureOverflow(bar)
+    bar:SetMinMaxValues(0, DR_START)
+    if not pcall(bar.SetValue, bar, bonus) then
+        bar:SetValue(0)
+    end
+    over:SetMinMaxValues(DR_START, DR_START * 2)
+    if not pcall(over.SetValue, over, bonus) then
+        over:SetValue(DR_START)
+    end
+    local r, g, b, a = bar:GetStatusBarColor()
+    over:SetStatusBarColor((r or 1) * 0.5, (g or 1) * 0.5, (b or 1) * 0.5, a or 1)
+    over:Show()
+    return true
+end
+function Styles.BarHeight(db, key, fallback)
+    local value = db and db[key]
+    if type(value) ~= "number" then
+        return fallback
+    end
+    return math.max(1, math.floor(value + 0.5))
+end
 function Styles.SetBarValue(bar, stat, maxValue)
+    if SetDiminishingBar(bar, stat.ratingId) then return end
+    local over = rawget(bar, "over")
+    if over then
+        over:Hide()
+    end
     bar:SetMinMaxValues(0, maxValue)
     local ok = pcall(bar.SetValue, bar, stat.value)
     if not ok then

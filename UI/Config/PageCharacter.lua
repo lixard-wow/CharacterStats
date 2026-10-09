@@ -49,6 +49,16 @@ local function BuildEntries(L)
                 ApplyGearBadges()
             end,
         },
+        {
+            kind = "slider", key = "paperdollBarHeight", label = L.LABEL_PAPERDOLL_BAR_HEIGHT or "Stat Bar Thickness",
+            min = 1, max = 10, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            disabled = function() return CS.Styles.GetActive().id ~= "meters" end,
+            onChange = function()
+                if CS.PaperdollPanel then CS.PaperdollPanel:Refresh() end
+                MarkDirty()
+            end,
+        },
         { kind = "header", label = L.SECTION_GEAR_SLOTS or "Gear Slots" },
         { kind = "toggle", key = "gearBadges", label = L.LABEL_GEAR_BADGES or "Show Item Level on Gear Slots", fullRow = true, onChange = ApplyGearBadges },
         { kind = "toggle", key = "gearFlags", label = L.LABEL_GEAR_FLAGS or "Flag Missing Enchants and Empty Gem Sockets", fullRow = true, onChange = ApplyGearBadges },

@@ -120,6 +120,21 @@ local function BuildEntries(L)
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
         },
         {
+            kind = "slider", key = "statBarHeight", label = L.LABEL_BAR_HEIGHT or "Bar Thickness",
+            min = 1, max = 12, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            disabled = function() return CS.Styles.GetActive().id ~= "meters" end,
+        },
+        {
+            kind = "toggle", key = "showDiminishing", label = L.LABEL_SHOW_DIMINISHING or "Show Diminishing Returns on Bars", fullRow = true,
+            retailOnly = true,
+            disabled = function() return CS.Styles.GetActive().id ~= "meters" end,
+            onChange = function()
+                ConfigPanel.RefreshStatsFrame()
+                if CS.PaperdollPanel then CS.PaperdollPanel:Refresh() end
+            end,
+        },
+        {
             kind = "toggle", key = "showSeparator", label = L.LABEL_SHOW_SEPARATOR or "Show Separator (Horizontal)", fullRow = true,
             disabled = function(db) return not IsHorizontal(db) or not IsLedger(db) end,
         },
