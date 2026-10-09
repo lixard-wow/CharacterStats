@@ -146,7 +146,11 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
             labelText = CreateAtlasMarkup(item.atlas, RESIST_ICON_SIZE, RESIST_ICON_SIZE) .. " " .. labelText
         end
         row.label:SetText(labelText)
-        row.value:SetText(item.value)
+        local valueText = item.value
+        if type(valueText) == "string" and not ns.IsSecretValue(valueText) then
+            valueText = valueText:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+        end
+        row.value:SetText(valueText)
         local schoolColor = item.school and SCHOOL_COLORS[item.school:lower()]
         if schoolColor then
             row.label:SetTextColor(schoolColor[1], schoolColor[2], schoolColor[3])
