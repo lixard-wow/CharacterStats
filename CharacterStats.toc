@@ -27,6 +27,7 @@ Locales\koKR.lua
 Locales\zhCN.lua
 Locales\zhTW.lua
 Core\Stats.lua
+Core\Diminishing.lua
 Core\Gear.lua
 UI\Theme.lua
 UI\Styles.lua

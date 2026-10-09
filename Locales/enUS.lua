@@ -236,6 +236,12 @@ local L = {
     HEADER_ENHANCEMENTS = "Enhancements",
 
     LABEL_FONT_SIZE = "Font Size",
+    DR_TITLE = "Diminishing Returns",
+    DR_PENALTY = "Current penalty",
+    DR_NONE = "None",
+    DR_NEXT = "Rating until %s penalty",
+    DR_EFFECTIVE = "Effective rating",
+    DR_STALE = "Stats are hidden right now, showing the last known values.",
     LABEL_BAR_HEIGHT = "Bar Thickness",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Stat Bar Thickness",
     LABEL_SHOW_DIMINISHING = "Show Diminishing Returns on Bars",

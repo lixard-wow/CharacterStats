@@ -127,8 +127,6 @@ function Styles.PlaceHeader(header, container, pad, y, label, fontPath, db)
     header.frame:Show()
     return height, Styles.SafeStringWidth(header.text, 0) + 20
 end
-local DR_START = 30
-local DR_RATINGS = { [9] = true, [18] = true, [26] = true, [29] = true }
 local function EnsureOverflow(bar)
     local existing = rawget(bar, "over")
     if existing then return existing end
@@ -139,20 +137,23 @@ local function EnsureOverflow(bar)
     bar.over = over
     return over
 end
-local function SetDiminishingBar(bar, ratingId)
+local function SetDiminishingBar(bar, statId)
     local db = ns.db
-    if not ns.IS_RETAIL or not ratingId or not DR_RATINGS[ratingId] or not GetCombatRatingBonus then return false end
     if db and db.showDiminishing == false then return false end
+    local DR = ns.Diminishing
+    local ratingId = DR and statId and DR.RatingFor(statId)
+    local threshold = ratingId and DR.FirstThreshold(ratingId)
+    if not threshold or not GetCombatRatingBonus then return false end
     local ok, bonus = pcall(GetCombatRatingBonus, ratingId)
     if not ok or type(bonus) ~= "number" then return false end
     local over = EnsureOverflow(bar)
-    bar:SetMinMaxValues(0, DR_START)
+    bar:SetMinMaxValues(0, threshold)
     if not pcall(bar.SetValue, bar, bonus) then
         bar:SetValue(0)
     end
-    over:SetMinMaxValues(DR_START, DR_START * 2)
+    over:SetMinMaxValues(threshold, threshold * 2)
     if not pcall(over.SetValue, over, bonus) then
-        over:SetValue(DR_START)
+        over:SetValue(threshold)
     end
     local r, g, b, a = bar:GetStatusBarColor()
     over:SetStatusBarColor((r or 1) * 0.5, (g or 1) * 0.5, (b or 1) * 0.5, a or 1)
@@ -167,7 +168,7 @@ function Styles.BarHeight(db, key, fallback)
     return math.max(1, math.floor(value + 0.5))
 end
 function Styles.SetBarValue(bar, stat, maxValue)
-    if SetDiminishingBar(bar, stat.ratingId) then return end
+    if SetDiminishingBar(bar, stat.id) then return end
     local over = rawget(bar, "over")
     if over then
         over:Hide()

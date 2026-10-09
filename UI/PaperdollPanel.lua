@@ -159,8 +159,17 @@ function PaperdollPanel.ShowBlizzardRowTooltip(owner, row)
     GameTooltip:Show()
 end
 ns.PaperdollPanel = PaperdollPanel
+local function AddDiminishingLines(owner, statId)
+    if not ns.Diminishing or not GameTooltip:IsOwned(owner) then return end
+    if ns.Diminishing.AddTooltipLines(GameTooltip, statId) then
+        GameTooltip:Show()
+    end
+end
 function PaperdollPanel.ShowStatTooltip(owner, statId, title, valueText, bodyText)
-    if TryShowBlizzardTooltip(owner, statId) then return end
+    if TryShowBlizzardTooltip(owner, statId) then
+        AddDiminishingLines(owner, statId)
+        return
+    end
     if not title then return end
     GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
     if valueText and ns.IsSecretValue(valueText) then
@@ -177,6 +186,7 @@ function PaperdollPanel.ShowStatTooltip(owner, statId, title, valueText, bodyTex
         GameTooltip:AddLine(bodyText, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true)
     end
     GameTooltip:Show()
+    AddDiminishingLines(owner, statId)
 end
 function PaperdollPanel.GetLocaleColon()
     local locale = GetLocale()
