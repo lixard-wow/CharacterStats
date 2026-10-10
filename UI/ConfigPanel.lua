@@ -296,6 +296,18 @@ end
 function ConfigPanel.GetFrame()
     return frame
 end
+function ConfigPanel.SetWindowScale(scale)
+    if not frame then return end
+    local oldScale = frame:GetScale()
+    if not scale or scale == oldScale then return end
+    local left, top = frame:GetLeft(), frame:GetTop()
+    frame:SetScale(scale)
+    if left and top then
+        local ratio = oldScale / scale
+        frame:ClearAllPoints()
+        frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left * ratio, top * ratio)
+    end
+end
 function ConfigPanel.Open()
     ConfigPanel.Show()
 end

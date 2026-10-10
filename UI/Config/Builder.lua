@@ -91,6 +91,7 @@ local function BuildControl(page, entry, row)
             format = entry.format,
             formatValue = entry.formatValue,
             value = entry.min,
+            commitOnRelease = entry.commitOnRelease,
             onChange = function(val)
                 WriteValue(entry, val)
                 page:OnValueChanged(entry, val)

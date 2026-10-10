@@ -292,13 +292,13 @@ function Widgets.CreateSlider(parent, opts)
         end
         return val
     end
-    function s:SetValue(val, fromUser)
+    function s:SetValue(val, fromUser, deferCommit)
         val = tonumber(val) or s.min
         val = math.max(s.min, math.min(s.max, val))
         val = RoundToStep(val)
         s.value = val
         UpdateVisuals()
-        if fromUser and opts.onChange then
+        if fromUser and opts.onChange and not deferCommit then
             opts.onChange(val)
         end
     end
@@ -317,18 +317,23 @@ function Widgets.CreateSlider(parent, opts)
         return s.min + t * (s.max - s.min)
     end
     local dragging = false
+    local deferCommit = opts.commitOnRelease
     s.hit:SetScript("OnMouseDown", function()
         dragging = true
-        s:SetValue(ValueFromCursor(), true)
+        s:SetValue(ValueFromCursor(), true, deferCommit)
         s:SetScript("OnUpdate", function()
             if dragging then
-                s:SetValue(ValueFromCursor(), true)
+                s:SetValue(ValueFromCursor(), true, deferCommit)
             end
         end)
     end)
     s.hit:SetScript("OnMouseUp", function()
+        if not dragging then return end
         dragging = false
         s:SetScript("OnUpdate", nil)
+        if deferCommit and opts.onChange then
+            opts.onChange(s.value)
+        end
     end)
     s.track:HookScript("OnSizeChanged", UpdateVisuals)
     s:SetValue(opts.value or opts.min or 0, false)

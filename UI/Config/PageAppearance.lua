@@ -191,9 +191,9 @@ local function BuildEntries(L)
         {
             kind = "slider", key = "uiScale", label = L.LABEL_OPTIONS_SCALE or "Options Window Scale",
             min = 0.5, max = 1.5, step = 0.05, format = "%.2f",
+            commitOnRelease = true,
             onChange = function(value)
-                local f = ConfigPanel.GetFrame()
-                if f then f:SetScale(value) end
+                ConfigPanel.SetWindowScale(value)
                 if CS.MarkProfileDirty then CS.MarkProfileDirty() end
             end,
         },
