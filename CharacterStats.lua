@@ -223,12 +223,8 @@ end
 eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
         ns.ApplyLocaleOverride(CharacterStatsDB and CharacterStatsDB.localeOverride)
-        local freshInstall = CharacterStatsDB == nil
         if not CharacterStatsDB then
             CharacterStatsDB = {}
-        end
-        if CharacterStatsDB.uiTheme == nil and ns.Theme then
-            CharacterStatsDB.uiTheme = ns.Theme.DefaultKey(freshInstall)
         end
         for k, v in pairs(ns.DEFAULTS) do
             if CharacterStatsDB[k] == nil then
@@ -347,9 +343,6 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
         end
         if ns.CharacterButton then
             ns.CharacterButton.Apply()
-        end
-        if ns.StylePicker then
-            C_Timer.After(2, ns.StylePicker.ShowIfFirstRun)
         end
         if ns.Integrations then
             C_Timer.After(4, ns.Integrations.CheckOnLogin)

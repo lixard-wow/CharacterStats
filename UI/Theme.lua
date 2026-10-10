@@ -75,11 +75,6 @@ function Theme.GetDescription(key)
     if not def then return "" end
     return ns.L[def.descKey] or def.fallbackDesc
 end
-function Theme.DefaultKey(freshInstall)
-    if not freshInstall then return "classic" end
-    if ns.BlizzardStats and ns.BlizzardStats.IsAvailable() then return "ledger" end
-    return "workbench"
-end
 function Theme.Load()
     local db = ns.db
     local key = db and db.uiTheme
