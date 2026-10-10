@@ -112,7 +112,7 @@ function Styles.CreateHeader(parent)
     return header
 end
 function Styles.PlaceHeader(header, container, pad, y, label, fontPath, db)
-    local size = math.max(8, db.fontSize - 2)
+    local size = math.max(4, db.fontSize - 2)
     local height = size + 6
     local alpha = db.textAlpha or 1
     local r, g, b = ns.GetAccentColor()

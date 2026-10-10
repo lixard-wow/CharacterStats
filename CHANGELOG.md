@@ -4,19 +4,20 @@
 
 ### Added
 
-- Four looks for the stats panel and the character window: Original, Ledger, Meters and Companion. A picker shows on first run with a live preview; change it any time with `/cs style`.
-- Three window themes for the options window and popups: Workbench, Artisan Ledger and Lixard Classic. Pick one in Appearance or cycle with `/cs theme`.
-- A new options window with a sidebar of pages.
-- Character window: item level on every gear slot, colored by upgrade track, with enchant and gem icons beside each slot (hover for details) and a "Missing enchant" note on slots that should be enchanted.
+- Four looks for the stats panel and the character window: Original, Ledger, Meters and Companion. Original stays the default; pick another under Appearance or with `/cs style`, which opens a picker with a live preview.
+- Three window themes for the options window and popups: Classic (the default), Workbench and Artisan Ledger. Pick one from the gear button in the options window's title bar or cycle with `/cs theme`.
+- A new options window with a sidebar of pages. Its title bar has a gear button for the window's own settings (theme, accent color, scale) and a minimize button.
+- Frame Scale setting for the stats panel, and Font Size now goes down to 4.
+- Character window (off by default, turn on under Character Frame): item level on every gear slot, colored by upgrade track, with enchant and gem icons beside each slot (hover for details) and a "Missing enchant" note on slots that should be enchanted.
 - A drawer beside the character window with Stats, Gear and Ratings tabs.
-- An options button on the character window.
+- An options button on the character window (off by default).
 - Diminishing returns:
   - In the Meters look, crit, haste, mastery and versatility bars fill up to the point where the penalty starts; past it, a darker shade fills back in to show how far over you are. Leech, avoidance and speed use their own, earlier start point.
   - Hovering those stats (stats panel or character window) shows your current penalty, the rating until the next penalty, and your effective rating.
-  - Item tooltips show what each stat on an item is worth after diminishing returns, and how much the penalty takes away. Can be turned off under General.
+  - Item tooltips show what each stat on an item is worth after diminishing returns, and how much the penalty takes away (off by default, turn on under General).
   - The drawer's Ratings tab shows the rating needed for 1% more at your current penalty.
 - Bar thickness settings for the stats panel and the character window (Meters look).
-- Detection of other addons that restyle the character window (ElvUI, EllesmereUI, Chonky Character Sheet and others), with a popup that offers to turn off the conflicting part or the other addon.
+- Detection of other addons that restyle the character window (ElvUI, EllesmereUI, Chonky Character Sheet and others), with a popup that offers to turn off the conflicting part or the other addon (off by default, turn on under Character Frame).
 - WoW Classic Forever support: Blizzard's own stat list on the character window, resistances colored by school, the ranged slot, and a Ratings tab with the combat ratings that client uses. The drawer sits clear of the character window's side tabs.
 - MoP Classic: the character window lists Blizzard's own stat categories (General, Attributes, Melee, Ranged, Spell, Defense, Resistance) in a scrolling list, showing only what matters for your class and spec, with every stat in its own color. Health, Power, weapon damage, Spell Healing, Spell Penetration and resistances are now in the Stats list too. Supports MoP Classic 5.5.4.
 - Addon language: show CharacterStats in any of its languages, independent of your game language, from General > Language or with `/cs locale`.

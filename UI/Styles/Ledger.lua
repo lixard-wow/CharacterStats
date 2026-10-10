@@ -183,7 +183,7 @@ local function CreateStatsRenderer(parent, original)
             if stat.id == "ilvl" and grouped then
                 local headline = self.headline
                 local bigSize = db.fontSize + 9
-                local captionSize = math.max(8, db.fontSize - 2)
+                local captionSize = math.max(4, db.fontSize - 2)
                 headline.value:SetFont(fontPath, bigSize, db.fontOutline)
                 headline.value:SetText(Styles.FormatValue(stat, db))
                 ApplyStatColor(stat, db, headline.value)

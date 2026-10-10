@@ -3,7 +3,10 @@ local CharacterButton = {}
 ns.CharacterButton = CharacterButton
 local TAB_TEXTURE = "Interface\\PaperDollInfoFrame\\PaperDollSidebarTabs"
 local ICON_TEXTURE = "Interface\\AddOns\\CharacterStats\\Assets\\CharacterStats_minimap_32x32.tga"
+local TAB_MARGIN = 30
+local TAB_GAP = 4
 local button
+local originalTabs
 local function GetLastTab()
     local last
     for index = 1, 8 do
@@ -75,8 +78,44 @@ local function Create()
     tabs:HookScript("OnShow", CharacterButton.Apply)
     return button
 end
+local function CenterTabs(on)
+    local tabs = rawget(_G, "PaperDollSidebarTabs")
+    local last = rawget(_G, "PaperDollSidebarTab3")
+    if not tabs or not last or not button then return end
+    local forever = ns.PaperdollPanel and ns.PaperdollPanel.UsesBlizzardStatList()
+    local inset = rawget(_G, "CharacterFrameInsetRight")
+    if not forever and not inset then return end
+    if on and not forever and GetLastTab() ~= last then on = false end
+    if not originalTabs then
+        if not on then return end
+        originalTabs = {
+            width = tabs:GetWidth(),
+            tabsPoint = { tabs:GetPoint(1) },
+            lastPoint = { last:GetPoint(1) },
+        }
+    end
+    local extra = button.gap + button:GetWidth()
+    tabs:ClearAllPoints()
+    if forever then
+        local point, relativeTo, relativePoint, x, y = unpack(originalTabs.tabsPoint)
+        tabs:SetPoint(point, relativeTo, relativePoint, (x or 0) - (on and extra / 2 or 0), y or 0)
+        return
+    end
+    last:ClearAllPoints()
+    if on then
+        local groupWidth = last:GetWidth() * 3 + TAB_GAP * 2 + extra
+        tabs:SetWidth(groupWidth + TAB_MARGIN * 2)
+        tabs:SetPoint("BOTTOM", inset, "TOP", 0, originalTabs.tabsPoint[5] or 0)
+        last:SetPoint("BOTTOMRIGHT", tabs, "BOTTOMRIGHT", -(TAB_MARGIN + extra), 0)
+    else
+        tabs:SetWidth(originalTabs.width)
+        tabs:SetPoint(unpack(originalTabs.tabsPoint))
+        last:SetPoint(unpack(originalTabs.lastPoint))
+    end
+end
 function CharacterButton.Place()
     if not button then return end
+    CenterTabs(true)
     local anchor = GetLastTab()
     button:ClearAllPoints()
     button:SetPoint("LEFT", anchor, "RIGHT", button.gap or 4, 0)
@@ -89,6 +128,7 @@ function CharacterButton.Apply()
     end
     if not show then
         if button then button:Hide() end
+        CenterTabs(false)
         return
     end
     if Create() then

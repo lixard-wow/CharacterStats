@@ -50,7 +50,7 @@ Theme.THEMES = {
         },
     },
     classic = {
-        nameKey = "THEME_CLASSIC", fallbackName = "Lixard Classic",
+        nameKey = "THEME_CLASSIC", fallbackName = "Classic",
         descKey = "THEME_CLASSIC_DESC", fallbackDesc = "The original CharacterStats look.",
         titleSize = 16, windowRadius = 0, buttonRadius = 0,
         headerFill = true,
@@ -74,11 +74,6 @@ function Theme.GetDescription(key)
     local def = Theme.THEMES[key]
     if not def then return "" end
     return ns.L[def.descKey] or def.fallbackDesc
-end
-function Theme.DefaultKey(freshInstall)
-    if not freshInstall then return "classic" end
-    if ns.BlizzardStats and ns.BlizzardStats.IsAvailable() then return "ledger" end
-    return "workbench"
 end
 function Theme.Load()
     local db = ns.db
@@ -312,13 +307,17 @@ function Theme.Window(frame, headerHeight, noRing)
     frame.headerLine = line
 end
 function Theme.CloseButton(parent, size)
+    return Theme.IconButton(parent, size, "icon_close")
+end
+function Theme.IconButton(parent, size, iconName)
     local _, C = Theme.Get()
     local T = Theme.T
     local button = CreateFrame("Button", nil, parent)
     button:SetSize(size, size)
     local fill = Theme.Box(button, "button", "buttonBorder", T.buttonRadius)
     local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetTexture(Theme.ART .. "icon_close")
+    button.icon = icon
+    icon:SetTexture(Theme.ART .. iconName)
     icon:SetSize(math.floor(size * 0.5 + 0.5), math.floor(size * 0.5 + 0.5))
     icon:SetPoint("CENTER")
     Theme.Tint(icon, C.muted)

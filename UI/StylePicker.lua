@@ -349,16 +349,3 @@ function StylePicker.Show()
     UpdateCards()
     frame:Show()
 end
-function StylePicker.ShowIfFirstRun()
-    if not ns.db or ns.db.stylePickerSeen then return end
-    if InCombatLockdown() then
-        local waiter = CreateFrame("Frame")
-        waiter:RegisterEvent("PLAYER_REGEN_ENABLED")
-        waiter:SetScript("OnEvent", function(self)
-            self:UnregisterAllEvents()
-            StylePicker.ShowIfFirstRun()
-        end)
-        return
-    end
-    StylePicker.Show()
-end

@@ -61,6 +61,37 @@ local function BuildEntries(L)
         },
         { kind = "header", label = L.SECTION_GEAR_SLOTS or "Gear Slots" },
         { kind = "toggle", key = "gearBadges", label = L.LABEL_GEAR_BADGES or "Show Item Level on Gear Slots", fullRow = true, onChange = ApplyGearBadges },
+        {
+            kind = "slider", key = "gearLevelSize", label = L.LABEL_GEAR_LEVEL_SIZE or "Item Level Size",
+            min = 6, max = 20, step = 1, format = "%.0f", onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
+            kind = "dropdown", key = "gearLevelAnchor", label = L.LABEL_GEAR_LEVEL_POSITION or "Item Level Position",
+            items = {
+                { value = "TOPLEFT", text = L.POS_TOPLEFT or "Top Left" },
+                { value = "TOP", text = L.POS_TOP or "Top" },
+                { value = "TOPRIGHT", text = L.POS_TOPRIGHT or "Top Right" },
+                { value = "LEFT", text = L.POS_LEFT or "Left" },
+                { value = "CENTER", text = L.POS_CENTER or "Center" },
+                { value = "RIGHT", text = L.POS_RIGHT or "Right" },
+                { value = "BOTTOMLEFT", text = L.POS_BOTTOMLEFT or "Bottom Left" },
+                { value = "BOTTOM", text = L.POS_BOTTOM or "Bottom" },
+                { value = "BOTTOMRIGHT", text = L.POS_BOTTOMRIGHT or "Bottom Right" },
+            },
+            onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
+            kind = "slider", key = "gearLevelX", label = L.LABEL_GEAR_LEVEL_X or "Horizontal Offset",
+            min = -20, max = 20, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
+            kind = "slider", key = "gearLevelY", label = L.LABEL_GEAR_LEVEL_Y or "Vertical Offset",
+            min = -20, max = 20, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
         { kind = "toggle", key = "gearFlags", label = L.LABEL_GEAR_FLAGS or "Flag Missing Enchants and Empty Gem Sockets", fullRow = true, onChange = ApplyGearBadges },
         { kind = "toggle", key = "gearDetails", label = L.LABEL_GEAR_DETAILS or "Show Enchants and Gems Next to Gear Slots", fullRow = true, onChange = ApplyGearBadges },
         {

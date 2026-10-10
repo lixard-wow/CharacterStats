@@ -38,18 +38,20 @@ local ENCHANT_FALLBACK_ICON = "Interface\\Icons\\Trade_Engraving"
 local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
-local function SplitEnchant(text)
-    local atlas = text:match("|A:([^:|]+)")
-    local name = text:gsub("%s*|A:.-|a", "")
-    name = name:match("^%s*(.-)%s*$")
-    return name, atlas
-end
 local function ShowEnchantTooltip(self)
-    if not self.enchantName then return end
+    local spell, item
+    if self.enchantId then
+        spell, item = ns.GetEnchantSource(self.enchantId)
+    end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
-    if self.enchantAtlas then
-        GameTooltip:AddLine(CreateAtlasMarkup and CreateAtlasMarkup(self.enchantAtlas, 16, 16) or "", 1, 1, 1)
+    if spell then
+        GameTooltip:SetSpellByID(spell)
+    elseif item then
+        GameTooltip:SetItemByID(item)
+    elseif self.enchantName then
+        GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
+    else
+        return
     end
     GameTooltip:Show()
 end
@@ -154,9 +156,9 @@ local function UpdateDetail(detail, entry, db)
         detail.enchant:SetTextColor(r, g, b)
         hasContent = true
     elseif entry.enchantText and iconMode then
-        local name, atlas = SplitEnchant(entry.enchantText)
-        icon.enchantName = name
-        icon.enchantAtlas = atlas
+        local atlas = entry.enchantText:match("|A:([^:|]+)")
+        icon.enchantId = entry.enchantId
+        icon.enchantName = entry.enchantText:gsub("%s*|A:.-|a", ""):match("^%s*(.-)%s*$")
         if atlas and icon.texture.SetAtlas then
             icon.texture:SetTexCoord(0, 1, 0, 1)
             icon.texture:SetAtlas(atlas)
@@ -192,6 +194,20 @@ local function UpdateDetail(detail, entry, db)
     PlaceEnchantText(detail, icon:IsShown())
     detail:SetShown(hasContent)
 end
+local LEVEL_INSET = 2
+local function ApplyLevelLayout(badge, db)
+    local size = db.gearLevelSize or 11
+    local anchor = db.gearLevelAnchor or "TOPRIGHT"
+    local x, y = db.gearLevelX or 0, db.gearLevelY or 0
+    local key = size .. anchor .. x .. ":" .. y
+    if badge.levelLayout == key then return end
+    badge.levelLayout = key
+    local insetX = anchor:find("LEFT") and 1 or (anchor:find("RIGHT") and -1 or 0)
+    local insetY = anchor:find("TOP") and -LEVEL_INSET or (anchor:find("BOTTOM") and LEVEL_INSET or 0)
+    badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
+    badge.level:ClearAllPoints()
+    badge.level:SetPoint(anchor, badge, anchor, insetX + x, insetY + y)
+end
 local function GetBadge(slot)
     local badge = badges[slot]
     if badge then return badge end
@@ -201,8 +217,6 @@ local function GetBadge(slot)
     badge:SetAllPoints(button)
     badge:SetFrameLevel(button:GetFrameLevel() + 5)
     badge.level = badge:CreateFontString(nil, "OVERLAY")
-    badge.level:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
-    badge.level:SetPoint("TOPRIGHT", badge, "TOPRIGHT", -1, -2)
     badge.flag = badge:CreateTexture(nil, "OVERLAY")
     badge.flag:SetSize(8, 8)
     badge.flag:SetPoint("TOPLEFT", badge, "TOPLEFT", 2, -2)
@@ -265,6 +279,7 @@ function GearBadges.Refresh()
         if badge then
             if entry and entry.link then
                 if showLevels and entry.itemLevel then
+                    ApplyLevelLayout(badge, db)
                     badge.level:SetText(string.format("%d", entry.itemLevel))
                     badge.level:SetTextColor(GearBadges.GetTrackColor(db, entry.track))
                     badge.level:Show()

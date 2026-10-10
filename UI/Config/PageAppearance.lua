@@ -17,26 +17,12 @@ local function BuildFontItems(L)
     end
     return items
 end
-local function BuildThemeItems()
-    local items = {}
-    for _, theme in ipairs(CS.THEMES) do
-        items[#items + 1] = { value = theme.id, text = CS.GetThemeName(theme.id) }
-    end
-    return items
-end
 local function IsHorizontal(db)
     return db.orientation == "horizontal"
 end
 local function IsLedger()
     local id = CS.Styles.GetActive().id
     return id == "ledger" or id == "original"
-end
-local function BuildUIThemeItems()
-    local items = {}
-    for _, key in ipairs(CS.Theme.ORDER) do
-        items[#items + 1] = { value = key, text = CS.Theme.GetName(key) }
-    end
-    return items
 end
 local function BuildStyleItems()
     local items = {}
@@ -45,23 +31,9 @@ local function BuildStyleItems()
     end
     return items
 end
-local function ApplyTheme()
-    ConfigPanel.RefreshTheme()
-    ConfigPanel.RefreshStatsFrame()
-end
 local function BuildEntries(L)
     local fontItems
     return {
-        { kind = "header", label = L.SECTION_UI_THEME or "Window Theme" },
-        {
-            kind = "dropdown", key = "uiTheme", label = L.LABEL_UI_THEME or "Theme",
-            items = BuildUIThemeItems,
-            get = function() return CS.Theme.Get() and CS.Theme.key end,
-            set = function() end,
-            onChange = function(value)
-                CS.Theme.Set(value)
-            end,
-        },
         { kind = "header", label = L.SECTION_STYLE or "Style" },
         {
             kind = "dropdown", key = "style", label = L.LABEL_STYLE or "Look",
@@ -77,7 +49,7 @@ local function BuildEntries(L)
                 return fontItems
             end,
         },
-        { kind = "slider", key = "fontSize", label = L.LABEL_FONT_SIZE or "Font Size", min = 8, max = 16, step = 1, format = "%.0f" },
+        { kind = "slider", key = "fontSize", label = L.LABEL_FONT_SIZE or "Font Size", min = 4, max = 16, step = 1, format = "%.0f" },
         {
             kind = "slider", key = "textAlpha", label = L.LABEL_TEXT_OPACITY or "Text Opacity",
             min = 0, max = 1, step = 0.05, formatValue = FormatPercentValue,
@@ -90,6 +62,10 @@ local function BuildEntries(L)
         { kind = "toggle", key = "useShortNames", label = L.LABEL_SHORT_NAMES or "Use Abbreviated Names" },
         { kind = "toggle", key = "showColon", label = L.LABEL_SHOW_COLON or "Show Colon After Label" },
         { kind = "header", label = L.SECTION_LAYOUT or "Layout" },
+        {
+            kind = "slider", key = "frameScale", label = L.LABEL_FRAME_SCALE or "Frame Scale",
+            min = 0.5, max = 2, step = 0.05, formatValue = FormatPercentValue,
+        },
         {
             kind = "dropdown", key = "orientation", label = L.LABEL_ORIENTATION or "Layout Direction",
             items = {
@@ -174,27 +150,6 @@ local function BuildEntries(L)
                     local r, g, b = ConfigPanel.ResolveCurrentClassColor()
                     if r then return r, g, b, 0.85 end
                 end
-            end,
-        },
-        { kind = "header", label = L.SECTION_THEME or "Accent Color" },
-        {
-            kind = "dropdown", key = "theme", label = L.LABEL_THEME or "Theme",
-            items = BuildThemeItems,
-            disabled = function(db) return db.themeUseClassColor == true or CS.Theme.key ~= "classic" end,
-            onChange = ApplyTheme,
-        },
-        {
-            kind = "toggle", key = "themeUseClassColor", label = L.LABEL_THEME_USE_CLASS or "Use my class color", fullRow = true, onChange = ApplyTheme,
-            disabled = function() return CS.Theme.key ~= "classic" end,
-        },
-        { kind = "header", label = L.SECTION_WINDOW or "Options Window" },
-        {
-            kind = "slider", key = "uiScale", label = L.LABEL_OPTIONS_SCALE or "Options Window Scale",
-            min = 0.5, max = 1.5, step = 0.05, format = "%.2f",
-            onChange = function(value)
-                local f = ConfigPanel.GetFrame()
-                if f then f:SetScale(value) end
-                if CS.MarkProfileDirty then CS.MarkProfileDirty() end
             end,
         },
     }

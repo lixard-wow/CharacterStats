@@ -8,6 +8,7 @@ local DEFAULT_HEIGHT = 520
 local NAV_WIDTH = 140
 local TITLE_HEIGHT = 32
 local CONTENT_PAD = 14
+local WINDOW_PAGE = "window"
 local frame
 local pages = {}
 local pageOrder = {}
@@ -109,7 +110,80 @@ local function SaveFrameSize()
     db.ui.configWidth = frame:GetWidth()
     db.ui.configHeight = frame:GetHeight()
 end
-local function CreateCloseButton(parent)
+local function BuildWindowEntries(L)
+    local function ApplyAccent()
+        ConfigPanel.RefreshTheme()
+        ConfigPanel.RefreshStatsFrame()
+    end
+    return {
+        { kind = "header", label = L.SECTION_UI_THEME or "Window Theme" },
+        {
+            kind = "dropdown", key = "uiTheme", label = L.LABEL_UI_THEME or "Theme",
+            items = function()
+                local items = {}
+                for _, key in ipairs(CS.Theme.ORDER) do
+                    items[#items + 1] = { value = key, text = CS.Theme.GetName(key) }
+                end
+                return items
+            end,
+            get = function() return CS.Theme.Get() and CS.Theme.key end,
+            set = function() end,
+            onChange = function(value)
+                CS.Theme.Set(value)
+            end,
+        },
+        { kind = "header", label = L.SECTION_THEME or "Accent Color" },
+        {
+            kind = "dropdown", key = "theme", label = L.LABEL_THEME or "Theme",
+            items = function()
+                local items = {}
+                for _, theme in ipairs(CS.THEMES) do
+                    items[#items + 1] = { value = theme.id, text = CS.GetThemeName(theme.id) }
+                end
+                return items
+            end,
+            disabled = function(db) return db.themeUseClassColor == true or CS.Theme.key ~= "classic" end,
+            onChange = ApplyAccent,
+        },
+        {
+            kind = "toggle", key = "themeUseClassColor", label = L.LABEL_THEME_USE_CLASS or "Use my class color", fullRow = true, onChange = ApplyAccent,
+            disabled = function() return CS.Theme.key ~= "classic" end,
+        },
+        { kind = "header", label = L.SECTION_WINDOW or "Options Window" },
+        {
+            kind = "slider", key = "uiScale", label = L.LABEL_OPTIONS_SCALE or "Options Window Scale",
+            min = 0.5, max = 1.5, step = 0.05, format = "%.2f",
+            commitOnRelease = true,
+            onChange = function(value)
+                ConfigPanel.SetWindowScale(value)
+                if CS.MarkProfileDirty then CS.MarkProfileDirty() end
+            end,
+        },
+    }
+end
+pages[WINDOW_PAGE] = {
+    key = WINDOW_PAGE,
+    create = function(container)
+        local _, content = ConfigPanel.CreateScrollPage(container)
+        local page = CS.ConfigBuilder.Build(content, BuildWindowEntries(CS.L), {
+            onChange = ConfigPanel.RefreshStatsFrame,
+        })
+        content:SetHeight(page.height)
+        return page
+    end,
+}
+function ConfigPanel.ToggleWindowSettings()
+    if not frame then return end
+    if frame._minimized then
+        ConfigPanel.SetMinimized(false)
+    end
+    if frame._activePage == WINDOW_PAGE then
+        ConfigPanel.ShowPage(frame._lastAddonPage or (pageOrder[1] and pageOrder[1].key))
+    else
+        ConfigPanel.ShowPage(WINDOW_PAGE)
+    end
+end
+local function CreateCircleButton(parent, iconName, isClose)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(20, 20)
     btn.bg = btn:CreateTexture(nil, "BACKGROUND")
@@ -119,18 +193,22 @@ local function CreateCloseButton(parent)
     btn.mask:SetAllPoints(btn.bg)
     btn.mask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     btn.bg:AddMaskTexture(btn.mask)
-    btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    btn.text:SetPoint("CENTER", 0, 1)
-    btn.text:SetFont(STANDARD_TEXT_FONT, 16, "")
-    btn.text:SetText("\195\151")
-    btn.text:SetTextColor(0.8, 0.8, 0.8)
+    btn.icon = btn:CreateTexture(nil, "ARTWORK")
+    btn.icon:SetTexture(CS.Theme.ART .. iconName)
+    btn.icon:SetSize(10, 10)
+    btn.icon:SetPoint("CENTER")
+    btn.icon:SetVertexColor(0.8, 0.8, 0.8)
     btn:SetScript("OnEnter", function(self)
-        self.bg:SetColorTexture(0.5, 0.1, 0.1, 1)
-        self.text:SetTextColor(1, 1, 1)
+        if isClose then
+            self.bg:SetColorTexture(0.5, 0.1, 0.1, 1)
+        else
+            self.bg:SetColorTexture(0.3, 0.3, 0.3, 1)
+        end
+        self.icon:SetVertexColor(1, 1, 1)
     end)
     btn:SetScript("OnLeave", function(self)
         self.bg:SetColorTexture(0.15, 0.15, 0.15, 1)
-        self.text:SetTextColor(0.8, 0.8, 0.8)
+        self.icon:SetVertexColor(0.8, 0.8, 0.8)
     end)
     return btn
 end
@@ -178,13 +256,48 @@ local function CreateMainFrame()
     frame.version:SetText(CS.VERSION or "")
     Widgets.ApplyFontColor(frame.version, "textMuted", 0.7)
     if CS.Theme.key == "classic" then
-        frame.closeBtn = CreateCloseButton(frame.titleBar)
+        frame.closeBtn = CreateCircleButton(frame.titleBar, "icon_close", true)
     else
         frame.closeBtn = CS.Theme.CloseButton(frame.titleBar, 22)
     end
     frame.closeBtn:SetPoint("RIGHT", frame.titleBar, "RIGHT", -8, 0)
     frame.closeBtn:SetScript("OnClick", function()
         ConfigPanel.Hide()
+    end)
+    if CS.Theme.key == "classic" then
+        frame.minBtn = CreateCircleButton(frame.titleBar, "icon_minus")
+    else
+        frame.minBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_minus")
+    end
+    frame.minBtn:SetPoint("RIGHT", frame.closeBtn, "LEFT", -6, 0)
+    frame.minBtn:SetScript("OnClick", function()
+        ConfigPanel.SetMinimized(not frame._minimized)
+    end)
+    frame.minBtn:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(frame._minimized and (L.TIP_EXPAND or "Expand") or (L.TIP_MINIMIZE or "Minimize"), 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    frame.minBtn:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    if CS.Theme.key == "classic" then
+        frame.gearBtn = CreateCircleButton(frame.titleBar, "icon_gear")
+        frame.gearBtn.icon:SetSize(12, 12)
+    else
+        frame.gearBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_gear")
+    end
+    frame.gearBtn:SetPoint("RIGHT", frame.minBtn, "LEFT", -6, 0)
+    frame.gearBtn:SetScript("OnClick", function()
+        ConfigPanel.ToggleWindowSettings()
+    end)
+    frame.gearBtn:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(L.TIP_WINDOW_SETTINGS or "Window Settings", 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    frame.gearBtn:HookScript("OnLeave", function()
+        GameTooltip:Hide()
     end)
     frame.nav = CreateFrame("Frame", nil, frame)
     frame.nav:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 0, 0)
@@ -285,6 +398,9 @@ function ConfigPanel.ShowPage(key)
         container.page:Refresh()
     end
     frame._activePage = key
+    if key ~= WINDOW_PAGE then
+        frame._lastAddonPage = key
+    end
 end
 function ConfigPanel.RefreshActivePage()
     if not frame or not frame:IsShown() or not frame._activePage then return end
@@ -296,6 +412,59 @@ end
 function ConfigPanel.GetFrame()
     return frame
 end
+local function PinTopLeft()
+    local left, top = frame:GetLeft(), frame:GetTop()
+    if not left or not top then return nil end
+    local scale = frame:GetScale()
+    frame:ClearAllPoints()
+    frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+    return left * scale, top * scale
+end
+local SCALE_ANIM_TIME = 0.18
+function ConfigPanel.SetWindowScale(scale)
+    if not frame or not scale then return end
+    local from = frame:GetScale()
+    if math.abs(scale - from) < 0.001 then return end
+    local screenLeft, screenTop = PinTopLeft()
+    local elapsed = 0
+    frame:SetScript("OnUpdate", function(self, dt)
+        elapsed = elapsed + dt
+        local t = math.min(elapsed / SCALE_ANIM_TIME, 1)
+        local eased = 1 - (1 - t) * (1 - t)
+        local s = from + (scale - from) * eased
+        self:SetScale(s)
+        if screenLeft then
+            self:ClearAllPoints()
+            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", screenLeft / s, screenTop / s)
+        end
+        if t >= 1 then
+            self:SetScript("OnUpdate", nil)
+        end
+    end)
+end
+function ConfigPanel.SetMinimized(on)
+    if not frame then return end
+    on = on and true or false
+    if (frame._minimized or false) == on then return end
+    PinTopLeft()
+    frame._minimized = on
+    frame.nav:SetShown(not on)
+    frame.content:SetShown(not on)
+    frame.resizeHandle:SetShown(not on)
+    if on then
+        frame._expandedHeight = frame:GetHeight()
+        if frame.SetResizeBounds then
+            frame:SetResizeBounds(MIN_WIDTH, TITLE_HEIGHT + 2)
+        end
+        frame:SetHeight(TITLE_HEIGHT + 2)
+    else
+        frame:SetHeight(math.max(frame._expandedHeight or DEFAULT_HEIGHT, MIN_HEIGHT))
+        if frame.SetResizeBounds then
+            frame:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
+        end
+    end
+    frame.minBtn.icon:SetTexture(CS.Theme.ART .. (on and "icon_chevron_down" or "icon_minus"))
+end
 function ConfigPanel.Open()
     ConfigPanel.Show()
 end
@@ -305,7 +474,9 @@ function ConfigPanel.Show()
         return
     end
     CreateMainFrame()
+    frame:SetScript("OnUpdate", nil)
     frame:SetScale((CS.db and CS.db.uiScale) or 1.0)
+    ConfigPanel.SetMinimized(false)
     frame:Show()
     ConfigPanel.RefreshTheme()
     ConfigPanel.ShowPage(frame._activePage or (pageOrder[1] and pageOrder[1].key))

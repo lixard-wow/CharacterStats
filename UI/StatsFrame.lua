@@ -115,12 +115,18 @@ local function UpdateHover(self, elapsed)
     DR.AddTooltipLines(GameTooltip, statId)
     GameTooltip:Show()
 end
+local function AnchorFrame(db)
+    local scale = frame:GetScale()
+    frame:ClearAllPoints()
+    frame:SetPoint(db.anchor or "LEFT", UIParent, db.anchorTo or "LEFT", ns.PixelRound(db.x or 0) / scale, ns.PixelRound(db.y or 0) / scale)
+end
 function StatsFrame:Create()
     if frame then return frame end
     local db = ns.db or ns.DEFAULTS
     frame = CreateFrame("Frame", "CharacterStatsFrame", UIParent, "BackdropTemplate")
     frame:SetSize(150, 200)
-    frame:SetPoint(db.anchor or "LEFT", UIParent, db.anchorTo or "LEFT", ns.PixelRound(db.x), ns.PixelRound(db.y))
+    frame:SetScale(db.frameScale or 1)
+    AnchorFrame(db)
     frame:SetMovable(true)
     frame:SetClampedToScreen(db.clampToScreen ~= false)
     frame:EnableMouse(true)
@@ -170,9 +176,17 @@ function StatsFrame:ApplyStyle()
     wipe(lastDisplayedStats)
     ns.Stats:Invalidate()
     local db = ns.db or ns.DEFAULTS
-    frame:SetScale(1)
+    local scale = db.frameScale or 1
+    if math.abs(frame:GetScale() - scale) > 0.001 then
+        frame:SetScale(scale)
+        AnchorFrame(db)
+    end
     frame.bg:SetColorTexture(0.05, 0.05, 0.08, db.bgAlpha)
     local border = BORDERS[db.borderStyle]
+    local inset = (db.borderStyle ~= "none" and border) and border.backdrop.insets.left or 0
+    frame.bg:ClearAllPoints()
+    frame.bg:SetPoint("TOPLEFT", frame, "TOPLEFT", inset, -inset)
+    frame.bg:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -inset, inset)
     if db.borderStyle == "none" or not border then
         frame:SetBackdrop(nil)
     else
@@ -249,7 +263,8 @@ function StatsFrame:SavePosition()
     if not frame or not ns.db then return end
     local frameWidth, frameHeight = frame:GetSize()
     local frameLeft, frameBottom = frame:GetLeft(), frame:GetBottom()
-    local screenWidth, screenHeight = UIParent:GetWidth(), UIParent:GetHeight()
+    local scale = frame:GetScale()
+    local screenWidth, screenHeight = UIParent:GetWidth() / scale, UIParent:GetHeight() / scale
     local anchor = ns.db.anchor or "LEFT"
     local x, y
     if anchor == "LEFT" or anchor == "TOPLEFT" or anchor == "BOTTOMLEFT" then
@@ -266,16 +281,16 @@ function StatsFrame:SavePosition()
     else
         y = frameBottom + frameHeight / 2 - screenHeight / 2
     end
-    ns.db.x = ns.PixelRound(x)
-    ns.db.y = ns.PixelRound(y)
+    ns.db.x = ns.PixelRound(x * scale)
+    ns.db.y = ns.PixelRound(y * scale)
     if ns.MarkProfileDirty then
         ns.MarkProfileDirty()
     end
 end
 function StatsFrame:RestorePosition()
     if not frame or not ns.db then return end
-    frame:ClearAllPoints()
-    frame:SetPoint(ns.db.anchor or "LEFT", UIParent, ns.db.anchorTo or "LEFT", ns.PixelRound(ns.db.x), ns.PixelRound(ns.db.y))
+    frame:SetScale(ns.db.frameScale or 1)
+    AnchorFrame(ns.db)
 end
 function StatsFrame:ResetPosition()
     if not ns.db then return end
