@@ -183,6 +183,10 @@ function StatsFrame:ApplyStyle()
     end
     frame.bg:SetColorTexture(0.05, 0.05, 0.08, db.bgAlpha)
     local border = BORDERS[db.borderStyle]
+    local inset = (db.borderStyle ~= "none" and border) and border.backdrop.insets.left or 0
+    frame.bg:ClearAllPoints()
+    frame.bg:SetPoint("TOPLEFT", frame, "TOPLEFT", inset, -inset)
+    frame.bg:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -inset, inset)
     if db.borderStyle == "none" or not border then
         frame:SetBackdrop(nil)
     else
