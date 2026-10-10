@@ -269,6 +269,7 @@ local L = {
     DR_EFFECTIVE = "Effective rating",
     DR_STALE = "Stats are hidden right now, showing the last known values.",
     LABEL_BAR_HEIGHT = "Bar Thickness",
+    LABEL_CHARACTER_WIDTH = "Extra Character Frame Width",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Stat Bar Thickness",
     LABEL_SHOW_DIMINISHING = "Show Diminishing Returns on Bars",
     LABEL_ROW_SPACING = "Row Spacing",

@@ -320,6 +320,7 @@ ns.RegisterLocale("esES", {
     TIP_MINIMIZE = "Minimizar",
     TIP_EXPAND = "Expandir",
     TIP_WINDOW_SETTINGS = "Ajustes de la ventana",
+    LABEL_CHARACTER_WIDTH = "Anchura extra de la ventana de personaje",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Grosor de barra de estadísticas",
     LABEL_SHOW_DIMINISHING = "Mostrar rendimientos decrecientes en las barras",
     LABEL_STYLE = "Aspecto",

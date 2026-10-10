@@ -320,6 +320,7 @@ ns.RegisterLocale("zhTW", {
     TIP_MINIMIZE = "最小化",
     TIP_EXPAND = "展開",
     TIP_WINDOW_SETTINGS = "視窗設定",
+    LABEL_CHARACTER_WIDTH = "角色視窗額外寬度",
     LABEL_PAPERDOLL_BAR_HEIGHT = "屬性條厚度",
     LABEL_SHOW_DIMINISHING = "在屬性條上顯示收益遞減",
     LABEL_STYLE = "外觀",

@@ -46,7 +46,17 @@ local function BuildEntries(L)
             onChange = function()
                 if CS.PaperdollPanel then CS.PaperdollPanel:ApplyStyle() end
                 if CS.CharacterButton then CS.CharacterButton.Apply() end
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
                 ApplyGearBadges()
+            end,
+        },
+        {
+            kind = "slider", key = "characterFrameExtraWidth", label = L.LABEL_CHARACTER_WIDTH or "Extra Character Frame Width",
+            min = 0, max = 120, step = 5, retailOnly = true,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = function()
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
+                MarkDirty()
             end,
         },
         {
@@ -160,6 +170,7 @@ ConfigPanel.RegisterPage("character", {
                 if CS.PaperdollPanel then CS.PaperdollPanel:ApplyStyle() end
                 if CS.GearBadges then CS.GearBadges.Apply() end
                 if CS.CharacterButton then CS.CharacterButton.Apply() end
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
             end
             page:Refresh()
         end)

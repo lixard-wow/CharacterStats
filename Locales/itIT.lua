@@ -319,6 +319,7 @@ ns.RegisterLocale("itIT", {
     TIP_MINIMIZE = "Riduci a icona",
     TIP_EXPAND = "Espandi",
     TIP_WINDOW_SETTINGS = "Impostazioni finestra",
+    LABEL_CHARACTER_WIDTH = "Larghezza extra finestra personaggio",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Spessore barre statistiche",
     LABEL_SHOW_DIMINISHING = "Mostra rendimenti decrescenti sulle barre",
     LABEL_STYLE = "Aspetto",

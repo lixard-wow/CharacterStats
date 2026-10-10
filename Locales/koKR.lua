@@ -320,6 +320,7 @@ ns.RegisterLocale("koKR", {
     TIP_MINIMIZE = "최소화",
     TIP_EXPAND = "펼치기",
     TIP_WINDOW_SETTINGS = "창 설정",
+    LABEL_CHARACTER_WIDTH = "캐릭터 창 추가 너비",
     LABEL_PAPERDOLL_BAR_HEIGHT = "능력치 바 두께",
     LABEL_SHOW_DIMINISHING = "바에 효과 감소 표시",
     LABEL_STYLE = "모양",

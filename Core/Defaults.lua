@@ -107,6 +107,7 @@ ns.DEFAULTS = {
     gearLevelX = 0,
     gearLevelY = 0,
     gearUpgradeDisplay = "full",
+    characterFrameExtraWidth = 0,
     enchantDisplay = "icon",
     characterButton = false,
     yieldToOtherAddons = false,

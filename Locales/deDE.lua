@@ -320,6 +320,7 @@ ns.RegisterLocale("deDE", {
     TIP_MINIMIZE = "Minimieren",
     TIP_EXPAND = "Erweitern",
     TIP_WINDOW_SETTINGS = "Fenstereinstellungen",
+    LABEL_CHARACTER_WIDTH = "Zusätzliche Breite des Charakterfensters",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Dicke der Wertebalken",
     LABEL_SHOW_DIMINISHING = "Abnehmenden Ertrag auf Balken anzeigen",
     LABEL_STYLE = "Ansicht",

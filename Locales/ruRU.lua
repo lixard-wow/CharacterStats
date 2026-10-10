@@ -320,6 +320,7 @@ ns.RegisterLocale("ruRU", {
     TIP_MINIMIZE = "Свернуть",
     TIP_EXPAND = "Развернуть",
     TIP_WINDOW_SETTINGS = "Настройки окна",
+    LABEL_CHARACTER_WIDTH = "Доп. ширина окна персонажа",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Толщина полос характеристик",
     LABEL_SHOW_DIMINISHING = "Снижение эффективности на полосах",
     LABEL_STYLE = "Вид",

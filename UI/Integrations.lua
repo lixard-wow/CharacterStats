@@ -183,6 +183,7 @@ local function RefreshCharacterFrame()
     if ns.PaperdollPanel then ns.PaperdollPanel:ApplyStyle() end
     if ns.GearBadges then ns.GearBadges.Apply() end
     if ns.CharacterButton then ns.CharacterButton.Apply() end
+    if ns.CharacterWidth then ns.CharacterWidth.Apply() end
 end
 local function TurnOffOurs(conflicts)
     local db = ns.db

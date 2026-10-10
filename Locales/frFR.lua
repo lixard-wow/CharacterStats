@@ -320,6 +320,7 @@ ns.RegisterLocale("frFR", {
     TIP_MINIMIZE = "Réduire",
     TIP_EXPAND = "Agrandir",
     TIP_WINDOW_SETTINGS = "Paramètres de la fenêtre",
+    LABEL_CHARACTER_WIDTH = "Largeur supplémentaire de la fenêtre du personnage",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Épaisseur des barres de stats",
     LABEL_SHOW_DIMINISHING = "Rendements décroissants sur les barres",
     LABEL_STYLE = "Apparence",

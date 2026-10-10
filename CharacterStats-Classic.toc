@@ -49,6 +49,7 @@ UI\PaperdollPanel.lua
 UI\GearBadges.lua
 UI\ItemTooltip.lua
 UI\CharacterButton.lua
+UI\CharacterWidth.lua
 UI\Styles\Paperdoll.lua
 UI\Styles\Ledger.lua
 UI\Styles\Meters.lua
