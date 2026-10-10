@@ -80,12 +80,12 @@ local function Create()
 end
 local function CenterTabs(on)
     local tabs = rawget(_G, "PaperDollSidebarTabs")
-    local inset = rawget(_G, "CharacterFrameInsetRight")
-    local first = rawget(_G, "PaperDollSidebarTab1")
     local last = rawget(_G, "PaperDollSidebarTab3")
-    if not tabs or not inset or not first or not last then return end
-    if ns.PaperdollPanel and ns.PaperdollPanel.UsesBlizzardStatList() then return end
-    if on and GetLastTab() ~= last then on = false end
+    if not tabs or not last or not button then return end
+    local forever = ns.PaperdollPanel and ns.PaperdollPanel.UsesBlizzardStatList()
+    local inset = rawget(_G, "CharacterFrameInsetRight")
+    if not forever and not inset then return end
+    if on and not forever and GetLastTab() ~= last then on = false end
     if not originalTabs then
         if not on then return end
         originalTabs = {
@@ -94,14 +94,19 @@ local function CenterTabs(on)
             lastPoint = { last:GetPoint(1) },
         }
     end
+    local extra = button.gap + button:GetWidth()
     tabs:ClearAllPoints()
+    if forever then
+        local point, relativeTo, relativePoint, x, y = unpack(originalTabs.tabsPoint)
+        tabs:SetPoint(point, relativeTo, relativePoint, (x or 0) - (on and extra / 2 or 0), y or 0)
+        return
+    end
     last:ClearAllPoints()
     if on then
-        local tabWidth = last:GetWidth()
-        local groupWidth = tabWidth * 3 + TAB_GAP * 2 + button.gap + button:GetWidth()
+        local groupWidth = last:GetWidth() * 3 + TAB_GAP * 2 + extra
         tabs:SetWidth(groupWidth + TAB_MARGIN * 2)
         tabs:SetPoint("BOTTOM", inset, "TOP", 0, originalTabs.tabsPoint[5] or 0)
-        last:SetPoint("BOTTOMRIGHT", tabs, "BOTTOMRIGHT", -(TAB_MARGIN + button.gap + button:GetWidth()), 0)
+        last:SetPoint("BOTTOMRIGHT", tabs, "BOTTOMRIGHT", -(TAB_MARGIN + extra), 0)
     else
         tabs:SetWidth(originalTabs.width)
         tabs:SetPoint(unpack(originalTabs.tabsPoint))
