@@ -38,19 +38,10 @@ local ENCHANT_FALLBACK_ICON = "Interface\\Icons\\Trade_Engraving"
 local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
-local function SplitEnchant(text)
-    local atlas = text:match("|A:([^:|]+)")
-    local name = text:gsub("%s*|A:.-|a", "")
-    name = name:match("^%s*(.-)%s*$")
-    return name, atlas
-end
 local function ShowEnchantTooltip(self)
-    if not self.enchantName then return end
+    if not self.slot then return end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
-    if self.enchantAtlas then
-        GameTooltip:AddLine(CreateAtlasMarkup and CreateAtlasMarkup(self.enchantAtlas, 16, 16) or "", 1, 1, 1)
-    end
+    GameTooltip:SetInventoryItem("player", self.slot)
     GameTooltip:Show()
 end
 local function ShowGemTooltip(self)
@@ -142,7 +133,7 @@ local function GetGemIcon(gemId)
     end
     return nil
 end
-local function UpdateDetail(detail, entry, db)
+local function UpdateDetail(detail, entry, db, slot)
     local hasContent = false
     local icon = detail.enchantIcon
     local iconMode = db.enchantDisplay ~= "text"
@@ -154,9 +145,8 @@ local function UpdateDetail(detail, entry, db)
         detail.enchant:SetTextColor(r, g, b)
         hasContent = true
     elseif entry.enchantText and iconMode then
-        local name, atlas = SplitEnchant(entry.enchantText)
-        icon.enchantName = name
-        icon.enchantAtlas = atlas
+        local atlas = entry.enchantText:match("|A:([^:|]+)")
+        icon.slot = slot
         if atlas and icon.texture.SetAtlas then
             icon.texture:SetTexCoord(0, 1, 0, 1)
             icon.texture:SetAtlas(atlas)
@@ -300,7 +290,7 @@ function GearBadges.Refresh()
                     badge.flag:Hide()
                 end
                 if showDetails then
-                    UpdateDetail(badge.detail, entry, db)
+                    UpdateDetail(badge.detail, entry, db, slot)
                 else
                     badge.detail:Hide()
                 end
