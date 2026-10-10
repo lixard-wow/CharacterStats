@@ -5,9 +5,9 @@ local FULL = "full"
 local STATS = "stats"
 local SLOTS = "slots"
 local FEATURES = {
-    [FULL] = { "paperdollEnabled", "gearBadges", "gearFlags", "gearDetails", "characterButton" },
+    [FULL] = { "paperdollEnabled", "gearBadges", "gearUpgrade", "gearFlags", "gearDetails", "characterButton" },
     [STATS] = { "paperdollEnabled" },
-    [SLOTS] = { "gearBadges", "gearFlags", "gearDetails" },
+    [SLOTS] = { "gearBadges", "gearUpgrade", "gearFlags", "gearDetails" },
 }
 local function IsLoaded(name)
     local isLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or rawget(_G, "IsAddOnLoaded")

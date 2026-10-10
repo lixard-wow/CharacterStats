@@ -159,46 +159,27 @@ local PLACE_ROW = { bottom = 0, middle = 1, top = 2 }
 local PLACE_ORDER = { "top", "middle", "bottom" }
 local function ApplyLevelLayout(badge, db)
     local size = db.gearLevelSize or 11
-    local anchor = db.gearLevelAnchor or "TOPRIGHT"
-    local x, y = db.gearLevelX or 0, db.gearLevelY or 0
-    local key = size .. anchor .. x .. ":" .. y
+    local upgradeSize = db.gearUpgradeSize or 9
+    local key = size .. ":" .. upgradeSize
     if badge.levelLayout == key then return end
     badge.levelLayout = key
     badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
-    badge.upgrade:SetFont(STANDARD_TEXT_FONT, math.max(6, math.floor(size * 0.8 + 0.5)), "OUTLINE")
+    badge.upgrade:SetFont(STANDARD_TEXT_FONT, upgradeSize, "OUTLINE")
 end
 local function GetUpgradeText(entry, mode)
-    if mode == "off" or not entry.trackRank or not entry.trackMax then return nil end
+    if not entry.trackRank or not entry.trackMax then return nil end
     local rank = string.format("%d/%d", entry.trackRank, entry.trackMax)
     if mode == "rank" or not entry.track then return rank end
     local name = ns.L["TRACK_" .. entry.track:upper()]
     return name and (rank .. " " .. name) or rank
 end
-local function PlaceOnIcon(badge, db)
-    local anchor = db.gearLevelAnchor or "TOPRIGHT"
-    local x, y = db.gearLevelX or 0, db.gearLevelY or 0
+local function PlaceOnIcon(region, badge, anchor, x, y)
     local insetX = anchor:find("LEFT") and 1 or (anchor:find("RIGHT") and -1 or 0)
     local insetY = anchor:find("TOP") and -LEVEL_INSET or (anchor:find("BOTTOM") and LEVEL_INSET or 0)
-    badge.level:ClearAllPoints()
-    badge.level:SetPoint(anchor, badge, anchor, insetX + x, insetY + y)
-end
-local function PlaceUnderLevel(badge, side, levelBeside)
-    local horizontal
-    if levelBeside then
-        horizontal = side == "left" and "RIGHT" or "LEFT"
-    else
-        local anchor = ns.db.gearLevelAnchor or "TOPRIGHT"
-        horizontal = anchor:match("LEFT") or anchor:match("RIGHT") or ""
-        if anchor:find("BOTTOM") then
-            badge.upgrade:SetJustifyH(horizontal == "" and "CENTER" or horizontal)
-            badge.upgrade:ClearAllPoints()
-            badge.upgrade:SetPoint("BOTTOM" .. horizontal, badge.level, "TOP" .. horizontal, 0, 1)
-            return
-        end
-    end
-    badge.upgrade:SetJustifyH(horizontal == "" and "CENTER" or horizontal)
-    badge.upgrade:ClearAllPoints()
-    badge.upgrade:SetPoint("TOP" .. horizontal, badge.level, "BOTTOM" .. horizontal, 0, -1)
+    local horizontal = anchor:match("LEFT") or anchor:match("RIGHT")
+    region:SetJustifyH(horizontal or "CENTER")
+    region:ClearAllPoints()
+    region:SetPoint(anchor, badge, anchor, insetX + (x or 0), insetY + (y or 0))
 end
 local function PlaceInChain(region, side, place, previous, button)
     region:ClearAllPoints()
@@ -233,17 +214,19 @@ local function LayoutSlot(badge, db)
     local detail = badge.detail
     local side, button = detail.side, detail.button
     local levelPlace = db.gearLevelPlace or "icon"
-    local upgradePlace = db.gearUpgradePlace or "under"
+    local upgradePlace = db.gearUpgradePlace or "icon"
+    if upgradePlace == "under" then upgradePlace = "icon" end
     if badge.level:IsShown() then
         if levelPlace == "icon" then
-            PlaceOnIcon(badge, db)
+            PlaceOnIcon(badge.level, badge, db.gearLevelAnchor or "TOPRIGHT", db.gearLevelX, db.gearLevelY)
         else
+            badge.level:SetJustifyH("LEFT")
             AddToChain(levelPlace, badge.level)
         end
     end
     if badge.upgrade:IsShown() then
-        if upgradePlace == "under" then
-            PlaceUnderLevel(badge, side, levelPlace ~= "icon")
+        if upgradePlace == "icon" then
+            PlaceOnIcon(badge.upgrade, badge, db.gearUpgradeAnchor or "BOTTOMRIGHT", db.gearUpgradeX, db.gearUpgradeY)
         else
             badge.upgrade:SetJustifyH("LEFT")
             AddToChain(upgradePlace, badge.upgrade)
@@ -321,19 +304,20 @@ local function HideAll()
 end
 function GearBadges.IsEnabled()
     local db = ns.db
-    return db and (db.gearBadges ~= false or db.gearFlags ~= false or db.gearDetails ~= false)
+    return db and (db.gearBadges ~= false or db.gearUpgrade == true or db.gearFlags ~= false or db.gearDetails ~= false)
 end
 function GearBadges.Refresh()
     local db = ns.db
     if not db or not PaperDollFrame or not PaperDollFrame:IsShown() then return end
     local showLevels = db.gearBadges ~= false
+    local showUpgrade = db.gearUpgrade == true
     local showFlags = db.gearFlags ~= false
     local showDetails = db.gearDetails ~= false
     if ns.Integrations and ns.Integrations.SlotInfoTaken() then
         HideAll()
         return
     end
-    if not showLevels and not showFlags and not showDetails then
+    if not showLevels and not showUpgrade and not showFlags and not showDetails then
         HideAll()
         return
     end
@@ -343,22 +327,21 @@ function GearBadges.Refresh()
         local entry = results[slot]
         if badge then
             if entry and entry.link then
+                ApplyLevelLayout(badge, db)
+                local r, g, b = GearBadges.GetTrackColor(db, entry.track)
                 if showLevels and entry.itemLevel then
-                    ApplyLevelLayout(badge, db)
                     badge.level:SetText(string.format("%d", entry.itemLevel))
-                    local r, g, b = GearBadges.GetTrackColor(db, entry.track)
                     badge.level:SetTextColor(r, g, b)
                     badge.level:Show()
-                    local upgrade = GetUpgradeText(entry, db.gearUpgradeDisplay)
-                    if upgrade then
-                        badge.upgrade:SetText(upgrade)
-                        badge.upgrade:SetTextColor(r, g, b)
-                        badge.upgrade:Show()
-                    else
-                        badge.upgrade:Hide()
-                    end
                 else
                     badge.level:Hide()
+                end
+                local upgrade = showUpgrade and GetUpgradeText(entry, db.gearUpgradeDisplay)
+                if upgrade then
+                    badge.upgrade:SetText(upgrade)
+                    badge.upgrade:SetTextColor(r, g, b)
+                    badge.upgrade:Show()
+                else
                     badge.upgrade:Hide()
                 end
                 local flagKey = nil
