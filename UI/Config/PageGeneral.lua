@@ -54,6 +54,17 @@ local function BuildEntries(L)
             get = function(db) return CS.GetDecimals(db.decimals) end,
         },
         { kind = "toggle", key = "itemTooltipDR", label = L.LABEL_ITEM_TOOLTIP_DR or "Show Value After Diminishing Returns on Item Tooltips", retailOnly = true, fullRow = true },
+        { kind = "header", label = L.SECTION_LANGUAGE or "Language" },
+        {
+            kind = "dropdown", key = "localeOverride", label = L.LABEL_ADDON_LANGUAGE or "Addon Language (reloads the UI)",
+            items = function() return CS.LocalePicker.Items() end,
+            get = function() return (CharacterStatsDB and CharacterStatsDB.localeOverride) or "game" end,
+            set = function(_, value)
+                if value ~= ((CharacterStatsDB and CharacterStatsDB.localeOverride) or "game") then
+                    CS.LocalePicker.Choose(value ~= "game" and value or nil)
+                end
+            end,
+        },
     }
 end
 ConfigPanel.RegisterPage("general", {

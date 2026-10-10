@@ -104,6 +104,14 @@ local function Create()
     frame:Hide()
     return frame
 end
+LocalePicker.Choose = Choose
+function LocalePicker.Items()
+    local items = { { value = "game", text = string.format("%s (%s)", ns.L.LOCALE_GAME or "Game language", ns.GAME_LOCALE or "?") } }
+    for _, language in ipairs(LANGUAGES) do
+        items[#items + 1] = { value = language.code, text = string.format("%s (%s)", language.name, language.code) }
+    end
+    return items
+end
 function LocalePicker.Show()
     Create()
     UpdateButtons()

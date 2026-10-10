@@ -18,11 +18,16 @@
 - Bar thickness settings for the stats panel and the character window (Meters look).
 - Detection of other addons that restyle the character window (ElvUI, EllesmereUI, Chonky Character Sheet and others), with a popup that offers to turn off the conflicting part or the other addon.
 - WoW Classic Forever support: Blizzard's own stat list on the character window, resistances colored by school, the ranged slot, and a Ratings tab with the combat ratings that client uses. The drawer sits clear of the character window's side tabs.
+- MoP Classic: the character window lists Blizzard's own stat categories (General, Attributes, Melee, Ranged, Spell, Defense, Resistance) in a scrolling list, showing only what matters for your class and spec, with every stat in its own color. Health, Power, weapon damage, Spell Healing, Spell Penetration and resistances are now in the Stats list too. Supports MoP Classic 5.5.4.
+- Addon language: show CharacterStats in any of its languages, independent of your game language, from General > Language or with `/cs locale`.
 
 ### Changed
 
 - Versatility now always shows the value from your versatility rating, live in combat. Flat bonuses such as Mark of the Wild are not included, because the game hides them from addons in combat. The Real-Time Versatility option is gone.
 - Minimap button: left-click opens the options, right-click shows or hides the stats panel.
+- Profiles for your own class's specs show just the spec name (for example Protection instead of Protection Warrior).
+- Buff colors from the game (green/red numbers) no longer override stat colors on the character window.
+- The `/csdebug` command has been removed.
 
 ### Fixed
 

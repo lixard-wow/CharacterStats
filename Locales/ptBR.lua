@@ -399,8 +399,10 @@ ns.RegisterLocale("ptBR", {
     TRACK_OTHER = "Sem Trilha de Aprimoramento",
     TRACK_VETERAN = "Veterano",
     UNIT_PX = "px",
-    CMD_LOCALE = "/cs locale - Escolher o idioma do addon (para testar traduções)",
+    CMD_LOCALE = "/cs locale - Escolher o idioma do addon",
     LOCALE_TITLE = "Idioma do Addon",
     LOCALE_GAME = "Idioma do jogo",
-    LOCALE_HINT = "Para testar traduções. Escolher um idioma recarrega a interface. Os textos da Blizzard continuam no idioma do jogo; coreano e chinês precisam de um cliente nesse idioma para mostrar os caracteres.",
+    LOCALE_HINT = "Mostra o CharacterStats em outro idioma. Escolher um recarrega a interface. Os textos da Blizzard continuam no idioma do jogo; coreano e chinês precisam de um cliente nesse idioma para mostrar os caracteres.",
+    SECTION_LANGUAGE = "Idioma",
+    LABEL_ADDON_LANGUAGE = "Idioma do Addon (recarrega a interface)",
 })

@@ -398,8 +398,10 @@ ns.RegisterLocale("esMX", {
     TRACK_OTHER = "Sin categoría de mejora",
     TRACK_VETERAN = "Veterano",
     UNIT_PX = "px",
-    CMD_LOCALE = "/cs locale - Elegir el idioma del addon (para probar traducciones)",
+    CMD_LOCALE = "/cs locale - Elegir el idioma del addon",
     LOCALE_TITLE = "Idioma del addon",
     LOCALE_GAME = "Idioma del juego",
-    LOCALE_HINT = "Para probar traducciones. Elegir un idioma recarga la interfaz. Los textos de Blizzard siguen en el idioma del juego; el coreano y el chino necesitan un cliente en ese idioma para mostrar sus caracteres.",
+    LOCALE_HINT = "Muestra CharacterStats en otro idioma. Elegir uno recarga la interfaz. Los textos de Blizzard siguen en el idioma del juego; el coreano y el chino necesitan un cliente en ese idioma para mostrar sus caracteres.",
+    SECTION_LANGUAGE = "Idioma",
+    LABEL_ADDON_LANGUAGE = "Idioma del addon (recarga la interfaz)",
 })
