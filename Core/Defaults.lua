@@ -80,6 +80,7 @@ ns.DEFAULTS = {
     borderColor = { r = 0.6, g = 0.6, b = 0.6 },
     borderUseClassColor = false,
     uiScale = 1.0,
+    frameScale = 1.0,
     theme = "default",
     themeUseClassColor = false,
     fontFace = "default",

@@ -299,6 +299,7 @@ ns.RegisterLocale("esES", {
     LABEL_GROUPED_LAYOUT = "Agrupar estadísticas bajo encabezados",
     LABEL_ITEM_TOOLTIP_DR = "Mostrar valor tras rendimientos decrecientes en descripciones de objetos",
     LABEL_OPTIONS_SCALE = "Escala de la ventana de opciones",
+    LABEL_FRAME_SCALE = "Escala del marco",
     TIP_MINIMIZE = "Minimizar",
     TIP_EXPAND = "Expandir",
     TIP_WINDOW_SETTINGS = "Ajustes de la ventana",

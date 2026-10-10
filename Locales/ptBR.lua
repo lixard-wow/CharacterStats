@@ -299,6 +299,7 @@ ns.RegisterLocale("ptBR", {
     LABEL_GROUPED_LAYOUT = "Agrupar Stats sob Cabeçalhos",
     LABEL_ITEM_TOOLTIP_DR = "Mostrar Valor Após Retornos Decrescentes nas Dicas de Itens",
     LABEL_OPTIONS_SCALE = "Escala da Janela de Opções",
+    LABEL_FRAME_SCALE = "Escala do quadro",
     TIP_MINIMIZE = "Minimizar",
     TIP_EXPAND = "Expandir",
     TIP_WINDOW_SETTINGS = "Configurações da janela",

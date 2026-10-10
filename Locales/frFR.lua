@@ -299,6 +299,7 @@ ns.RegisterLocale("frFR", {
     LABEL_GROUPED_LAYOUT = "Grouper les stats sous des en-têtes",
     LABEL_ITEM_TOOLTIP_DR = "Valeur après rendements décroissants dans les infobulles d'objet",
     LABEL_OPTIONS_SCALE = "Échelle de la fenêtre d'options",
+    LABEL_FRAME_SCALE = "Échelle du cadre",
     TIP_MINIMIZE = "Réduire",
     TIP_EXPAND = "Agrandir",
     TIP_WINDOW_SETTINGS = "Paramètres de la fenêtre",

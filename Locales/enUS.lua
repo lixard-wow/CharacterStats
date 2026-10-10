@@ -260,6 +260,7 @@ local L = {
     LABEL_TEXT_OPACITY = "Text Opacity",
     LABEL_SCALE = "UI Scale",
     LABEL_OPTIONS_SCALE = "Options Window Scale",
+    LABEL_FRAME_SCALE = "Frame Scale",
     TIP_MINIMIZE = "Minimize",
     TIP_EXPAND = "Expand",
     TIP_WINDOW_SETTINGS = "Window Settings",

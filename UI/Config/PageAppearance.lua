@@ -63,6 +63,10 @@ local function BuildEntries(L)
         { kind = "toggle", key = "showColon", label = L.LABEL_SHOW_COLON or "Show Colon After Label" },
         { kind = "header", label = L.SECTION_LAYOUT or "Layout" },
         {
+            kind = "slider", key = "frameScale", label = L.LABEL_FRAME_SCALE or "Frame Scale",
+            min = 0.5, max = 2, step = 0.05, formatValue = FormatPercentValue,
+        },
+        {
             kind = "dropdown", key = "orientation", label = L.LABEL_ORIENTATION or "Layout Direction",
             items = {
                 { value = "vertical", text = L.ORIENT_VERTICAL or "Vertical" },

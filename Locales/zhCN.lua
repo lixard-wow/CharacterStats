@@ -299,6 +299,7 @@ ns.RegisterLocale("zhCN", {
     LABEL_GROUPED_LAYOUT = "按标题分组显示属性",
     LABEL_ITEM_TOOLTIP_DR = "在物品提示中显示收益递减后的数值",
     LABEL_OPTIONS_SCALE = "设置窗口缩放",
+    LABEL_FRAME_SCALE = "框体缩放",
     TIP_MINIMIZE = "最小化",
     TIP_EXPAND = "展开",
     TIP_WINDOW_SETTINGS = "窗口设置",

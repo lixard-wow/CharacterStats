@@ -299,6 +299,7 @@ ns.RegisterLocale("deDE", {
     LABEL_GROUPED_LAYOUT = "Werte unter Überschriften gruppieren",
     LABEL_ITEM_TOOLTIP_DR = "Wert nach abnehmendem Ertrag in Gegenstands-Tooltips anzeigen",
     LABEL_OPTIONS_SCALE = "Skalierung des Optionsfensters",
+    LABEL_FRAME_SCALE = "Rahmenskalierung",
     TIP_MINIMIZE = "Minimieren",
     TIP_EXPAND = "Erweitern",
     TIP_WINDOW_SETTINGS = "Fenstereinstellungen",
