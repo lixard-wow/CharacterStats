@@ -299,6 +299,8 @@ ns.RegisterLocale("deDE", {
     LABEL_GROUPED_LAYOUT = "Werte unter Überschriften gruppieren",
     LABEL_ITEM_TOOLTIP_DR = "Wert nach abnehmendem Ertrag in Gegenstands-Tooltips anzeigen",
     LABEL_OPTIONS_SCALE = "Skalierung des Optionsfensters",
+    TIP_MINIMIZE = "Minimieren",
+    TIP_EXPAND = "Erweitern",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Dicke der Wertebalken",
     LABEL_SHOW_DIMINISHING = "Abnehmenden Ertrag auf Balken anzeigen",
     LABEL_STYLE = "Ansicht",

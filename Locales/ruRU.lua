@@ -299,6 +299,8 @@ ns.RegisterLocale("ruRU", {
     LABEL_GROUPED_LAYOUT = "Группировать характеристики по заголовкам",
     LABEL_ITEM_TOOLTIP_DR = "Значение с учетом снижения эффективности в подсказках предметов",
     LABEL_OPTIONS_SCALE = "Масштаб окна настроек",
+    TIP_MINIMIZE = "Свернуть",
+    TIP_EXPAND = "Развернуть",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Толщина полос характеристик",
     LABEL_SHOW_DIMINISHING = "Снижение эффективности на полосах",
     LABEL_STYLE = "Вид",

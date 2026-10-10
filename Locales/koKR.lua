@@ -299,6 +299,8 @@ ns.RegisterLocale("koKR", {
     LABEL_GROUPED_LAYOUT = "능력치를 제목별로 묶기",
     LABEL_ITEM_TOOLTIP_DR = "아이템 툴팁에 효과 감소 적용 값 표시",
     LABEL_OPTIONS_SCALE = "설정 창 크기",
+    TIP_MINIMIZE = "최소화",
+    TIP_EXPAND = "펼치기",
     LABEL_PAPERDOLL_BAR_HEIGHT = "능력치 바 두께",
     LABEL_SHOW_DIMINISHING = "바에 효과 감소 표시",
     LABEL_STYLE = "모양",

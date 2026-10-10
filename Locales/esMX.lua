@@ -298,6 +298,8 @@ ns.RegisterLocale("esMX", {
     LABEL_GROUPED_LAYOUT = "Agrupar estadísticas bajo encabezados",
     LABEL_ITEM_TOOLTIP_DR = "Mostrar valor tras rendimientos decrecientes en las descripciones de objetos",
     LABEL_OPTIONS_SCALE = "Escala de la ventana de opciones",
+    TIP_MINIMIZE = "Minimizar",
+    TIP_EXPAND = "Expandir",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Grosor de barra de estadísticas",
     LABEL_SHOW_DIMINISHING = "Mostrar rendimientos decrecientes en las barras",
     LABEL_STYLE = "Aspecto",

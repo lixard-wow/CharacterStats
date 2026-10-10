@@ -109,7 +109,7 @@ local function SaveFrameSize()
     db.ui.configWidth = frame:GetWidth()
     db.ui.configHeight = frame:GetHeight()
 end
-local function CreateCloseButton(parent)
+local function CreateCloseButton(parent, glyph)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(20, 20)
     btn.bg = btn:CreateTexture(nil, "BACKGROUND")
@@ -122,10 +122,14 @@ local function CreateCloseButton(parent)
     btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     btn.text:SetPoint("CENTER", 0, 1)
     btn.text:SetFont(STANDARD_TEXT_FONT, 16, "")
-    btn.text:SetText("\195\151")
+    btn.text:SetText(glyph or "\195\151")
     btn.text:SetTextColor(0.8, 0.8, 0.8)
     btn:SetScript("OnEnter", function(self)
-        self.bg:SetColorTexture(0.5, 0.1, 0.1, 1)
+        if glyph then
+            self.bg:SetColorTexture(0.3, 0.3, 0.3, 1)
+        else
+            self.bg:SetColorTexture(0.5, 0.1, 0.1, 1)
+        end
         self.text:SetTextColor(1, 1, 1)
     end)
     btn:SetScript("OnLeave", function(self)
@@ -185,6 +189,23 @@ local function CreateMainFrame()
     frame.closeBtn:SetPoint("RIGHT", frame.titleBar, "RIGHT", -8, 0)
     frame.closeBtn:SetScript("OnClick", function()
         ConfigPanel.Hide()
+    end)
+    if CS.Theme.key == "classic" then
+        frame.minBtn = CreateCloseButton(frame.titleBar, "-")
+    else
+        frame.minBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_minus")
+    end
+    frame.minBtn:SetPoint("RIGHT", frame.closeBtn, "LEFT", -6, 0)
+    frame.minBtn:SetScript("OnClick", function()
+        ConfigPanel.SetMinimized(not frame._minimized)
+    end)
+    frame.minBtn:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(frame._minimized and (L.TIP_EXPAND or "Expand") or (L.TIP_MINIMIZE or "Minimize"), 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    frame.minBtn:HookScript("OnLeave", function()
+        GameTooltip:Hide()
     end)
     frame.nav = CreateFrame("Frame", nil, frame)
     frame.nav:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 0, 0)
@@ -296,16 +317,62 @@ end
 function ConfigPanel.GetFrame()
     return frame
 end
-function ConfigPanel.SetWindowScale(scale)
-    if not frame then return end
-    local oldScale = frame:GetScale()
-    if not scale or scale == oldScale then return end
+local function PinTopLeft()
     local left, top = frame:GetLeft(), frame:GetTop()
-    frame:SetScale(scale)
-    if left and top then
-        local ratio = oldScale / scale
-        frame:ClearAllPoints()
-        frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left * ratio, top * ratio)
+    if not left or not top then return nil end
+    local scale = frame:GetScale()
+    frame:ClearAllPoints()
+    frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+    return left * scale, top * scale
+end
+local SCALE_ANIM_TIME = 0.18
+function ConfigPanel.SetWindowScale(scale)
+    if not frame or not scale then return end
+    local from = frame:GetScale()
+    if math.abs(scale - from) < 0.001 then return end
+    local screenLeft, screenTop = PinTopLeft()
+    local elapsed = 0
+    frame:SetScript("OnUpdate", function(self, dt)
+        elapsed = elapsed + dt
+        local t = math.min(elapsed / SCALE_ANIM_TIME, 1)
+        local eased = 1 - (1 - t) * (1 - t)
+        local s = from + (scale - from) * eased
+        self:SetScale(s)
+        if screenLeft then
+            self:ClearAllPoints()
+            self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", screenLeft / s, screenTop / s)
+        end
+        if t >= 1 then
+            self:SetScript("OnUpdate", nil)
+        end
+    end)
+end
+function ConfigPanel.SetMinimized(on)
+    if not frame then return end
+    on = on and true or false
+    if (frame._minimized or false) == on then return end
+    PinTopLeft()
+    frame._minimized = on
+    frame.nav:SetShown(not on)
+    frame.content:SetShown(not on)
+    frame.resizeHandle:SetShown(not on)
+    if on then
+        frame._expandedHeight = frame:GetHeight()
+        if frame.SetResizeBounds then
+            frame:SetResizeBounds(MIN_WIDTH, TITLE_HEIGHT + 2)
+        end
+        frame:SetHeight(TITLE_HEIGHT + 2)
+    else
+        frame:SetHeight(math.max(frame._expandedHeight or DEFAULT_HEIGHT, MIN_HEIGHT))
+        if frame.SetResizeBounds then
+            frame:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
+        end
+    end
+    local btn = frame.minBtn
+    if btn.icon then
+        btn.icon:SetTexture(CS.Theme.ART .. (on and "icon_chevron_down" or "icon_minus"))
+    elseif btn.text then
+        btn.text:SetText(on and "+" or "-")
     end
 end
 function ConfigPanel.Open()
@@ -317,7 +384,9 @@ function ConfigPanel.Show()
         return
     end
     CreateMainFrame()
+    frame:SetScript("OnUpdate", nil)
     frame:SetScale((CS.db and CS.db.uiScale) or 1.0)
+    ConfigPanel.SetMinimized(false)
     frame:Show()
     ConfigPanel.RefreshTheme()
     ConfigPanel.ShowPage(frame._activePage or (pageOrder[1] and pageOrder[1].key))

@@ -298,6 +298,8 @@ ns.RegisterLocale("itIT", {
     LABEL_GROUPED_LAYOUT = "Raggruppa statistiche sotto intestazioni",
     LABEL_ITEM_TOOLTIP_DR = "Mostra valore dopo rendimenti decrescenti nei tooltip oggetto",
     LABEL_OPTIONS_SCALE = "Scala finestra opzioni",
+    TIP_MINIMIZE = "Riduci a icona",
+    TIP_EXPAND = "Espandi",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Spessore barre statistiche",
     LABEL_SHOW_DIMINISHING = "Mostra rendimenti decrescenti sulle barre",
     LABEL_STYLE = "Aspetto",

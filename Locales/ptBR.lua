@@ -299,6 +299,8 @@ ns.RegisterLocale("ptBR", {
     LABEL_GROUPED_LAYOUT = "Agrupar Stats sob Cabeçalhos",
     LABEL_ITEM_TOOLTIP_DR = "Mostrar Valor Após Retornos Decrescentes nas Dicas de Itens",
     LABEL_OPTIONS_SCALE = "Escala da Janela de Opções",
+    TIP_MINIMIZE = "Minimizar",
+    TIP_EXPAND = "Expandir",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Espessura da Barra de Stats",
     LABEL_SHOW_DIMINISHING = "Mostrar Retornos Decrescentes nas Barras",
     LABEL_STYLE = "Visual",

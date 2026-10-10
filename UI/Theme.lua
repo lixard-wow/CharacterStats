@@ -312,13 +312,17 @@ function Theme.Window(frame, headerHeight, noRing)
     frame.headerLine = line
 end
 function Theme.CloseButton(parent, size)
+    return Theme.IconButton(parent, size, "icon_close")
+end
+function Theme.IconButton(parent, size, iconName)
     local _, C = Theme.Get()
     local T = Theme.T
     local button = CreateFrame("Button", nil, parent)
     button:SetSize(size, size)
     local fill = Theme.Box(button, "button", "buttonBorder", T.buttonRadius)
     local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetTexture(Theme.ART .. "icon_close")
+    button.icon = icon
+    icon:SetTexture(Theme.ART .. iconName)
     icon:SetSize(math.floor(size * 0.5 + 0.5), math.floor(size * 0.5 + 0.5))
     icon:SetPoint("CENTER")
     Theme.Tint(icon, C.muted)
