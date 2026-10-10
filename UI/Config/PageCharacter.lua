@@ -92,6 +92,15 @@ local function BuildEntries(L)
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
             onChange = ApplyGearBadges, disabled = LevelsOff,
         },
+        {
+            kind = "dropdown", key = "gearUpgradeDisplay", label = L.LABEL_GEAR_UPGRADE or "Upgrade Level Under Item Level",
+            items = {
+                { value = "full", text = L.UPGRADE_DISPLAY_FULL or "Rank and track (4/6 Hero)" },
+                { value = "rank", text = L.UPGRADE_DISPLAY_RANK or "Rank only (4/6)" },
+                { value = "off", text = L.UPGRADE_DISPLAY_OFF or "Hidden" },
+            },
+            onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
         { kind = "toggle", key = "gearFlags", label = L.LABEL_GEAR_FLAGS or "Flag Missing Enchants and Empty Gem Sockets", fullRow = true, onChange = ApplyGearBadges },
         { kind = "toggle", key = "gearDetails", label = L.LABEL_GEAR_DETAILS or "Show Enchants and Gems Next to Gear Slots", fullRow = true, onChange = ApplyGearBadges },
         {

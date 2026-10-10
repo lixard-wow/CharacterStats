@@ -207,6 +207,22 @@ local function ApplyLevelLayout(badge, db)
     badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
     badge.level:ClearAllPoints()
     badge.level:SetPoint(anchor, badge, anchor, insetX + x, insetY + y)
+    local horizontal = anchor:match("LEFT") or anchor:match("RIGHT") or ""
+    badge.upgrade:SetFont(STANDARD_TEXT_FONT, math.max(6, math.floor(size * 0.8 + 0.5)), "OUTLINE")
+    badge.upgrade:SetJustifyH(horizontal == "" and "CENTER" or horizontal)
+    badge.upgrade:ClearAllPoints()
+    if anchor:find("BOTTOM") then
+        badge.upgrade:SetPoint("BOTTOM" .. horizontal, badge.level, "TOP" .. horizontal, 0, 1)
+    else
+        badge.upgrade:SetPoint("TOP" .. horizontal, badge.level, "BOTTOM" .. horizontal, 0, -1)
+    end
+end
+local function GetUpgradeText(entry, mode)
+    if mode == "off" or not entry.trackRank or not entry.trackMax then return nil end
+    local rank = string.format("%d/%d", entry.trackRank, entry.trackMax)
+    if mode == "rank" or not entry.track then return rank end
+    local name = ns.L["TRACK_" .. entry.track:upper()]
+    return name and (rank .. " " .. name) or rank
 end
 local function GetBadge(slot)
     local badge = badges[slot]
@@ -217,6 +233,8 @@ local function GetBadge(slot)
     badge:SetAllPoints(button)
     badge:SetFrameLevel(button:GetFrameLevel() + 5)
     badge.level = badge:CreateFontString(nil, "OVERLAY")
+    badge.upgrade = badge:CreateFontString(nil, "OVERLAY")
+    badge.upgrade:SetWordWrap(false)
     badge.flag = badge:CreateTexture(nil, "OVERLAY")
     badge.flag:SetSize(8, 8)
     badge.flag:SetPoint("TOPLEFT", badge, "TOPLEFT", 2, -2)
@@ -281,10 +299,20 @@ function GearBadges.Refresh()
                 if showLevels and entry.itemLevel then
                     ApplyLevelLayout(badge, db)
                     badge.level:SetText(string.format("%d", entry.itemLevel))
-                    badge.level:SetTextColor(GearBadges.GetTrackColor(db, entry.track))
+                    local r, g, b = GearBadges.GetTrackColor(db, entry.track)
+                    badge.level:SetTextColor(r, g, b)
                     badge.level:Show()
+                    local upgrade = GetUpgradeText(entry, db.gearUpgradeDisplay)
+                    if upgrade then
+                        badge.upgrade:SetText(upgrade)
+                        badge.upgrade:SetTextColor(r, g, b)
+                        badge.upgrade:Show()
+                    else
+                        badge.upgrade:Hide()
+                    end
                 else
                     badge.level:Hide()
+                    badge.upgrade:Hide()
                 end
                 local flagKey = nil
                 if showFlags and not showDetails then
