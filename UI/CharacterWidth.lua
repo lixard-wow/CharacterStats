@@ -1,7 +1,6 @@
 local ADDON_NAME, ns = ...
 local CharacterWidth = {}
 ns.CharacterWidth = CharacterWidth
-local MODEL_WIDTH = 231
 local MODEL_X, MODEL_Y = 52, -66
 local BACKGROUND_LEFT_WIDTH = 212
 local WEAPON_X, WEAPON_Y = 130, 16
@@ -22,10 +21,14 @@ local function Layout(extra)
     layoutExtra = extra
     local model = rawget(_G, "CharacterModelScene")
     if model then
-        model:SetWidth(MODEL_WIDTH + extra)
+        local half = math.floor(extra / 2)
         model:ClearAllPoints()
-        model:SetPoint("TOPLEFT", model:GetParent(), "TOPLEFT", MODEL_X, MODEL_Y)
-        if model.BackgroundTopLeft then model.BackgroundTopLeft:SetWidth(BACKGROUND_LEFT_WIDTH + extra) end
+        model:SetPoint("TOPLEFT", model:GetParent(), "TOPLEFT", MODEL_X + half, MODEL_Y)
+        if model.BackgroundTopLeft then
+            model.BackgroundTopLeft:SetWidth(BACKGROUND_LEFT_WIDTH + extra)
+            model.BackgroundTopLeft:ClearAllPoints()
+            model.BackgroundTopLeft:SetPoint("TOPLEFT", model, "TOPLEFT", -half, 0)
+        end
         if model.BackgroundBotLeft then model.BackgroundBotLeft:SetWidth(BACKGROUND_LEFT_WIDTH + extra) end
     end
     local weapon = rawget(_G, "CharacterMainHandSlot")
