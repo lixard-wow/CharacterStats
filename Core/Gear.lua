@@ -16,6 +16,32 @@ local ENCHANT_SLOTS_RETAIL = {
     [16] = true,
     [17] = "weapon",
 }
+local ENCHANT_SLOTS_MOP = {
+    [3] = true,
+    [5] = true,
+    [7] = true,
+    [8] = true,
+    [9] = true,
+    [10] = true,
+    [15] = true,
+    [16] = "weapon",
+    [17] = true,
+}
+local ENCHANT_SLOTS_FOREVER = {
+    [2] = true,
+    [5] = true,
+    [8] = true,
+    [9] = true,
+    [10] = true,
+    [15] = true,
+    [16] = "weapon",
+    [17] = true,
+}
+local function GetEnchantSlots()
+    if ns.IS_RETAIL then return ENCHANT_SLOTS_RETAIL end
+    if ns.BlizzardStats and ns.BlizzardStats.IsAvailable() then return ENCHANT_SLOTS_FOREVER end
+    return ENCHANT_SLOTS_MOP
+end
 local ITEM_CLASS_WEAPON = (Enum and Enum.ItemClass and Enum.ItemClass.Weapon) or 2
 local TRACK_KEYS = { "explorer", "adventurer", "veteran", "champion", "hero", "myth" }
 local trackLookup = nil
@@ -170,8 +196,7 @@ local function ReadSockets(entry, link, fields)
     return empty
 end
 local function NeedsEnchant(slot, link)
-    if not ns.IS_RETAIL then return false end
-    local rule = ENCHANT_SLOTS_RETAIL[slot]
+    local rule = GetEnchantSlots()[slot]
     if not rule then return false end
     if rule == "weapon" then
         local getInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
