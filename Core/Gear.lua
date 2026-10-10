@@ -225,6 +225,7 @@ function Gear.Scan()
         entry.trackRank = nil
         entry.trackMax = nil
         entry.enchantText = nil
+        entry.enchantId = nil
         entry.gems = entry.gems or {}
         wipe(entry.gems)
         if link then
@@ -240,6 +241,9 @@ function Gear.Scan()
             local fields = SplitItemString(link)
             if fields then
                 local enchantId = tonumber(fields[2] or "")
+                if enchantId and enchantId > 0 then
+                    entry.enchantId = enchantId
+                end
                 if NeedsEnchant(slot, link) and not (enchantId and enchantId > 0) then
                     entry.missingEnchant = true
                     summary.missingEnchants = summary.missingEnchants + 1

@@ -39,9 +39,15 @@ local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
 local function ShowEnchantTooltip(self)
-    if not self.slot then return end
+    local spell = self.enchantId and ns.GetEnchantSpell(self.enchantId)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetInventoryItem("player", self.slot)
+    if spell then
+        GameTooltip:SetSpellByID(spell)
+    elseif self.enchantName then
+        GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
+    else
+        return
+    end
     GameTooltip:Show()
 end
 local function ShowGemTooltip(self)
@@ -133,7 +139,7 @@ local function GetGemIcon(gemId)
     end
     return nil
 end
-local function UpdateDetail(detail, entry, db, slot)
+local function UpdateDetail(detail, entry, db)
     local hasContent = false
     local icon = detail.enchantIcon
     local iconMode = db.enchantDisplay ~= "text"
@@ -146,7 +152,8 @@ local function UpdateDetail(detail, entry, db, slot)
         hasContent = true
     elseif entry.enchantText and iconMode then
         local atlas = entry.enchantText:match("|A:([^:|]+)")
-        icon.slot = slot
+        icon.enchantId = entry.enchantId
+        icon.enchantName = entry.enchantText:gsub("%s*|A:.-|a", ""):match("^%s*(.-)%s*$")
         if atlas and icon.texture.SetAtlas then
             icon.texture:SetTexCoord(0, 1, 0, 1)
             icon.texture:SetAtlas(atlas)
@@ -290,7 +297,7 @@ function GearBadges.Refresh()
                     badge.flag:Hide()
                 end
                 if showDetails then
-                    UpdateDetail(badge.detail, entry, db, slot)
+                    UpdateDetail(badge.detail, entry, db)
                 else
                     badge.detail:Hide()
                 end
