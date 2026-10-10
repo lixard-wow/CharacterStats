@@ -39,10 +39,15 @@ local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
 local function ShowEnchantTooltip(self)
-    local spell = self.enchantId and ns.GetEnchantSpell(self.enchantId)
+    local spell, item
+    if self.enchantId then
+        spell, item = ns.GetEnchantSource(self.enchantId)
+    end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     if spell then
         GameTooltip:SetSpellByID(spell)
+    elseif item then
+        GameTooltip:SetItemByID(item)
     elseif self.enchantName then
         GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
     else
