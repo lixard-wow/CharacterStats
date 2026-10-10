@@ -262,6 +262,7 @@ local L = {
     LABEL_OPTIONS_SCALE = "Options Window Scale",
     TIP_MINIMIZE = "Minimize",
     TIP_EXPAND = "Expand",
+    TIP_WINDOW_SETTINGS = "Window Settings",
 
     LABEL_FONT_FACE = "Font",
     LABEL_BORDER_STYLE = "Border Style",

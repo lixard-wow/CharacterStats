@@ -301,6 +301,7 @@ ns.RegisterLocale("zhTW", {
     LABEL_OPTIONS_SCALE = "選項視窗縮放",
     TIP_MINIMIZE = "最小化",
     TIP_EXPAND = "展開",
+    TIP_WINDOW_SETTINGS = "視窗設定",
     LABEL_PAPERDOLL_BAR_HEIGHT = "屬性條厚度",
     LABEL_SHOW_DIMINISHING = "在屬性條上顯示收益遞減",
     LABEL_STYLE = "外觀",

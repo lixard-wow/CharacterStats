@@ -301,6 +301,7 @@ ns.RegisterLocale("zhCN", {
     LABEL_OPTIONS_SCALE = "设置窗口缩放",
     TIP_MINIMIZE = "最小化",
     TIP_EXPAND = "展开",
+    TIP_WINDOW_SETTINGS = "窗口设置",
     LABEL_PAPERDOLL_BAR_HEIGHT = "属性条厚度",
     LABEL_SHOW_DIMINISHING = "在属性条上显示收益递减",
     LABEL_STYLE = "外观",

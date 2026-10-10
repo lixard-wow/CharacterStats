@@ -401,6 +401,7 @@ function PaperdollPanel:Create()
         bg:SetTexture("Interface\\FrameGeneral\\UI-Background-Rock", "REPEAT", "REPEAT")
         bg:SetHorizTile(true)
         bg:SetVertTile(true)
+        bg:SetVertexColor(0.72, 0.72, 0.72)
         panel.bg = bg
     end
     panel:Hide()

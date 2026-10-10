@@ -301,6 +301,7 @@ ns.RegisterLocale("esES", {
     LABEL_OPTIONS_SCALE = "Escala de la ventana de opciones",
     TIP_MINIMIZE = "Minimizar",
     TIP_EXPAND = "Expandir",
+    TIP_WINDOW_SETTINGS = "Ajustes de la ventana",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Grosor de barra de estadísticas",
     LABEL_SHOW_DIMINISHING = "Mostrar rendimientos decrecientes en las barras",
     LABEL_STYLE = "Aspecto",

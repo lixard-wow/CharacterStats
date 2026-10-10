@@ -301,6 +301,7 @@ ns.RegisterLocale("deDE", {
     LABEL_OPTIONS_SCALE = "Skalierung des Optionsfensters",
     TIP_MINIMIZE = "Minimieren",
     TIP_EXPAND = "Erweitern",
+    TIP_WINDOW_SETTINGS = "Fenstereinstellungen",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Dicke der Wertebalken",
     LABEL_SHOW_DIMINISHING = "Abnehmenden Ertrag auf Balken anzeigen",
     LABEL_STYLE = "Ansicht",

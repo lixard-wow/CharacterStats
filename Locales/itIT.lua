@@ -300,6 +300,7 @@ ns.RegisterLocale("itIT", {
     LABEL_OPTIONS_SCALE = "Scala finestra opzioni",
     TIP_MINIMIZE = "Riduci a icona",
     TIP_EXPAND = "Espandi",
+    TIP_WINDOW_SETTINGS = "Impostazioni finestra",
     LABEL_PAPERDOLL_BAR_HEIGHT = "Spessore barre statistiche",
     LABEL_SHOW_DIMINISHING = "Mostra rendimenti decrescenti sulle barre",
     LABEL_STYLE = "Aspetto",

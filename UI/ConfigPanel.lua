@@ -8,6 +8,7 @@ local DEFAULT_HEIGHT = 520
 local NAV_WIDTH = 140
 local TITLE_HEIGHT = 32
 local CONTENT_PAD = 14
+local WINDOW_PAGE = "window"
 local frame
 local pages = {}
 local pageOrder = {}
@@ -109,6 +110,79 @@ local function SaveFrameSize()
     db.ui.configWidth = frame:GetWidth()
     db.ui.configHeight = frame:GetHeight()
 end
+local function BuildWindowEntries(L)
+    local function ApplyAccent()
+        ConfigPanel.RefreshTheme()
+        ConfigPanel.RefreshStatsFrame()
+    end
+    return {
+        { kind = "header", label = L.SECTION_UI_THEME or "Window Theme" },
+        {
+            kind = "dropdown", key = "uiTheme", label = L.LABEL_UI_THEME or "Theme",
+            items = function()
+                local items = {}
+                for _, key in ipairs(CS.Theme.ORDER) do
+                    items[#items + 1] = { value = key, text = CS.Theme.GetName(key) }
+                end
+                return items
+            end,
+            get = function() return CS.Theme.Get() and CS.Theme.key end,
+            set = function() end,
+            onChange = function(value)
+                CS.Theme.Set(value)
+            end,
+        },
+        { kind = "header", label = L.SECTION_THEME or "Accent Color" },
+        {
+            kind = "dropdown", key = "theme", label = L.LABEL_THEME or "Theme",
+            items = function()
+                local items = {}
+                for _, theme in ipairs(CS.THEMES) do
+                    items[#items + 1] = { value = theme.id, text = CS.GetThemeName(theme.id) }
+                end
+                return items
+            end,
+            disabled = function(db) return db.themeUseClassColor == true or CS.Theme.key ~= "classic" end,
+            onChange = ApplyAccent,
+        },
+        {
+            kind = "toggle", key = "themeUseClassColor", label = L.LABEL_THEME_USE_CLASS or "Use my class color", fullRow = true, onChange = ApplyAccent,
+            disabled = function() return CS.Theme.key ~= "classic" end,
+        },
+        { kind = "header", label = L.SECTION_WINDOW or "Options Window" },
+        {
+            kind = "slider", key = "uiScale", label = L.LABEL_OPTIONS_SCALE or "Options Window Scale",
+            min = 0.5, max = 1.5, step = 0.05, format = "%.2f",
+            commitOnRelease = true,
+            onChange = function(value)
+                ConfigPanel.SetWindowScale(value)
+                if CS.MarkProfileDirty then CS.MarkProfileDirty() end
+            end,
+        },
+    }
+end
+pages[WINDOW_PAGE] = {
+    key = WINDOW_PAGE,
+    create = function(container)
+        local _, content = ConfigPanel.CreateScrollPage(container)
+        local page = CS.ConfigBuilder.Build(content, BuildWindowEntries(CS.L), {
+            onChange = ConfigPanel.RefreshStatsFrame,
+        })
+        content:SetHeight(page.height)
+        return page
+    end,
+}
+function ConfigPanel.ToggleWindowSettings()
+    if not frame then return end
+    if frame._minimized then
+        ConfigPanel.SetMinimized(false)
+    end
+    if frame._activePage == WINDOW_PAGE then
+        ConfigPanel.ShowPage(frame._lastAddonPage or (pageOrder[1] and pageOrder[1].key))
+    else
+        ConfigPanel.ShowPage(WINDOW_PAGE)
+    end
+end
 local function CreateCloseButton(parent, glyph)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(20, 20)
@@ -205,6 +279,28 @@ local function CreateMainFrame()
         GameTooltip:Show()
     end)
     frame.minBtn:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    if CS.Theme.key == "classic" then
+        frame.gearBtn = CreateCloseButton(frame.titleBar, "")
+        local icon = frame.gearBtn:CreateTexture(nil, "ARTWORK")
+        icon:SetTexture(CS.Theme.ART .. "icon_gear")
+        icon:SetSize(12, 12)
+        icon:SetPoint("CENTER")
+        icon:SetVertexColor(0.8, 0.8, 0.8)
+    else
+        frame.gearBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_gear")
+    end
+    frame.gearBtn:SetPoint("RIGHT", frame.minBtn, "LEFT", -6, 0)
+    frame.gearBtn:SetScript("OnClick", function()
+        ConfigPanel.ToggleWindowSettings()
+    end)
+    frame.gearBtn:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(L.TIP_WINDOW_SETTINGS or "Window Settings", 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    frame.gearBtn:HookScript("OnLeave", function()
         GameTooltip:Hide()
     end)
     frame.nav = CreateFrame("Frame", nil, frame)
@@ -306,6 +402,9 @@ function ConfigPanel.ShowPage(key)
         container.page:Refresh()
     end
     frame._activePage = key
+    if key ~= WINDOW_PAGE then
+        frame._lastAddonPage = key
+    end
 end
 function ConfigPanel.RefreshActivePage()
     if not frame or not frame:IsShown() or not frame._activePage then return end
