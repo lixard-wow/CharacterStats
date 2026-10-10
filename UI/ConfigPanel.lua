@@ -183,7 +183,7 @@ function ConfigPanel.ToggleWindowSettings()
         ConfigPanel.ShowPage(WINDOW_PAGE)
     end
 end
-local function CreateCloseButton(parent, glyph)
+local function CreateCircleButton(parent, iconName, isClose)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(20, 20)
     btn.bg = btn:CreateTexture(nil, "BACKGROUND")
@@ -193,22 +193,22 @@ local function CreateCloseButton(parent, glyph)
     btn.mask:SetAllPoints(btn.bg)
     btn.mask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     btn.bg:AddMaskTexture(btn.mask)
-    btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    btn.text:SetPoint("CENTER", 0, 1)
-    btn.text:SetFont(STANDARD_TEXT_FONT, 16, "")
-    btn.text:SetText(glyph or "\195\151")
-    btn.text:SetTextColor(0.8, 0.8, 0.8)
+    btn.icon = btn:CreateTexture(nil, "ARTWORK")
+    btn.icon:SetTexture(CS.Theme.ART .. iconName)
+    btn.icon:SetSize(10, 10)
+    btn.icon:SetPoint("CENTER")
+    btn.icon:SetVertexColor(0.8, 0.8, 0.8)
     btn:SetScript("OnEnter", function(self)
-        if glyph then
-            self.bg:SetColorTexture(0.3, 0.3, 0.3, 1)
-        else
+        if isClose then
             self.bg:SetColorTexture(0.5, 0.1, 0.1, 1)
+        else
+            self.bg:SetColorTexture(0.3, 0.3, 0.3, 1)
         end
-        self.text:SetTextColor(1, 1, 1)
+        self.icon:SetVertexColor(1, 1, 1)
     end)
     btn:SetScript("OnLeave", function(self)
         self.bg:SetColorTexture(0.15, 0.15, 0.15, 1)
-        self.text:SetTextColor(0.8, 0.8, 0.8)
+        self.icon:SetVertexColor(0.8, 0.8, 0.8)
     end)
     return btn
 end
@@ -256,7 +256,7 @@ local function CreateMainFrame()
     frame.version:SetText(CS.VERSION or "")
     Widgets.ApplyFontColor(frame.version, "textMuted", 0.7)
     if CS.Theme.key == "classic" then
-        frame.closeBtn = CreateCloseButton(frame.titleBar)
+        frame.closeBtn = CreateCircleButton(frame.titleBar, "icon_close", true)
     else
         frame.closeBtn = CS.Theme.CloseButton(frame.titleBar, 22)
     end
@@ -265,7 +265,7 @@ local function CreateMainFrame()
         ConfigPanel.Hide()
     end)
     if CS.Theme.key == "classic" then
-        frame.minBtn = CreateCloseButton(frame.titleBar, "-")
+        frame.minBtn = CreateCircleButton(frame.titleBar, "icon_minus")
     else
         frame.minBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_minus")
     end
@@ -282,12 +282,8 @@ local function CreateMainFrame()
         GameTooltip:Hide()
     end)
     if CS.Theme.key == "classic" then
-        frame.gearBtn = CreateCloseButton(frame.titleBar, "")
-        local icon = frame.gearBtn:CreateTexture(nil, "ARTWORK")
-        icon:SetTexture(CS.Theme.ART .. "icon_gear")
-        icon:SetSize(12, 12)
-        icon:SetPoint("CENTER")
-        icon:SetVertexColor(0.8, 0.8, 0.8)
+        frame.gearBtn = CreateCircleButton(frame.titleBar, "icon_gear")
+        frame.gearBtn.icon:SetSize(12, 12)
     else
         frame.gearBtn = CS.Theme.IconButton(frame.titleBar, 22, "icon_gear")
     end
@@ -467,12 +463,7 @@ function ConfigPanel.SetMinimized(on)
             frame:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
         end
     end
-    local btn = frame.minBtn
-    if btn.icon then
-        btn.icon:SetTexture(CS.Theme.ART .. (on and "icon_chevron_down" or "icon_minus"))
-    elseif btn.text then
-        btn.text:SetText(on and "+" or "-")
-    end
+    frame.minBtn.icon:SetTexture(CS.Theme.ART .. (on and "icon_chevron_down" or "icon_minus"))
 end
 function ConfigPanel.Open()
     ConfigPanel.Show()
