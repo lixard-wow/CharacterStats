@@ -39,19 +39,11 @@ local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
 local function ShowEnchantTooltip(self)
-    local spell, item
-    if self.enchantId then
-        spell, item = ns.GetEnchantSource(self.enchantId)
-    end
+    if not self.enchantName then return end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    if spell then
-        GameTooltip:SetSpellByID(spell)
-    elseif item then
-        GameTooltip:SetItemByID(item)
-    elseif self.enchantName then
-        GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
-    else
-        return
+    GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
+    if self.enchantAtlas and CreateAtlasMarkup then
+        GameTooltip:AddLine(CreateAtlasMarkup(self.enchantAtlas, 16, 16), 1, 1, 1)
     end
     GameTooltip:Show()
 end
@@ -122,7 +114,7 @@ local function UpdateDetail(detail, entry, db)
         hasContent = true
     elseif entry.enchantText and iconMode then
         local atlas = entry.enchantText:match("|A:([^:|]+)")
-        icon.enchantId = entry.enchantId
+        icon.enchantAtlas = atlas
         icon.enchantName = entry.enchantText:gsub("%s*|A:.-|a", ""):match("^%s*(.-)%s*$")
         if atlas and icon.texture.SetAtlas then
             icon.texture:SetTexCoord(0, 1, 0, 1)
