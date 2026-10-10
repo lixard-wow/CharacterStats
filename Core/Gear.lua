@@ -47,6 +47,24 @@ local function StripEnchantPrefix(text)
     local stripped = text:match("^[^:|]+:%s*(.+)$") or text:match("^[^|]-\239\188\154%s*(.+)$") or text
     return stripped:match("^[^|]- %- (.+)$") or stripped
 end
+local enchantPattern
+local function EnchantPattern()
+    if enchantPattern == nil then
+        local line = rawget(_G, "ENCHANTED_TOOLTIP_LINE")
+        if type(line) == "string" and line:find("%s", 1, true) then
+            local escaped = line:gsub("([%(%)%.%+%-%*%?%[%]%^%$%%])", "%%%1")
+            enchantPattern = "^" .. escaped:gsub("%%%%s", "(.+)", 1) .. "$"
+        else
+            enchantPattern = false
+        end
+    end
+    return enchantPattern
+end
+local function IsEnchantLine(line, text)
+    if ENCHANT_LINE_TYPE and line.type == ENCHANT_LINE_TYPE then return true end
+    local pattern = EnchantPattern()
+    return pattern and text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):match(pattern) ~= nil
+end
 local function ReadTooltip(entry, slot, readTrack)
     if not (C_TooltipInfo and C_TooltipInfo.GetInventoryItem) then return end
     local ok, data = pcall(C_TooltipInfo.GetInventoryItem, "player", slot)
@@ -62,7 +80,7 @@ local function ReadTooltip(entry, slot, readTrack)
                     foundTrack = true
                 end
             end
-            if not entry.enchantText and ENCHANT_LINE_TYPE and line.type == ENCHANT_LINE_TYPE then
+            if not entry.enchantText and IsEnchantLine(line, text) then
                 entry.enchantText = StripEnchantPrefix(text)
             end
         end
@@ -77,6 +95,8 @@ end
 local results = {}
 local summary = { missingEnchants = 0, emptySockets = 0, pending = false }
 local dirty = true
+local enchantRetries = {}
+local ENCHANT_RETRY_LIMIT = 5
 Gear.SLOTS = SLOTS
 local function GetItemLevel(slot, link)
     if C_Item and C_Item.GetCurrentItemLevel and ItemLocation and ItemLocation.CreateFromEquipmentSlot then
@@ -200,6 +220,11 @@ function Gear.Scan()
                     summary.missingEnchants = summary.missingEnchants + 1
                 elseif enchantId and enchantId > 0 and not entry.enchantText then
                     entry.enchantText = ns.L.GEAR_ENCHANTED or "Enchanted"
+                    local tries = (enchantRetries[link] or 0) + 1
+                    enchantRetries[link] = tries
+                    if tries <= ENCHANT_RETRY_LIMIT then
+                        summary.pending = true
+                    end
                 end
                 entry.emptySockets = ReadSockets(entry, link, fields)
                 summary.emptySockets = summary.emptySockets + entry.emptySockets
