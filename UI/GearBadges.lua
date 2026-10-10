@@ -192,6 +192,20 @@ local function UpdateDetail(detail, entry, db)
     PlaceEnchantText(detail, icon:IsShown())
     detail:SetShown(hasContent)
 end
+local LEVEL_INSET = 2
+local function ApplyLevelLayout(badge, db)
+    local size = db.gearLevelSize or 11
+    local anchor = db.gearLevelAnchor or "TOPRIGHT"
+    local x, y = db.gearLevelX or 0, db.gearLevelY or 0
+    local key = size .. anchor .. x .. ":" .. y
+    if badge.levelLayout == key then return end
+    badge.levelLayout = key
+    local insetX = anchor:find("LEFT") and 1 or (anchor:find("RIGHT") and -1 or 0)
+    local insetY = anchor:find("TOP") and -LEVEL_INSET or (anchor:find("BOTTOM") and LEVEL_INSET or 0)
+    badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
+    badge.level:ClearAllPoints()
+    badge.level:SetPoint(anchor, badge, anchor, insetX + x, insetY + y)
+end
 local function GetBadge(slot)
     local badge = badges[slot]
     if badge then return badge end
@@ -201,8 +215,6 @@ local function GetBadge(slot)
     badge:SetAllPoints(button)
     badge:SetFrameLevel(button:GetFrameLevel() + 5)
     badge.level = badge:CreateFontString(nil, "OVERLAY")
-    badge.level:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
-    badge.level:SetPoint("TOPRIGHT", badge, "TOPRIGHT", -1, -2)
     badge.flag = badge:CreateTexture(nil, "OVERLAY")
     badge.flag:SetSize(8, 8)
     badge.flag:SetPoint("TOPLEFT", badge, "TOPLEFT", 2, -2)
@@ -265,6 +277,7 @@ function GearBadges.Refresh()
         if badge then
             if entry and entry.link then
                 if showLevels and entry.itemLevel then
+                    ApplyLevelLayout(badge, db)
                     badge.level:SetText(string.format("%d", entry.itemLevel))
                     badge.level:SetTextColor(GearBadges.GetTrackColor(db, entry.track))
                     badge.level:Show()
