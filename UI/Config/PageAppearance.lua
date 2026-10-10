@@ -49,7 +49,7 @@ local function BuildEntries(L)
                 return fontItems
             end,
         },
-        { kind = "slider", key = "fontSize", label = L.LABEL_FONT_SIZE or "Font Size", min = 8, max = 16, step = 1, format = "%.0f" },
+        { kind = "slider", key = "fontSize", label = L.LABEL_FONT_SIZE or "Font Size", min = 4, max = 16, step = 1, format = "%.0f" },
         {
             kind = "slider", key = "textAlpha", label = L.LABEL_TEXT_OPACITY or "Text Opacity",
             min = 0, max = 1, step = 0.05, formatValue = FormatPercentValue,

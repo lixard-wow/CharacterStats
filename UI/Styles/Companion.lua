@@ -53,7 +53,7 @@ local function CreateStatsRenderer(parent)
         for _, cell in ipairs(self.cells) do cell.frame:Hide() end
         wipe(self.byId)
         local fontPath = ns.GetFontPath(db.fontFace)
-        local labelSize = math.max(7, db.fontSize - 3)
+        local labelSize = math.max(4, db.fontSize - 3)
         local valueSize = db.fontSize + 1
         local cellHeight = labelSize + valueSize + 12
         local horizontal = db.orientation == "horizontal"
