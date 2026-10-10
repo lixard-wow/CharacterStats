@@ -395,6 +395,14 @@ function PaperdollPanel:Create()
     panel = CreateFrame("Frame", "CharacterStatsCustomPanel", statsPane)
     panel:SetAllPoints(statsPane)
     panel:SetFrameLevel(statsPane:GetFrameLevel() + 50)
+    if ns.IS_CLASSIC and not CharacterFrame.GetStatsPane and rawget(_G, "CharacterFrameInsetRight") then
+        local bg = panel:CreateTexture(nil, "BACKGROUND", nil, -8)
+        bg:SetAllPoints(panel)
+        bg:SetTexture("Interface\\FrameGeneral\\UI-Background-Rock", "REPEAT", "REPEAT")
+        bg:SetHorizTile(true)
+        bg:SetVertTile(true)
+        panel.bg = bg
+    end
     panel:Hide()
     return panel
 end
