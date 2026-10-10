@@ -17,6 +17,20 @@ end
 local function LevelsOff(db)
     return db.gearBadges == false
 end
+local function LevelNotOnIcon(db)
+    return db.gearBadges == false or (db.gearLevelPlace or "icon") ~= "icon"
+end
+local function DetailsOff(db)
+    return db.gearDetails == false
+end
+local function SidePlaces(L, first)
+    local items = {}
+    if first then items[1] = first end
+    items[#items + 1] = { value = "top", text = L.PLACE_TOP or "Beside icon, top" }
+    items[#items + 1] = { value = "middle", text = L.PLACE_MIDDLE or "Beside icon, middle" }
+    items[#items + 1] = { value = "bottom", text = L.PLACE_BOTTOM or "Beside icon, bottom" }
+    return items
+end
 local function FlagsOff(db)
     return db.gearFlags == false
 end
@@ -76,6 +90,11 @@ local function BuildEntries(L)
             min = 6, max = 20, step = 1, format = "%.0f", onChange = ApplyGearBadges, disabled = LevelsOff,
         },
         {
+            kind = "dropdown", key = "gearLevelPlace", label = L.LABEL_GEAR_LEVEL_PLACE or "Item Level Placement",
+            items = SidePlaces(L, { value = "icon", text = L.PLACE_ICON or "On the icon" }),
+            onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
             kind = "dropdown", key = "gearLevelAnchor", label = L.LABEL_GEAR_LEVEL_POSITION or "Item Level Position",
             items = {
                 { value = "TOPLEFT", text = L.POS_TOPLEFT or "Top Left" },
@@ -88,19 +107,19 @@ local function BuildEntries(L)
                 { value = "BOTTOM", text = L.POS_BOTTOM or "Bottom" },
                 { value = "BOTTOMRIGHT", text = L.POS_BOTTOMRIGHT or "Bottom Right" },
             },
-            onChange = ApplyGearBadges, disabled = LevelsOff,
+            onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
         },
         {
             kind = "slider", key = "gearLevelX", label = L.LABEL_GEAR_LEVEL_X or "Horizontal Offset",
             min = -20, max = 20, step = 1,
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
-            onChange = ApplyGearBadges, disabled = LevelsOff,
+            onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
         },
         {
             kind = "slider", key = "gearLevelY", label = L.LABEL_GEAR_LEVEL_Y or "Vertical Offset",
             min = -20, max = 20, step = 1,
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
-            onChange = ApplyGearBadges, disabled = LevelsOff,
+            onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
         },
         {
             kind = "dropdown", key = "gearUpgradeDisplay", label = L.LABEL_GEAR_UPGRADE or "Upgrade Level Under Item Level",
@@ -110,6 +129,12 @@ local function BuildEntries(L)
                 { value = "off", text = L.UPGRADE_DISPLAY_OFF or "Hidden" },
             },
             onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
+            kind = "dropdown", key = "gearUpgradePlace", label = L.LABEL_GEAR_UPGRADE_PLACE or "Upgrade Level Placement",
+            items = SidePlaces(L, { value = "under", text = L.PLACE_UNDER or "Under the item level" }),
+            onChange = ApplyGearBadges,
+            disabled = function(db) return db.gearBadges == false or db.gearUpgradeDisplay == "off" end,
         },
         { kind = "toggle", key = "gearFlags", label = L.LABEL_GEAR_FLAGS or "Flag Missing Enchants and Empty Gem Sockets", fullRow = true, onChange = ApplyGearBadges },
         { kind = "toggle", key = "gearDetails", label = L.LABEL_GEAR_DETAILS or "Show Enchants and Gems Next to Gear Slots", fullRow = true, onChange = ApplyGearBadges },
@@ -121,6 +146,14 @@ local function BuildEntries(L)
             },
             onChange = ApplyGearBadges,
             disabled = function(db) return db.gearDetails == false end,
+        },
+        {
+            kind = "dropdown", key = "gearEnchantPlace", label = L.LABEL_GEAR_ENCHANT_PLACE or "Enchant Placement",
+            items = SidePlaces(L), onChange = ApplyGearBadges, disabled = DetailsOff,
+        },
+        {
+            kind = "dropdown", key = "gearGemPlace", label = L.LABEL_GEAR_GEM_PLACE or "Gem Placement",
+            items = SidePlaces(L), onChange = ApplyGearBadges, disabled = DetailsOff,
         },
         { kind = "header", label = L.SECTION_GEAR_COLORS or "Gear Slot Colors" },
         { kind = "color", key = "gearColorMyth", label = L.TRACK_MYTH or "Myth", onChange = ApplyGearBadges, disabled = LevelsOff },

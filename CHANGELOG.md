@@ -8,7 +8,7 @@
 - Three window themes for the options window and popups: Classic (the default), Workbench and Artisan Ledger. Pick one from the gear button in the options window's title bar or cycle with `/cs theme`.
 - A new options window with a sidebar of pages. Its title bar has a gear button for the window's own settings (theme, accent color, scale) and a minimize button.
 - Frame Scale setting for the stats panel, and Font Size now goes down to 4.
-- Character window (off by default, turn on under Character Frame): item level on every gear slot, colored by upgrade track with the upgrade rank underneath (e.g. 4/6 Hero), with enchant and gem icons beside each slot (hover for details) and a "Missing enchant" note on slots that should be enchanted.
+- Character window (off by default, turn on under Character Frame): item level on every gear slot, colored by upgrade track with the upgrade rank (e.g. 4/6 Hero), enchant and gem icons (hover for details); choose where each one sits on or beside the slot and a "Missing enchant" note on slots that should be enchanted.
 - A drawer beside the character window with Stats, Gear and Ratings tabs.
 - An options button on the character window (off by default).
 - Extra Character Frame Width (retail, 0 by default): widens the character window to give more room between your character and the gear slots.
