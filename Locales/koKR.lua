@@ -399,8 +399,10 @@ ns.RegisterLocale("koKR", {
     TRACK_OTHER = "강화 단계 없음",
     TRACK_VETERAN = "노련가",
     UNIT_PX = "px",
-    CMD_LOCALE = "/cs locale - 애드온 언어 선택 (번역 테스트용)",
+    CMD_LOCALE = "/cs locale - 애드온 언어 선택",
     LOCALE_TITLE = "애드온 언어",
     LOCALE_GAME = "게임 언어",
-    LOCALE_HINT = "번역 테스트용입니다. 언어를 선택하면 UI를 다시 불러옵니다. 블리자드 기본 문구는 게임 언어로 유지되며, 한국어와 중국어 글자는 해당 언어의 게임 클라이언트에서만 표시됩니다.",
+    LOCALE_HINT = "CharacterStats를 다른 언어로 표시합니다. 언어를 선택하면 UI를 다시 불러옵니다. 블리자드 기본 문구는 게임 언어로 유지되며, 한국어와 중국어 글자는 해당 언어의 게임 클라이언트에서만 표시됩니다.",
+    SECTION_LANGUAGE = "언어",
+    LABEL_ADDON_LANGUAGE = "애드온 언어 (UI 다시 불러옴)",
 })

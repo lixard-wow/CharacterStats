@@ -46,35 +46,6 @@ local function PrintMsg(msg, colorType)
     print(color .. "CharacterStats:|r " .. msg)
 end
 ns.PrintMsg = PrintMsg
-local function SafeToString(value)
-    if ns.IsSecretValue(value) then
-        return "<secret>"
-    end
-    local ok, text = pcall(tostring, value)
-    return ok and text or "<unreadable>"
-end
-local function FormatProbeValue(value)
-    local valueType = type(value)
-    local secret = ns.IsSecretValue(value)
-    return string.format("type=%s secret=%s value=%s", valueType, secret and "yes" or "no", SafeToString(value))
-end
-local function ProbeMoveSpeed()
-    print("Movement speed live-path probe:")
-    print("  InCombatLockdown(): " .. tostring(InCombatLockdown and InCombatLockdown()))
-    print("  ns._inInstance: " .. tostring(ns._inInstance))
-    local inVehicle = UnitInVehicle and UnitInVehicle("player")
-    print("  UnitInVehicle: " .. tostring(inVehicle))
-    print("  IsMounted(): " .. tostring(IsMounted and IsMounted()))
-    local unit = inVehicle and "vehicle" or "player"
-    local ok, _, runSpeed = pcall(GetUnitSpeed, unit)
-    print(string.format("  GetUnitSpeed(%s): ok=%s runSpeed=%s", unit, tostring(ok), FormatProbeValue(runSpeed)))
-    print("  Cached ns.movespeedDefault: " .. tostring(ns.movespeedDefault))
-    local def = ns.STAT_DEFS and ns.STAT_DEFS.movespeed
-    if def and def.api then
-        local ok4, live = pcall(def.api)
-        print("  movespeed stat's live api() result: ok=" .. tostring(ok4) .. " value=" .. tostring(live))
-    end
-end
 local HELP_KEYS = {
     "CMD_TOGGLE",
     "CMD_CONFIG",
@@ -90,7 +61,6 @@ local HELP_KEYS = {
 SLASH_CHARACTERSTATS1 = "/cs"
 SLASH_CHARACTERSTATS2 = "/charstats"
 SLASH_CHARACTERSTATS3 = "/cstats"
-SLASH_CHARACTERSTATSDEBUG1 = "/csdebug"
 SlashCmdList["CHARACTERSTATS"] = function(msg)
     msg = string.lower(string.trim(msg or ""))
     if msg == "config" or msg == "options" or msg == "opt" then
@@ -135,15 +105,6 @@ SlashCmdList["CHARACTERSTATS"] = function(msg)
         end
     else
         ns.StatsFrame:Toggle()
-    end
-end
-SlashCmdList["CHARACTERSTATSDEBUG"] = function(msg)
-    msg = string.lower(string.trim(msg or ""))
-    if msg == "movespeed" then
-        ProbeMoveSpeed()
-    else
-        PrintMsg("Debug commands:")
-        print("  /csdebug movespeed - Walk the movement speed calculation path step by step")
     end
 end
 local eventFrame = CreateFrame("Frame")

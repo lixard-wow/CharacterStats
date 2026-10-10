@@ -399,8 +399,10 @@ ns.RegisterLocale("deDE", {
     TRACK_OTHER = "Kein Aufwertungspfad",
     TRACK_VETERAN = "Veteran",
     UNIT_PX = "px",
-    CMD_LOCALE = "/cs locale - Addon-Sprache wählen (zum Testen von Übersetzungen)",
+    CMD_LOCALE = "/cs locale - Sprache des Addons wählen",
     LOCALE_TITLE = "Addon-Sprache",
     LOCALE_GAME = "Spielsprache",
-    LOCALE_HINT = "Zum Testen von Übersetzungen. Die Auswahl lädt das Interface neu. Texte von Blizzard bleiben in deiner Spielsprache; Koreanisch und Chinesisch brauchen einen Spielclient in dieser Sprache, damit die Schriftzeichen angezeigt werden.",
+    LOCALE_HINT = "Zeigt CharacterStats in einer anderen Sprache. Die Auswahl lädt das Interface neu. Texte von Blizzard bleiben in deiner Spielsprache; Koreanisch und Chinesisch brauchen einen Spielclient in dieser Sprache, damit die Schriftzeichen angezeigt werden.",
+    SECTION_LANGUAGE = "Sprache",
+    LABEL_ADDON_LANGUAGE = "Addon-Sprache (lädt das Interface neu)",
 })

@@ -399,8 +399,10 @@ ns.RegisterLocale("zhCN", {
     TRACK_OTHER = "无升级路线",
     TRACK_VETERAN = "老兵",
     UNIT_PX = "像素",
-    CMD_LOCALE = "/cs locale - 选择插件语言（用于测试翻译）",
+    CMD_LOCALE = "/cs locale - 选择插件语言",
     LOCALE_TITLE = "插件语言",
     LOCALE_GAME = "游戏语言",
-    LOCALE_HINT = "用于测试翻译。选择语言后会重新载入界面。暴雪自带的文字仍为游戏语言；韩文和中文需要对应语言的游戏客户端才能显示文字。",
+    LOCALE_HINT = "以其他语言显示 CharacterStats。选择语言后会重新载入界面。暴雪自带的文字仍为游戏语言；韩文和中文需要对应语言的游戏客户端才能显示文字。",
+    SECTION_LANGUAGE = "语言",
+    LABEL_ADDON_LANGUAGE = "插件语言（重新载入界面）",
 })
