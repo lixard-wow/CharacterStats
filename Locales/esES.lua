@@ -380,7 +380,7 @@ ns.RegisterLocale("esES", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "La lista clásica de versiones anteriores.",
     STYLE_PREVIEW_DRAWER = "+ Cajón de equipo",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "El aspecto original de CharacterStats.",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "Nogal y latón con encabezados grabados.",

@@ -380,7 +380,7 @@ ns.RegisterLocale("zhTW", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "早期版本的經典列表。",
     STYLE_PREVIEW_DRAWER = "+ 裝備抽屜",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "CharacterStats的原始外觀。",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "胡桃木與黃銅，搭配雕刻標題。",

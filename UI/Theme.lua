@@ -50,7 +50,7 @@ Theme.THEMES = {
         },
     },
     classic = {
-        nameKey = "THEME_CLASSIC", fallbackName = "Lixard Classic",
+        nameKey = "THEME_CLASSIC", fallbackName = "Classic",
         descKey = "THEME_CLASSIC_DESC", fallbackDesc = "The original CharacterStats look.",
         titleSize = 16, windowRadius = 0, buttonRadius = 0,
         headerFill = true,

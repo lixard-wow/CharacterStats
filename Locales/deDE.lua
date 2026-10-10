@@ -380,7 +380,7 @@ ns.RegisterLocale("deDE", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "Die klassische Liste aus früheren Versionen.",
     STYLE_PREVIEW_DRAWER = "+ Ausrüstungsschublade",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "Das ursprüngliche Aussehen von CharacterStats.",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "Walnuss und Messing mit gravierten Überschriften.",

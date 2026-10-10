@@ -379,7 +379,7 @@ ns.RegisterLocale("itIT", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "L'elenco classico delle versioni precedenti.",
     STYLE_PREVIEW_DRAWER = "+ Cassetto equip.",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "L'aspetto originale di CharacterStats.",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "Noce e ottone con titoli incisi.",

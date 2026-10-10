@@ -380,7 +380,7 @@ ns.RegisterLocale("koKR", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "이전 버전의 클래식 목록.",
     STYLE_PREVIEW_DRAWER = "+ 장비 서랍",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "원래 CharacterStats 모양.",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "호두나무와 황동, 각인된 제목.",

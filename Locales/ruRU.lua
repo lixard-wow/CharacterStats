@@ -380,7 +380,7 @@ ns.RegisterLocale("ruRU", {
     STYLE_ORIGINAL = "Original",
     STYLE_ORIGINAL_DESC = "Классический список из прежних версий.",
     STYLE_PREVIEW_DRAWER = "+ панель экипировки",
-    THEME_CLASSIC = "Lixard Classic",
+    THEME_CLASSIC = "Classic",
     THEME_CLASSIC_DESC = "Исходный вид CharacterStats.",
     THEME_LEDGER = "Artisan Ledger",
     THEME_LEDGER_DESC = "Орех и латунь с гравированными заголовками.",
