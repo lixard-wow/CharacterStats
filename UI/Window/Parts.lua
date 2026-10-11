@@ -574,7 +574,7 @@ function Parts.CreateList(parent, rowHeight, buildRow, fillRow)
     local list = { rows = {}, scroll = scroll, content = scroll.content }
     function list:SetData(data)
         local width = parent:GetWidth()
-        if width and width > 1 then self.content:SetWidth(width) end
+        if width and not (ns.IsSecretValue and ns.IsSecretValue(width)) and width > 1 then self.content:SetWidth(width) end
         for i, item in ipairs(data) do
             local row = self.rows[i]
             if not row then

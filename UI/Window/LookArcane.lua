@@ -273,6 +273,7 @@ local function BuildStrip(f)
         card.track = card:CreateTexture(nil, "ARTWORK")
         card.track:SetPoint("TOPLEFT", card.value, "BOTTOMLEFT", 0, -7)
         card.track:SetSize(cardWidth - 24, 5)
+        card.trackWidth = cardWidth - 24
         card.track:SetColorTexture(C.track[1], C.track[2], C.track[3])
         card.fill = card:CreateTexture(nil, "ARTWORK", nil, 1)
         card.fill:SetPoint("LEFT", card.track, "LEFT")
@@ -334,7 +335,7 @@ local function FillSecondary(card, stat, db)
     local ratingId = D and D.RatingFor(stat.id)
     local info = ratingId and D.Info(ratingId)
     local threshold = ratingId and D.FirstThreshold(ratingId)
-    local width = card.track:GetWidth()
+    local width = card.trackWidth
     if info and threshold and threshold > 0 then
         local fraction = math.min(1, info.raw / (threshold / 0.6))
         card.fill:SetWidth(math.max(1, width * fraction))

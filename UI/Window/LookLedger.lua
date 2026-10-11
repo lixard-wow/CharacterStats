@@ -268,6 +268,7 @@ local function BuildCharacterPage(f, page)
         row.track:SetPoint("LEFT", row, "LEFT", 118, 0)
         row.track:SetPoint("RIGHT", row, "RIGHT", -70, 0)
         row.track:SetHeight(6)
+        row.trackWidth = RIGHT_PAGE - 44 - 118 - 70
         row.fill = Solid(row, C.ink, "ARTWORK", 1)
         row.fill:SetPoint("LEFT", row.track, "LEFT")
         row.fill:SetHeight(6)
@@ -394,7 +395,7 @@ local function FillStats(f, db)
             local ratingId = D and D.RatingFor(stat.id)
             local info = ratingId and D.Info(ratingId)
             local threshold = ratingId and D.FirstThreshold(ratingId)
-            local width = row.track:GetWidth()
+            local width = row.trackWidth
             if info and threshold and threshold > 0 and width and width > 0 then
                 row.fill:SetWidth(math.max(1, width * math.min(1, info.raw / (threshold / 0.6))))
                 row.marker:ClearAllPoints()
