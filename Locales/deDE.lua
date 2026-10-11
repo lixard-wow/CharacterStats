@@ -105,25 +105,12 @@ ns.RegisterLocale("deDE", {
     STAT_PVPRESILIENCE_TT = "Verringert erlittenen Schaden durch Spieler.",
     STAT_RANGEDATTACKPOWER_TT = "Erhöht den durch Fernkampfangriffe verursachten Schaden.",
 
-    TAB_DISPLAY = "Anzeige",
-    TAB_LAYOUT = "Layout",
-    TAB_PROFILES = "Profile",
-    TAB_THEMES = "Themen",
-    TAB_INFO = "Info",
 
-    GROUP_SLIDERS = "Regler",
-    GROUP_DROPDOWNS = "Optionen",
-    GROUP_COLORS = "Farben",
-    GROUP_CHECKBOXES = "Schalter",
 
     HEADER_PROFILES = "Kontoprofil",
     HEADER_SPEC_PROFILES = "Spezialisierungsprofile",
-    HEADER_THEMES = "Designs",
     HEADER_INFO = "Über",
     HEADER_COMMANDS = "Befehle",
-    HEADER_QUICKSTART = "Schnellstart",
-    HEADER_TIPS = "Tipps",
-    HEADER_SUPPORT = "Unterstützung",
     HEADER_ATTRIBUTES = "Attribute",
     HEADER_ENHANCEMENTS = "Verstärkungen",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("deDE", {
     LABEL_BG_OPACITY = "Hintergrund-Deckkraft",
     LABEL_BORDER_OPACITY = "Rahmentransparenz",
     LABEL_TEXT_OPACITY = "Texttransparenz",
-    LABEL_SCALE = "Skalierung",
 
     LABEL_FONT_FACE = "Schriftart",
     LABEL_BORDER_STYLE = "Rahmenstil",
@@ -190,7 +176,6 @@ ns.RegisterLocale("deDE", {
     BTN_NEW = "Neu",
     BTN_COPY = "Kopieren",
     BTN_DELETE = "Loeschen",
-    BTN_CLOSE = "Schliessen",
     BTN_OK = "OK",
     BTN_CANCEL = "Abbrechen",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("deDE", {
     POPUP_COPY_PROFILE_TITLE = "Profil kopieren",
     POPUP_COPY_PROFILE_DESC = "Aktuelles Profil in ein neues kopieren.",
     POPUP_DELETE_PROFILE_TITLE = "Profil l?schen",
-    POPUP_DELETE_PROFILE_DESC = "Profil '%s' loeschen?",
     POPUP_RESET_PROFILES_TITLE = "Profile zur?cksetzen",
     POPUP_RESET_PROFILES_DESC = "Alle Profile zurücksetzen und Automatik deaktivieren? Das kann nicht rückgängig gemacht werden.",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("deDE", {
     SHARE_RAID = "Schlachtzug",
     SHARE_PARTY = "Gruppe",
     SHARE_WHISPER = "Ziel anflüstern",
-    SHARE_SAY = "Sagen",
-    SHARE_HINT = "Rechtsklick auf das Wertefenster, um Werte zu teilen.",
     SHARE_FRIENDS = "An Freund senden",
     SHARE_SELECT_FRIEND = "Freund auswaehlen",
     SHARE_SEND = "Senden",
@@ -271,7 +253,6 @@ ns.RegisterLocale("deDE", {
     GEAR_EMPTY_SOCKET = "Leerer Sockel",
     GEAR_EMPTY_SOCKETS = "Edelsteine: %d",
     GEAR_ENCHANTED = "Verzaubert",
-    GEAR_LABEL = "Ausrüstung",
     GEAR_MISSING = "Fehlt",
     GEAR_MISSING_ENCHANT = "Verzauberung fehlt",
     GEAR_MISSING_ENCHANTS = "Verzauberungen: %d",

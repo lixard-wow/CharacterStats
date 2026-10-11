@@ -105,25 +105,12 @@ ns.RegisterLocale("zhTW", {
     STAT_PVPRESILIENCE_TT = "降低來自玩家的傷害。",
     STAT_RANGEDATTACKPOWER_TT = "提高你的遠程攻擊傷害。",
 
-    TAB_DISPLAY = "顯示",
-    TAB_LAYOUT = "配置",
-    TAB_PROFILES = "設定檔",
-    TAB_THEMES = "主題",
-    TAB_INFO = "資訊",
 
-    GROUP_SLIDERS = "滑桿",
-    GROUP_DROPDOWNS = "選項",
-    GROUP_COLORS = "顏色",
-    GROUP_CHECKBOXES = "開關",
 
     HEADER_PROFILES = "設定檔",
     HEADER_SPEC_PROFILES = "專精設定檔",
-    HEADER_THEMES = "主題",
     HEADER_INFO = "關於",
     HEADER_COMMANDS = "指令",
-    HEADER_QUICKSTART = "快速入門",
-    HEADER_TIPS = "提示",
-    HEADER_SUPPORT = "支援",
     HEADER_ATTRIBUTES = "屬性",
     HEADER_ENHANCEMENTS = "強化",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("zhTW", {
     LABEL_BG_OPACITY = "背景不透明度",
     LABEL_BORDER_OPACITY = "邊框不透明度",
     LABEL_TEXT_OPACITY = "文字不透明度",
-    LABEL_SCALE = "縮放",
 
     LABEL_FONT_FACE = "字型",
     LABEL_BORDER_STYLE = "邊框樣式",
@@ -190,7 +176,6 @@ ns.RegisterLocale("zhTW", {
     BTN_NEW = "新增",
     BTN_COPY = "複製",
     BTN_DELETE = "刪除",
-    BTN_CLOSE = "關閉",
     BTN_OK = "確定",
     BTN_CANCEL = "取消",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("zhTW", {
     POPUP_COPY_PROFILE_TITLE = "複製設定檔",
     POPUP_COPY_PROFILE_DESC = "複製目前的設定檔。",
     POPUP_DELETE_PROFILE_TITLE = "刪除設定檔",
-    POPUP_DELETE_PROFILE_DESC = "刪除設定檔 '%s'？",
     POPUP_RESET_PROFILES_TITLE = "重置設定檔",
     POPUP_RESET_PROFILES_DESC = "重置所有設定檔？此操作無法復原。",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("zhTW", {
     SHARE_RAID = "分享到團隊",
     SHARE_PARTY = "分享到隊伍",
     SHARE_WHISPER = "密語目標",
-    SHARE_SAY = "說",
-    SHARE_HINT = "右鍵點擊屬性面板以分享。",
     SHARE_FRIENDS = "傳送給好友",
     SHARE_SELECT_FRIEND = "選擇好友...",
     SHARE_SEND = "傳送",
@@ -271,7 +253,6 @@ ns.RegisterLocale("zhTW", {
     GEAR_EMPTY_SOCKET = "空插槽",
     GEAR_EMPTY_SOCKETS = "寶石：%d",
     GEAR_ENCHANTED = "已附魔",
-    GEAR_LABEL = "裝備",
     GEAR_MISSING = "缺少",
     GEAR_MISSING_ENCHANT = "缺少附魔",
     GEAR_MISSING_ENCHANTS = "附魔：%d",

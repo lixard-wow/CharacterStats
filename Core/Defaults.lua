@@ -108,8 +108,8 @@ ns.DEFAULTS = {
     gearLevelY = 0,
     gearUpgrade = false,
     gearUpgradeDisplay = "rank",
-    gearUpgradeSize = 9,
-    gearUpgradeAnchor = "BOTTOMRIGHT",
+    gearUpgradeSize = 12,
+    gearUpgradeAnchor = "BOTTOM",
     gearUpgradeX = 0,
     gearUpgradeY = 0,
     gearLevelPlace = "icon",
@@ -809,7 +809,7 @@ ns.STAT_DEFS = {
         tooltipKey = "STAT_EXPERTISE_TT",
         api = function()
             if GetExpertise then
-                local ok, mainhand, offhand = pcall(GetExpertise)
+                local ok, mainhand = pcall(GetExpertise)
                 if ok and type(mainhand) == "number" then
                     return mainhand
                 end

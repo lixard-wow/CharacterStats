@@ -105,25 +105,12 @@ ns.RegisterLocale("ruRU", {
     STAT_PVPRESILIENCE_TT = "Уменьшает урон, получаемый от игроков.",
     STAT_RANGEDATTACKPOWER_TT = "Увеличивает урон ваших атак дальнего боя.",
 
-    TAB_DISPLAY = "Отображение",
-    TAB_LAYOUT = "Расположение",
-    TAB_PROFILES = "Профили",
-    TAB_THEMES = "Темы",
-    TAB_INFO = "Инфо",
 
-    GROUP_SLIDERS = "Ползунки",
-    GROUP_DROPDOWNS = "Параметры",
-    GROUP_COLORS = "Цвета",
-    GROUP_CHECKBOXES = "Переключатели",
 
     HEADER_PROFILES = "Профили",
     HEADER_SPEC_PROFILES = "Профили специализаций",
-    HEADER_THEMES = "Темы",
     HEADER_INFO = "О дополнении",
     HEADER_COMMANDS = "Команды",
-    HEADER_QUICKSTART = "Быстрый старт",
-    HEADER_TIPS = "Советы",
-    HEADER_SUPPORT = "Поддержка",
     HEADER_ATTRIBUTES = "Характеристики",
     HEADER_ENHANCEMENTS = "Усиления",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("ruRU", {
     LABEL_BG_OPACITY = "Прозрачность фона",
     LABEL_BORDER_OPACITY = "Прозрачность рамки",
     LABEL_TEXT_OPACITY = "Прозрачность текста",
-    LABEL_SCALE = "Масштаб",
 
     LABEL_FONT_FACE = "Шрифт",
     LABEL_BORDER_STYLE = "Стиль рамки",
@@ -190,7 +176,6 @@ ns.RegisterLocale("ruRU", {
     BTN_NEW = "Новый",
     BTN_COPY = "Копировать",
     BTN_DELETE = "Удалить",
-    BTN_CLOSE = "Закрыть",
     BTN_OK = "ОК",
     BTN_CANCEL = "Отмена",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("ruRU", {
     POPUP_COPY_PROFILE_TITLE = "Копировать профиль",
     POPUP_COPY_PROFILE_DESC = "Копировать текущий профиль.",
     POPUP_DELETE_PROFILE_TITLE = "Удалить профиль",
-    POPUP_DELETE_PROFILE_DESC = "Удалить профиль '%s'?",
     POPUP_RESET_PROFILES_TITLE = "Сбросить профили",
     POPUP_RESET_PROFILES_DESC = "Сбросить все профили? Это действие нельзя отменить.",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("ruRU", {
     SHARE_RAID = "В рейд",
     SHARE_PARTY = "В группу",
     SHARE_WHISPER = "Шепнуть цели",
-    SHARE_SAY = "Сказать",
-    SHARE_HINT = "ПКМ по окну статов, чтобы поделиться.",
     SHARE_FRIENDS = "Отправить другу",
     SHARE_SELECT_FRIEND = "Выбрать друга...",
     SHARE_SEND = "Отправить",
@@ -271,7 +253,6 @@ ns.RegisterLocale("ruRU", {
     GEAR_EMPTY_SOCKET = "Пустое гнездо",
     GEAR_EMPTY_SOCKETS = "Самоцветы: %d",
     GEAR_ENCHANTED = "Зачаровано",
-    GEAR_LABEL = "Экипировка",
     GEAR_MISSING = "Нет",
     GEAR_MISSING_ENCHANT = "Нет чар",
     GEAR_MISSING_ENCHANTS = "Чары: %d",

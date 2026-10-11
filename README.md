@@ -4,13 +4,14 @@ Keep your item level and stats on screen without opening the character window. C
 
 - **Download:** [CurseForge](https://www.curseforge.com/wow/addons/characterstats)
 - **User guide:** [lixard-wow.github.io/characterstats](https://lixard-wow.github.io/characterstats/)
-- **Game:** Retail and Mists of Pandaria Classic
+- **Game:** Retail, Mists of Pandaria Classic and WoW Classic Forever
 - **Languages:** 12
 
 ## Features
 - An on-screen stat panel: item level, primary and secondary stats, defensive and utility stats, and movement speed. Move it anywhere and lock it in place.
 - Stats in the character window, next to your gear.
-- Gear badges showing each item's level, colored by upgrade track, with flags for missing enchants and empty gem sockets.
+- Gear slot details (off by default): item level colored by upgrade track, upgrade level (4/6), enchants and gems, and flags for missing enchants and empty sockets. Choose where each one sits.
+- A wider character window, giving the gear details room next to your character.
 - Several looks, each previewed live before you pick.
 - Share your stats to raid, party, your target or a Battle.net friend from the panel's right-click menu.
 - Profiles, with automatic switching by specialization.
@@ -19,7 +20,7 @@ Keep your item level and stats on screen without opening the character window. C
 
 ## Getting started
 1. Install the addon and log in.
-2. Choose a look in the window that opens.
+2. Optional: choose a look with `/cs style`.
 3. Drag the stat panel where you want it.
 4. Open the options with `/cs config`, click the minimap button, or use the options button on the character window.
 
@@ -29,6 +30,8 @@ Keep your item level and stats on screen without opening the character window. C
 | `/cs` | Show or hide the stat panel |
 | `/cs config` | Open the options (`/cs options` also works) |
 | `/cs style` | Choose a look (`/cs look` also works) |
+| `/cs theme` | Switch the options window theme |
+| `/cs locale` | Choose the addon's language |
 | `/cs show` / `/cs hide` | Show or hide the stat panel |
 | `/cs reset` | Put the stat panel back in its default position |
 | `/cs resetminimap` | Put the minimap button back in its default position |
