@@ -347,6 +347,9 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
         if ns.CharacterWidth then
             ns.CharacterWidth.Apply()
         end
+        if ns.Window then
+            ns.Window.Apply()
+        end
         if ns.Integrations then
             C_Timer.After(4, ns.Integrations.CheckOnLogin)
         end

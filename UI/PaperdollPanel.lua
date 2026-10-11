@@ -374,6 +374,7 @@ local function ShouldReplacePane()
     return ns.Styles.GetActive().replacesPaperdollPane == true
 end
 local function ShouldShowDrawer()
+    if ns.Window and ns.Window.IsActive() then return false end
     local db = ns.db
     if not db or not db.paperdollEnabled then return false end
     if ns.Integrations and ns.Integrations.CharacterFrameTaken() then return false end

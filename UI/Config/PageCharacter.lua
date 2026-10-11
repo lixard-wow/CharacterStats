@@ -58,6 +58,31 @@ local function FlagsOff(db)
 end
 local function BuildEntries(L)
     return {
+        { kind = "header", label = L.SECTION_CHARACTER_WINDOW or "CharacterStats Character Window" },
+        {
+            kind = "toggle", key = "characterWindow", label = L.LABEL_CHARACTER_WINDOW or "Use the CharacterStats Character Window", fullRow = true,
+            available = function() return CS.Window and CS.Window.IsSupported() end,
+            onChange = function()
+                if CS.Window then CS.Window.Apply() end
+                MarkDirty()
+            end,
+        },
+        {
+            kind = "dropdown", key = "characterWindowLook", label = L.LABEL_CHARACTER_WINDOW_LOOK or "Window Look",
+            available = function() return CS.Window and CS.Window.IsSupported() end,
+            items = function()
+                local items = {}
+                for _, look in ipairs(CS.Window.GetLooks()) do
+                    items[#items + 1] = { value = look.id, text = (look.labelKey and L[look.labelKey]) or look.label }
+                end
+                return items
+            end,
+            onChange = function()
+                if CS.Window then CS.Window.HideAll(); CS.Window.Apply() end
+                MarkDirty()
+            end,
+            disabled = function(db) return not db.characterWindow end,
+        },
         { kind = "header", label = L.SECTION_CHARACTER_PANEL or "Character Panel" },
         {
             kind = "toggle", key = "paperdollEnabled", label = L.LABEL_PAPERDOLL or "Replace Paperdoll Stats", fullRow = true,
