@@ -192,7 +192,7 @@ function Builder.Build(parent, entries, opts)
     local leftToggleRowY = nil
     local first = true
     for _, entry in ipairs(entries) do
-        if not entry.retailOnly or CS.IS_RETAIL then
+        if (not entry.retailOnly or CS.IS_RETAIL) and (not entry.available or entry.available()) then
             local kind = entry.kind
             local height = ROW_HEIGHTS[kind] or 20
             local row = CreateFrame("Frame", nil, parent)

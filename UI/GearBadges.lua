@@ -39,19 +39,11 @@ local ENCHANT_ICON_SIZE = 14
 local SIDE_GAP = 7
 local EDGE_INSET = 3
 local function ShowEnchantTooltip(self)
-    local spell, item
-    if self.enchantId then
-        spell, item = ns.GetEnchantSource(self.enchantId)
-    end
+    if not self.enchantName then return end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    if spell then
-        GameTooltip:SetSpellByID(spell)
-    elseif item then
-        GameTooltip:SetItemByID(item)
-    elseif self.enchantName then
-        GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
-    else
-        return
+    GameTooltip:SetText(self.enchantName, ENCHANT_COLOR[1], ENCHANT_COLOR[2], ENCHANT_COLOR[3])
+    if self.enchantAtlas and CreateAtlasMarkup then
+        GameTooltip:AddLine(CreateAtlasMarkup(self.enchantAtlas, 16, 16), 1, 1, 1)
     end
     GameTooltip:Show()
 end
@@ -77,13 +69,6 @@ local function CreateDetail(badge, button, side, width)
     detail.enchantIcon = CreateFrame("Frame", nil, detail)
     detail.enchantIcon:SetSize(ENCHANT_ICON_SIZE, ENCHANT_ICON_SIZE)
     detail.enchantIcon:EnableMouse(true)
-    if side == "top" then
-        detail.enchantIcon:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP)
-    elseif side == "left" then
-        detail.enchantIcon:SetPoint("TOPRIGHT", button, "TOPLEFT", -SIDE_GAP, -EDGE_INSET)
-    else
-        detail.enchantIcon:SetPoint("TOPLEFT", button, "TOPRIGHT", SIDE_GAP, -EDGE_INSET)
-    end
     detail.enchantIcon.texture = detail.enchantIcon:CreateTexture(nil, "OVERLAY")
     detail.enchantIcon.texture:SetAllPoints()
     detail.enchantIcon:SetScript("OnEnter", ShowEnchantTooltip)
@@ -99,38 +84,10 @@ local function CreateDetail(badge, button, side, width)
         gem.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         gem:SetScript("OnEnter", ShowGemTooltip)
         gem:SetScript("OnLeave", GameTooltip_Hide)
-        local offset = (index - 1) * (GEM_SIZE + 1)
-        if side == "top" then
-            gem:SetPoint("BOTTOMLEFT", button, "TOPLEFT", ENCHANT_ICON_SIZE + 3 + offset, SIDE_GAP + (ENCHANT_ICON_SIZE - GEM_SIZE) / 2)
-        elseif side == "left" then
-            gem:SetPoint("BOTTOMRIGHT", button, "BOTTOMLEFT", -SIDE_GAP - offset, EDGE_INSET)
-        else
-            gem:SetPoint("BOTTOMLEFT", button, "BOTTOMRIGHT", SIDE_GAP + offset, EDGE_INSET)
-        end
         gem:Hide()
         detail.gems[index] = gem
     end
     return detail
-end
-local function PlaceEnchantText(detail, afterIcon)
-    local text, button, icon = detail.enchant, detail.button, detail.enchantIcon
-    text:ClearAllPoints()
-    if detail.side == "top" then
-        text:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP + ENCHANT_ICON_SIZE + 2)
-    elseif afterIcon then
-        if detail.side == "left" then
-            text:SetPoint("RIGHT", icon, "LEFT", -SIDE_GAP, 0)
-        else
-            text:SetPoint("LEFT", icon, "RIGHT", SIDE_GAP, 0)
-        end
-    else
-        local y = -EDGE_INSET - ENCHANT_ICON_SIZE / 2
-        if detail.side == "left" then
-            text:SetPoint("RIGHT", button, "TOPLEFT", -SIDE_GAP, y)
-        else
-            text:SetPoint("LEFT", button, "TOPRIGHT", SIDE_GAP, y)
-        end
-    end
 end
 local function GetGemIcon(gemId)
     if C_Item and C_Item.GetItemIconByID then
@@ -157,7 +114,7 @@ local function UpdateDetail(detail, entry, db)
         hasContent = true
     elseif entry.enchantText and iconMode then
         local atlas = entry.enchantText:match("|A:([^:|]+)")
-        icon.enchantId = entry.enchantId
+        icon.enchantAtlas = atlas
         icon.enchantName = entry.enchantText:gsub("%s*|A:.-|a", ""):match("^%s*(.-)%s*$")
         if atlas and icon.texture.SetAtlas then
             icon.texture:SetTexCoord(0, 1, 0, 1)
@@ -191,22 +148,114 @@ local function UpdateDetail(detail, entry, db)
             hasContent = true
         end
     end
-    PlaceEnchantText(detail, icon:IsShown())
     detail:SetShown(hasContent)
 end
 local LEVEL_INSET = 2
+local ITEM_GAP = 3
+local ROW_HEIGHT = 16
+local PLACE_VERTICAL = { top = "TOP", middle = "", bottom = "BOTTOM" }
+local PLACE_INSET = { top = -EDGE_INSET, middle = 0, bottom = EDGE_INSET }
+local ROW_ORDER = { "bottom", "middle", "top" }
 local function ApplyLevelLayout(badge, db)
-    local size = db.gearLevelSize or 11
-    local anchor = db.gearLevelAnchor or "TOPRIGHT"
-    local x, y = db.gearLevelX or 0, db.gearLevelY or 0
-    local key = size .. anchor .. x .. ":" .. y
+    local size = db.gearLevelSize or 13
+    local upgradeSize = db.gearUpgradeSize or 9
+    local key = size .. ":" .. upgradeSize
     if badge.levelLayout == key then return end
     badge.levelLayout = key
+    badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
+    badge.upgrade:SetFont(STANDARD_TEXT_FONT, upgradeSize, "OUTLINE")
+end
+local function GetUpgradeText(entry, mode)
+    if not entry.trackRank or not entry.trackMax then return nil end
+    local rank = string.format("%d/%d", entry.trackRank, entry.trackMax)
+    if mode == "rank" or not entry.track then return rank end
+    local name = ns.L["TRACK_" .. entry.track:upper()]
+    return name and (rank .. " " .. name) or rank
+end
+local function PlaceOnIcon(region, badge, anchor, x, y)
     local insetX = anchor:find("LEFT") and 1 or (anchor:find("RIGHT") and -1 or 0)
     local insetY = anchor:find("TOP") and -LEVEL_INSET or (anchor:find("BOTTOM") and LEVEL_INSET or 0)
-    badge.level:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
-    badge.level:ClearAllPoints()
-    badge.level:SetPoint(anchor, badge, anchor, insetX + x, insetY + y)
+    local horizontal = anchor:match("LEFT") or anchor:match("RIGHT")
+    region:SetJustifyH(horizontal or "CENTER")
+    region:ClearAllPoints()
+    region:SetPoint(anchor, badge, anchor, insetX + (x or 0), insetY + (y or 0))
+end
+local function PlaceInChain(region, side, place, previous, button, row)
+    region:ClearAllPoints()
+    if side == "top" then
+        if previous then
+            region:SetPoint("BOTTOMLEFT", previous, "BOTTOMRIGHT", ITEM_GAP, 0)
+        else
+            region:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP + row * ROW_HEIGHT)
+        end
+        return
+    end
+    local vertical = PLACE_VERTICAL[place]
+    local near = side == "left" and "RIGHT" or "LEFT"
+    local far = side == "left" and "LEFT" or "RIGHT"
+    if previous then
+        region:SetPoint(vertical .. near, previous, vertical .. far, side == "left" and -ITEM_GAP or ITEM_GAP, 0)
+    else
+        region:SetPoint(vertical .. near, button, vertical .. far, side == "left" and -SIDE_GAP or SIDE_GAP, PLACE_INSET[place])
+    end
+end
+local chains = { top = {}, middle = {}, bottom = {} }
+local function AddToChain(place, region)
+    local chain = chains[place]
+    if chain then
+        chain[#chain + 1] = region
+    end
+end
+local function LayoutSlot(badge, db)
+    for _, place in ipairs(ROW_ORDER) do
+        wipe(chains[place])
+    end
+    local detail = badge.detail
+    local side, button = detail.side, detail.button
+    local levelPlace = db.gearLevelPlace or "icon"
+    local upgradePlace = db.gearUpgradePlace or "icon"
+    if upgradePlace == "under" then upgradePlace = "icon" end
+    if badge.level:IsShown() then
+        if levelPlace == "icon" then
+            PlaceOnIcon(badge.level, badge, db.gearLevelAnchor or "TOP", db.gearLevelX, db.gearLevelY)
+        else
+            badge.level:SetJustifyH("LEFT")
+            AddToChain(levelPlace, badge.level)
+        end
+    end
+    if badge.upgrade:IsShown() then
+        if upgradePlace == "icon" then
+            PlaceOnIcon(badge.upgrade, badge, db.gearUpgradeAnchor or "BOTTOMRIGHT", db.gearUpgradeX, db.gearUpgradeY)
+        else
+            badge.upgrade:SetJustifyH("LEFT")
+            AddToChain(upgradePlace, badge.upgrade)
+        end
+    end
+    if detail:IsShown() then
+        local gemPlace = db.gearGemPlace or "top"
+        for _, gem in ipairs(detail.gems) do
+            if gem:IsShown() then
+                AddToChain(gemPlace, gem)
+            end
+        end
+        local enchantPlace = db.gearEnchantPlace or "bottom"
+        if detail.enchantIcon:IsShown() then
+            AddToChain(enchantPlace, detail.enchantIcon)
+        elseif detail.enchant:GetText() ~= "" then
+            AddToChain(enchantPlace, detail.enchant)
+        end
+    end
+    local row = 0
+    for _, place in ipairs(ROW_ORDER) do
+        local previous
+        for _, region in ipairs(chains[place]) do
+            PlaceInChain(region, side, place, previous, button, row)
+            previous = region
+        end
+        if previous then
+            row = row + 1
+        end
+    end
 end
 local function GetBadge(slot)
     local badge = badges[slot]
@@ -217,6 +266,8 @@ local function GetBadge(slot)
     badge:SetAllPoints(button)
     badge:SetFrameLevel(button:GetFrameLevel() + 5)
     badge.level = badge:CreateFontString(nil, "OVERLAY")
+    badge.upgrade = badge:CreateFontString(nil, "OVERLAY")
+    badge.upgrade:SetWordWrap(false)
     badge.flag = badge:CreateTexture(nil, "OVERLAY")
     badge.flag:SetSize(8, 8)
     badge.flag:SetPoint("TOPLEFT", badge, "TOPLEFT", 2, -2)
@@ -226,7 +277,7 @@ local function GetBadge(slot)
     badge.flagMask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     badge.flag:AddMaskTexture(badge.flagMask)
     local side = DETAIL_RIGHT[slot] and "right" or "left"
-    if WEAPON_SLOTS[slot] and rawget(_G, SLOT_BUTTONS[18]) then
+    if slot == 17 and rawget(_G, SLOT_BUTTONS[18]) then
         side = "top"
     end
     badge.detail = CreateDetail(badge, button, side, WEAPON_SLOTS[slot] and WEAPON_DETAIL_WIDTH or DETAIL_WIDTH)
@@ -256,19 +307,20 @@ local function HideAll()
 end
 function GearBadges.IsEnabled()
     local db = ns.db
-    return db and (db.gearBadges ~= false or db.gearFlags ~= false or db.gearDetails ~= false)
+    return db and (db.gearBadges ~= false or db.gearUpgrade == true or db.gearFlags ~= false or db.gearDetails ~= false)
 end
 function GearBadges.Refresh()
     local db = ns.db
     if not db or not PaperDollFrame or not PaperDollFrame:IsShown() then return end
     local showLevels = db.gearBadges ~= false
+    local showUpgrade = db.gearUpgrade == true
     local showFlags = db.gearFlags ~= false
     local showDetails = db.gearDetails ~= false
     if ns.Integrations and ns.Integrations.SlotInfoTaken() then
         HideAll()
         return
     end
-    if not showLevels and not showFlags and not showDetails then
+    if not showLevels and not showUpgrade and not showFlags and not showDetails then
         HideAll()
         return
     end
@@ -278,13 +330,22 @@ function GearBadges.Refresh()
         local entry = results[slot]
         if badge then
             if entry and entry.link then
+                ApplyLevelLayout(badge, db)
+                local r, g, b = GearBadges.GetTrackColor(db, entry.track)
                 if showLevels and entry.itemLevel then
-                    ApplyLevelLayout(badge, db)
                     badge.level:SetText(string.format("%d", entry.itemLevel))
-                    badge.level:SetTextColor(GearBadges.GetTrackColor(db, entry.track))
+                    badge.level:SetTextColor(r, g, b)
                     badge.level:Show()
                 else
                     badge.level:Hide()
+                end
+                local upgrade = showUpgrade and GetUpgradeText(entry, db.gearUpgradeDisplay)
+                if upgrade then
+                    badge.upgrade:SetText(upgrade)
+                    badge.upgrade:SetTextColor(r, g, b)
+                    badge.upgrade:Show()
+                else
+                    badge.upgrade:Hide()
                 end
                 local flagKey = nil
                 if showFlags and not showDetails then
@@ -306,6 +367,7 @@ function GearBadges.Refresh()
                 else
                     badge.detail:Hide()
                 end
+                LayoutSlot(badge, db)
                 badge:Show()
             else
                 badge:Hide()

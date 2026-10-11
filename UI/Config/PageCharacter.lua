@@ -17,6 +17,42 @@ end
 local function LevelsOff(db)
     return db.gearBadges == false
 end
+local function LevelNotOnIcon(db)
+    return db.gearBadges == false or (db.gearLevelPlace or "icon") ~= "icon"
+end
+local function UpgradeOff(db)
+    return db.gearUpgrade ~= true
+end
+local function UpgradeNotOnIcon(db)
+    return db.gearUpgrade ~= true or (db.gearUpgradePlace or "icon") ~= "icon"
+end
+local function IconPositions(L)
+    return {
+        { value = "TOPLEFT", text = L.POS_TOPLEFT or "Top Left" },
+        { value = "TOP", text = L.POS_TOP or "Top" },
+        { value = "TOPRIGHT", text = L.POS_TOPRIGHT or "Top Right" },
+        { value = "LEFT", text = L.POS_LEFT or "Left" },
+        { value = "CENTER", text = L.POS_CENTER or "Center" },
+        { value = "RIGHT", text = L.POS_RIGHT or "Right" },
+        { value = "BOTTOMLEFT", text = L.POS_BOTTOMLEFT or "Bottom Left" },
+        { value = "BOTTOM", text = L.POS_BOTTOM or "Bottom" },
+        { value = "BOTTOMRIGHT", text = L.POS_BOTTOMRIGHT or "Bottom Right" },
+    }
+end
+local function TrackColorsOff(db)
+    return db.gearBadges == false and db.gearUpgrade ~= true
+end
+local function DetailsOff(db)
+    return db.gearDetails == false
+end
+local function SidePlaces(L, first)
+    local items = {}
+    if first then items[1] = first end
+    items[#items + 1] = { value = "top", text = L.PLACE_TOP or "Beside icon, top" }
+    items[#items + 1] = { value = "middle", text = L.PLACE_MIDDLE or "Beside icon, middle" }
+    items[#items + 1] = { value = "bottom", text = L.PLACE_BOTTOM or "Beside icon, bottom" }
+    return items
+end
 local function FlagsOff(db)
     return db.gearFlags == false
 end
@@ -46,7 +82,18 @@ local function BuildEntries(L)
             onChange = function()
                 if CS.PaperdollPanel then CS.PaperdollPanel:ApplyStyle() end
                 if CS.CharacterButton then CS.CharacterButton.Apply() end
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
                 ApplyGearBadges()
+            end,
+        },
+        {
+            kind = "slider", key = "characterFrameExtraWidth", label = L.LABEL_CHARACTER_WIDTH or "Extra Character Frame Width",
+            min = 0, max = 120, step = 5,
+            available = function() return CS.CharacterWidth and CS.CharacterWidth.IsSupported() end,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = function()
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
+                MarkDirty()
             end,
         },
         {
@@ -66,31 +113,59 @@ local function BuildEntries(L)
             min = 6, max = 20, step = 1, format = "%.0f", onChange = ApplyGearBadges, disabled = LevelsOff,
         },
         {
-            kind = "dropdown", key = "gearLevelAnchor", label = L.LABEL_GEAR_LEVEL_POSITION or "Item Level Position",
-            items = {
-                { value = "TOPLEFT", text = L.POS_TOPLEFT or "Top Left" },
-                { value = "TOP", text = L.POS_TOP or "Top" },
-                { value = "TOPRIGHT", text = L.POS_TOPRIGHT or "Top Right" },
-                { value = "LEFT", text = L.POS_LEFT or "Left" },
-                { value = "CENTER", text = L.POS_CENTER or "Center" },
-                { value = "RIGHT", text = L.POS_RIGHT or "Right" },
-                { value = "BOTTOMLEFT", text = L.POS_BOTTOMLEFT or "Bottom Left" },
-                { value = "BOTTOM", text = L.POS_BOTTOM or "Bottom" },
-                { value = "BOTTOMRIGHT", text = L.POS_BOTTOMRIGHT or "Bottom Right" },
-            },
+            kind = "dropdown", key = "gearLevelPlace", label = L.LABEL_GEAR_LEVEL_PLACE or "Item Level Placement",
+            items = SidePlaces(L, { value = "icon", text = L.PLACE_ICON or "On the icon" }),
             onChange = ApplyGearBadges, disabled = LevelsOff,
+        },
+        {
+            kind = "dropdown", key = "gearLevelAnchor", label = L.LABEL_GEAR_LEVEL_POSITION or "Item Level Position",
+            items = IconPositions(L), onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
         },
         {
             kind = "slider", key = "gearLevelX", label = L.LABEL_GEAR_LEVEL_X or "Horizontal Offset",
             min = -20, max = 20, step = 1,
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
-            onChange = ApplyGearBadges, disabled = LevelsOff,
+            onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
         },
         {
             kind = "slider", key = "gearLevelY", label = L.LABEL_GEAR_LEVEL_Y or "Vertical Offset",
             min = -20, max = 20, step = 1,
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
-            onChange = ApplyGearBadges, disabled = LevelsOff,
+            onChange = ApplyGearBadges, disabled = LevelNotOnIcon,
+        },
+        { kind = "toggle", key = "gearUpgrade", label = L.LABEL_GEAR_UPGRADE_SHOW or "Show Upgrade Level on Gear Slots (4/6 Hero)", fullRow = true, onChange = ApplyGearBadges },
+        {
+            kind = "dropdown", key = "gearUpgradeDisplay", label = L.LABEL_GEAR_UPGRADE or "Upgrade Level",
+            items = {
+                { value = "full", text = L.UPGRADE_DISPLAY_FULL or "Rank and track (4/6 Hero)" },
+                { value = "rank", text = L.UPGRADE_DISPLAY_RANK or "Rank only (4/6)" },
+            },
+            onChange = ApplyGearBadges, disabled = UpgradeOff,
+        },
+        {
+            kind = "slider", key = "gearUpgradeSize", label = L.LABEL_GEAR_UPGRADE_SIZE or "Upgrade Level Size",
+            min = 6, max = 20, step = 1, format = "%.0f", onChange = ApplyGearBadges, disabled = UpgradeOff,
+        },
+        {
+            kind = "dropdown", key = "gearUpgradePlace", label = L.LABEL_GEAR_UPGRADE_PLACE or "Upgrade Level Placement",
+            items = SidePlaces(L, { value = "icon", text = L.PLACE_ICON or "On the icon" }),
+            onChange = ApplyGearBadges, disabled = UpgradeOff,
+        },
+        {
+            kind = "dropdown", key = "gearUpgradeAnchor", label = L.LABEL_GEAR_UPGRADE_POSITION or "Upgrade Level Position",
+            items = IconPositions(L), onChange = ApplyGearBadges, disabled = UpgradeNotOnIcon,
+        },
+        {
+            kind = "slider", key = "gearUpgradeX", label = L.LABEL_GEAR_LEVEL_X or "Horizontal Offset",
+            min = -20, max = 20, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = ApplyGearBadges, disabled = UpgradeNotOnIcon,
+        },
+        {
+            kind = "slider", key = "gearUpgradeY", label = L.LABEL_GEAR_LEVEL_Y or "Vertical Offset",
+            min = -20, max = 20, step = 1,
+            formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
+            onChange = ApplyGearBadges, disabled = UpgradeNotOnIcon,
         },
         { kind = "toggle", key = "gearFlags", label = L.LABEL_GEAR_FLAGS or "Flag Missing Enchants and Empty Gem Sockets", fullRow = true, onChange = ApplyGearBadges },
         { kind = "toggle", key = "gearDetails", label = L.LABEL_GEAR_DETAILS or "Show Enchants and Gems Next to Gear Slots", fullRow = true, onChange = ApplyGearBadges },
@@ -103,15 +178,23 @@ local function BuildEntries(L)
             onChange = ApplyGearBadges,
             disabled = function(db) return db.gearDetails == false end,
         },
+        {
+            kind = "dropdown", key = "gearEnchantPlace", label = L.LABEL_GEAR_ENCHANT_PLACE or "Enchant Placement",
+            items = SidePlaces(L), onChange = ApplyGearBadges, disabled = DetailsOff,
+        },
+        {
+            kind = "dropdown", key = "gearGemPlace", label = L.LABEL_GEAR_GEM_PLACE or "Gem Placement",
+            items = SidePlaces(L), onChange = ApplyGearBadges, disabled = DetailsOff,
+        },
         { kind = "header", label = L.SECTION_GEAR_COLORS or "Gear Slot Colors" },
-        { kind = "color", key = "gearColorMyth", label = L.TRACK_MYTH or "Myth", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorCrafted", label = L.TRACK_CRAFTED or "Crafted", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorHero", label = L.TRACK_HERO or "Hero", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorChampion", label = L.TRACK_CHAMPION or "Champion", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorVeteran", label = L.TRACK_VETERAN or "Veteran", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorAdventurer", label = L.TRACK_ADVENTURER or "Adventurer", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorExplorer", label = L.TRACK_EXPLORER or "Explorer", onChange = ApplyGearBadges, disabled = LevelsOff },
-        { kind = "color", key = "gearColorOther", label = L.TRACK_OTHER or "No Upgrade Track", onChange = ApplyGearBadges, disabled = LevelsOff },
+        { kind = "color", key = "gearColorMyth", label = L.TRACK_MYTH or "Myth", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorCrafted", label = L.TRACK_CRAFTED or "Crafted", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorHero", label = L.TRACK_HERO or "Hero", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorChampion", label = L.TRACK_CHAMPION or "Champion", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorVeteran", label = L.TRACK_VETERAN or "Veteran", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorAdventurer", label = L.TRACK_ADVENTURER or "Adventurer", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorExplorer", label = L.TRACK_EXPLORER or "Explorer", onChange = ApplyGearBadges, disabled = TrackColorsOff },
+        { kind = "color", key = "gearColorOther", label = L.TRACK_OTHER or "No Upgrade Track", onChange = ApplyGearBadges, disabled = TrackColorsOff },
         { kind = "color", key = "gearColorEnchant", label = L.LABEL_GEAR_COLOR_ENCHANT or "Missing Enchant", onChange = ApplyGearBadges, disabled = FlagsOff },
         { kind = "color", key = "gearColorSocket", label = L.LABEL_GEAR_COLOR_SOCKET or "Empty Gem Socket Dot", onChange = ApplyGearBadges, disabled = FlagsOff },
     }
@@ -151,6 +234,7 @@ ConfigPanel.RegisterPage("character", {
                 if CS.PaperdollPanel then CS.PaperdollPanel:ApplyStyle() end
                 if CS.GearBadges then CS.GearBadges.Apply() end
                 if CS.CharacterButton then CS.CharacterButton.Apply() end
+                if CS.CharacterWidth then CS.CharacterWidth.Apply() end
             end
             page:Refresh()
         end)

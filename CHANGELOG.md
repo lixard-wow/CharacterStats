@@ -8,9 +8,10 @@
 - Three window themes for the options window and popups: Classic (the default), Workbench and Artisan Ledger. Pick one from the gear button in the options window's title bar or cycle with `/cs theme`.
 - A new options window with a sidebar of pages. Its title bar has a gear button for the window's own settings (theme, accent color, scale) and a minimize button.
 - Frame Scale setting for the stats panel, and Font Size now goes down to 4.
-- Character window (off by default, turn on under Character Frame): item level on every gear slot, colored by upgrade track, with enchant and gem icons beside each slot (hover for details) and a "Missing enchant" note on slots that should be enchanted.
+- Character window (off by default, turn on under Character Frame): item level on every gear slot colored by upgrade track, the upgrade rank (e.g. 4/6 Hero), enchant and gem icons (hover for details), and a "Missing enchant" note on slots that should be enchanted. Choose where each part sits, on the icon or beside it at the top, middle or bottom.
 - A drawer beside the character window with Stats, Gear and Ratings tabs.
 - An options button on the character window (off by default).
+- Extra Character Frame Width (50 px by default): widens the character window to give more room between your character and the gear slots.
 - Diminishing returns:
   - In the Meters look, crit, haste, mastery and versatility bars fill up to the point where the penalty starts; past it, a darker shade fills back in to show how far over you are. Leech, avoidance and speed use their own, earlier start point.
   - Hovering those stats (stats panel or character window) shows your current penalty, the rating until the next penalty, and your effective rating.

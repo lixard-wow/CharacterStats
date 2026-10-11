@@ -56,7 +56,8 @@ local function GetTrackLookup()
     end
     return trackLookup
 end
-local function ParseTrackLine(text)
+local UPGRADE_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.ItemUpgradeLevel
+local function ParseTrackLine(text, lineType)
     if type(text) ~= "string" then return nil end
     local name, rank, maxRank = text:match(":%s*(.-)%s*(%d+)/(%d+)")
     if not name then
@@ -64,7 +65,12 @@ local function ParseTrackLine(text)
     end
     if not name then return nil end
     local key = GetTrackLookup()[name:lower()]
-    if not key then return nil end
+    if not key then
+        if UPGRADE_LINE_TYPE and lineType == UPGRADE_LINE_TYPE then
+            return false, tonumber(rank), tonumber(maxRank)
+        end
+        return nil
+    end
     return key, tonumber(rank), tonumber(maxRank)
 end
 local ENCHANT_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.ItemEnchantmentPermanent
@@ -100,9 +106,9 @@ local function ReadTooltip(entry, slot, readTrack)
         local text = line.leftText
         if type(text) == "string" then
             if not foundTrack then
-                local key, rank, maxRank = ParseTrackLine(text)
-                if key then
-                    entry.track, entry.trackRank, entry.trackMax = key, rank, maxRank
+                local key, rank, maxRank = ParseTrackLine(text, line.type)
+                if key ~= nil then
+                    entry.track, entry.trackRank, entry.trackMax = key or nil, rank, maxRank
                     foundTrack = true
                 end
             end
@@ -111,6 +117,26 @@ local function ReadTooltip(entry, slot, readTrack)
             end
         end
     end
+end
+local function EnchantNameFromSource(enchantId)
+    if not ns.GetEnchantSource then return nil end
+    local spell, item = ns.GetEnchantSource(enchantId)
+    local name
+    if spell then
+        if C_Spell and C_Spell.GetSpellName then
+            name = C_Spell.GetSpellName(spell)
+        elseif GetSpellInfo then
+            name = GetSpellInfo(spell)
+        end
+    elseif item then
+        if C_Item and C_Item.GetItemNameByID then
+            name = C_Item.GetItemNameByID(item)
+        elseif GetItemInfo then
+            name = GetItemInfo(item)
+        end
+    end
+    if type(name) ~= "string" or name == "" then return nil end
+    return name:match("^.- %- (.+)$") or name
 end
 local function IsCrafted(link)
     local getQuality = C_TradeSkillUI and C_TradeSkillUI.GetItemCraftedQualityByItemInfo
@@ -248,7 +274,7 @@ function Gear.Scan()
                     entry.missingEnchant = true
                     summary.missingEnchants = summary.missingEnchants + 1
                 elseif enchantId and enchantId > 0 and not entry.enchantText then
-                    entry.enchantText = ns.L.GEAR_ENCHANTED or "Enchanted"
+                    entry.enchantText = EnchantNameFromSource(enchantId) or ns.L.GEAR_ENCHANTED or "Enchanted"
                     local tries = (enchantRetries[link] or 0) + 1
                     enchantRetries[link] = tries
                     if tries <= ENCHANT_RETRY_LIMIT then

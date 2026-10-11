@@ -146,6 +146,8 @@ local function CreateGearPage(parent)
                     if entry.trackRank and entry.trackMax then
                         trackText = string.format("%s %d/%d", trackText, entry.trackRank, entry.trackMax)
                     end
+                elseif entry.trackRank and entry.trackMax then
+                    trackText = string.format("%d/%d", entry.trackRank, entry.trackMax)
                 end
                 if trackText ~= "" then
                     local tr, tg, tb = GearBadges.GetTrackColor(db, entry.track)
