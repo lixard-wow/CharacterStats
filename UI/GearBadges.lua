@@ -155,8 +155,7 @@ local ITEM_GAP = 3
 local ROW_HEIGHT = 16
 local PLACE_VERTICAL = { top = "TOP", middle = "", bottom = "BOTTOM" }
 local PLACE_INSET = { top = -EDGE_INSET, middle = 0, bottom = EDGE_INSET }
-local PLACE_ROW = { bottom = 0, middle = 1, top = 2 }
-local PLACE_ORDER = { "top", "middle", "bottom" }
+local ROW_ORDER = { "bottom", "middle", "top" }
 local function ApplyLevelLayout(badge, db)
     local size = db.gearLevelSize or 13
     local upgradeSize = db.gearUpgradeSize or 9
@@ -181,13 +180,13 @@ local function PlaceOnIcon(region, badge, anchor, x, y)
     region:ClearAllPoints()
     region:SetPoint(anchor, badge, anchor, insetX + (x or 0), insetY + (y or 0))
 end
-local function PlaceInChain(region, side, place, previous, button)
+local function PlaceInChain(region, side, place, previous, button, row)
     region:ClearAllPoints()
     if side == "top" then
         if previous then
             region:SetPoint("BOTTOMLEFT", previous, "BOTTOMRIGHT", ITEM_GAP, 0)
         else
-            region:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP + PLACE_ROW[place] * ROW_HEIGHT)
+            region:SetPoint("BOTTOMLEFT", button, "TOPLEFT", 0, SIDE_GAP + row * ROW_HEIGHT)
         end
         return
     end
@@ -208,7 +207,7 @@ local function AddToChain(place, region)
     end
 end
 local function LayoutSlot(badge, db)
-    for _, place in ipairs(PLACE_ORDER) do
+    for _, place in ipairs(ROW_ORDER) do
         wipe(chains[place])
     end
     local detail = badge.detail
@@ -246,11 +245,15 @@ local function LayoutSlot(badge, db)
             AddToChain(enchantPlace, detail.enchant)
         end
     end
-    for _, place in ipairs(PLACE_ORDER) do
+    local row = 0
+    for _, place in ipairs(ROW_ORDER) do
         local previous
         for _, region in ipairs(chains[place]) do
-            PlaceInChain(region, side, place, previous, button)
+            PlaceInChain(region, side, place, previous, button, row)
             previous = region
+        end
+        if previous then
+            row = row + 1
         end
     end
 end
