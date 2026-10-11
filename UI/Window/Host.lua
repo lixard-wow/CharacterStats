@@ -43,12 +43,54 @@ function Window.IsActive()
     local frame = ActiveFrame()
     return frame ~= nil and frame:IsShown()
 end
+local function SavePosition()
+    local db = ns.db
+    if not db or not CharacterFrame then return end
+    local left, top = CharacterFrame:GetLeft(), CharacterFrame:GetTop()
+    if left and top then
+        db.characterWindowPos = { x = math.floor(left + 0.5), y = math.floor(top + 0.5) }
+    end
+end
+local function RestorePosition()
+    local pos = ns.db and ns.db.characterWindowPos
+    if not pos or not CharacterFrame then return end
+    CharacterFrame:ClearAllPoints()
+    CharacterFrame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", pos.x, pos.y)
+end
+local function OnDragStart()
+    if not CharacterFrame then return end
+    CharacterFrame:SetMovable(true)
+    CharacterFrame:SetClampedToScreen(true)
+    CharacterFrame:StartMoving()
+end
+local function OnDragStop()
+    if not CharacterFrame then return end
+    CharacterFrame:StopMovingOrSizing()
+    CharacterFrame:SetUserPlaced(false)
+    SavePosition()
+end
+local function OnResetClick(_, button)
+    if button == "RightButton" and ns.db and ns.db.characterWindowPos then
+        ns.db.characterWindowPos = nil
+        ns.PrintMsg(ns.L.WINDOW_POSITION_RESET or "Character window position reset. It returns to its default spot next time you open it.")
+    end
+end
+function Window.MakeDraggable(frame)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", OnDragStart)
+    frame:SetScript("OnDragStop", OnDragStop)
+    frame:SetScript("OnMouseUp", OnResetClick)
+end
 local function GetFrame(id)
     local frame = frames[id]
     if frame then return frame end
     local look = looks[id]
     if not look then return nil end
     frame = look.Create()
+    Window.MakeDraggable(frame)
+    if frame.rep then Window.MakeDraggable(frame.rep) end
+    if frame.cur then Window.MakeDraggable(frame.cur) end
     frame:Hide()
     frames[id] = frame
     return frame
@@ -91,6 +133,9 @@ function Window.Sync()
         ns.CompanionDrawer:Hide()
     end
     CharacterFrame:SetAlpha(0)
+    if not frame:IsShown() then
+        RestorePosition()
+    end
     frame:ClearAllPoints()
     frame:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 0, 0)
     frame:Show()

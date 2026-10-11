@@ -309,6 +309,7 @@ local L = {
     WINDOW_SET_NAME = "Name",
     WINDOW_SET_EDIT = "Edit Equipment Set",
     WINDOW_SET_ASSIGN = "Assign to specialization",
+    WINDOW_POSITION_RESET = "Character window position reset. It returns to its default spot next time you open it.",
     WINDOW_ROTATE_LEFT = "Rotate left",
     WINDOW_ROTATE_RIGHT = "Rotate right",
     WINDOW_RESET_CAMERA = "Reset camera",
