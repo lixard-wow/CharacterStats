@@ -4,7 +4,7 @@ Keep your item level and stats on screen without opening the character window. C
 
 - **Download:** [CurseForge](https://www.curseforge.com/wow/addons/characterstats)
 - **User guide:** [lixard-wow.github.io/characterstats](https://lixard-wow.github.io/characterstats/)
-- **Game:** Retail, Mists of Pandaria Classic and WoW Classic Forever
+- **Game:** Retail, Mists of Pandaria Classic and WoW Forever
 - **Languages:** 12
 
 ## Features
