@@ -56,7 +56,8 @@ local function GetTrackLookup()
     end
     return trackLookup
 end
-local function ParseTrackLine(text)
+local UPGRADE_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.ItemUpgradeLevel
+local function ParseTrackLine(text, lineType)
     if type(text) ~= "string" then return nil end
     local name, rank, maxRank = text:match(":%s*(.-)%s*(%d+)/(%d+)")
     if not name then
@@ -64,7 +65,12 @@ local function ParseTrackLine(text)
     end
     if not name then return nil end
     local key = GetTrackLookup()[name:lower()]
-    if not key then return nil end
+    if not key then
+        if UPGRADE_LINE_TYPE and lineType == UPGRADE_LINE_TYPE then
+            return false, tonumber(rank), tonumber(maxRank)
+        end
+        return nil
+    end
     return key, tonumber(rank), tonumber(maxRank)
 end
 local ENCHANT_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.ItemEnchantmentPermanent
@@ -100,9 +106,9 @@ local function ReadTooltip(entry, slot, readTrack)
         local text = line.leftText
         if type(text) == "string" then
             if not foundTrack then
-                local key, rank, maxRank = ParseTrackLine(text)
-                if key then
-                    entry.track, entry.trackRank, entry.trackMax = key, rank, maxRank
+                local key, rank, maxRank = ParseTrackLine(text, line.type)
+                if key ~= nil then
+                    entry.track, entry.trackRank, entry.trackMax = key or nil, rank, maxRank
                     foundTrack = true
                 end
             end
