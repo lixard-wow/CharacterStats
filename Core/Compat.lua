@@ -270,7 +270,7 @@ ns.GetPlayerRole = function()
     if GetSpecialization and GetSpecializationInfo then
         local specIndex = GetSpecialization()
         if specIndex then
-            local specId, _, _, _, role = GetSpecializationInfo(specIndex)
+            local _, _, _, _, role = GetSpecializationInfo(specIndex)
             if role then
                 return role
             end

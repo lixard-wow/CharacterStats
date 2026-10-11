@@ -105,25 +105,12 @@ ns.RegisterLocale("koKR", {
     STAT_PVPRESILIENCE_TT = "플레이어로부터 받는 피해를 감소시킵니다.",
     STAT_RANGEDATTACKPOWER_TT = "원거리 공격의 피해를 증가시킵니다.",
 
-    TAB_DISPLAY = "표시",
-    TAB_LAYOUT = "레이아웃",
-    TAB_PROFILES = "프로필",
-    TAB_THEMES = "테마",
-    TAB_INFO = "정보",
 
-    GROUP_SLIDERS = "슬라이더",
-    GROUP_DROPDOWNS = "옵션",
-    GROUP_COLORS = "색상",
-    GROUP_CHECKBOXES = "토글",
 
     HEADER_PROFILES = "프로필",
     HEADER_SPEC_PROFILES = "전문화 프로필",
-    HEADER_THEMES = "테마",
     HEADER_INFO = "정보",
     HEADER_COMMANDS = "명령어",
-    HEADER_QUICKSTART = "빠른 시작",
-    HEADER_TIPS = "팁",
-    HEADER_SUPPORT = "지원",
     HEADER_ATTRIBUTES = "능력치",
     HEADER_ENHANCEMENTS = "강화 수치",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("koKR", {
     LABEL_BG_OPACITY = "배경 불투명도",
     LABEL_BORDER_OPACITY = "테두리 불투명도",
     LABEL_TEXT_OPACITY = "텍스트 불투명도",
-    LABEL_SCALE = "크기 비율",
 
     LABEL_FONT_FACE = "글꼴",
     LABEL_BORDER_STYLE = "테두리 스타일",
@@ -190,7 +176,6 @@ ns.RegisterLocale("koKR", {
     BTN_NEW = "새로 만들기",
     BTN_COPY = "복사",
     BTN_DELETE = "삭제",
-    BTN_CLOSE = "닫기",
     BTN_OK = "확인",
     BTN_CANCEL = "취소",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("koKR", {
     POPUP_COPY_PROFILE_TITLE = "프로필 복사",
     POPUP_COPY_PROFILE_DESC = "현재 프로필을 복사합니다.",
     POPUP_DELETE_PROFILE_TITLE = "프로필 삭제",
-    POPUP_DELETE_PROFILE_DESC = "'%s' 프로필을 삭제하시겠습니까?",
     POPUP_RESET_PROFILES_TITLE = "프로필 초기화",
     POPUP_RESET_PROFILES_DESC = "모든 프로필을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("koKR", {
     SHARE_RAID = "공격대에 공유",
     SHARE_PARTY = "파티에 공유",
     SHARE_WHISPER = "대상에게 귓속말",
-    SHARE_SAY = "일반",
-    SHARE_HINT = "능력치 프레임을 오른쪽 클릭하여 공유하세요.",
     SHARE_FRIENDS = "친구에게 보내기",
     SHARE_SELECT_FRIEND = "친구 선택...",
     SHARE_SEND = "보내기",
@@ -271,7 +253,6 @@ ns.RegisterLocale("koKR", {
     GEAR_EMPTY_SOCKET = "빈 보석 홈",
     GEAR_EMPTY_SOCKETS = "보석: %d",
     GEAR_ENCHANTED = "마법부여됨",
-    GEAR_LABEL = "장비",
     GEAR_MISSING = "누락",
     GEAR_MISSING_ENCHANT = "마법부여 누락",
     GEAR_MISSING_ENCHANTS = "마법부여: %d",

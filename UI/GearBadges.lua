@@ -158,7 +158,7 @@ local PLACE_INSET = { top = -EDGE_INSET, middle = 0, bottom = EDGE_INSET }
 local ROW_ORDER = { "bottom", "middle", "top" }
 local function ApplyLevelLayout(badge, db)
     local size = db.gearLevelSize or 13
-    local upgradeSize = db.gearUpgradeSize or 9
+    local upgradeSize = db.gearUpgradeSize or 12
     local key = size .. ":" .. upgradeSize
     if badge.levelLayout == key then return end
     badge.levelLayout = key
@@ -225,7 +225,7 @@ local function LayoutSlot(badge, db)
     end
     if badge.upgrade:IsShown() then
         if upgradePlace == "icon" then
-            PlaceOnIcon(badge.upgrade, badge, db.gearUpgradeAnchor or "BOTTOMRIGHT", db.gearUpgradeX, db.gearUpgradeY)
+            PlaceOnIcon(badge.upgrade, badge, db.gearUpgradeAnchor or "BOTTOM", db.gearUpgradeX, db.gearUpgradeY)
         else
             badge.upgrade:SetJustifyH("LEFT")
             AddToChain(upgradePlace, badge.upgrade)
@@ -356,8 +356,8 @@ function GearBadges.Refresh()
                     end
                 end
                 if flagKey then
-                    local r, g, b = GearBadges.GetColor(db, flagKey)
-                    badge.flag:SetVertexColor(r, g, b, 1)
+                    local fr, fg, fb = GearBadges.GetColor(db, flagKey)
+                    badge.flag:SetVertexColor(fr, fg, fb, 1)
                     badge.flag:Show()
                 else
                     badge.flag:Hide()

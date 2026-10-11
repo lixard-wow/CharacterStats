@@ -105,25 +105,12 @@ ns.RegisterLocale("ptBR", {
     STAT_PVPRESILIENCE_TT = "Reduz o dano recebido de jogadores.",
     STAT_RANGEDATTACKPOWER_TT = "Aumenta o dano causado por seus ataques à distância.",
 
-    TAB_DISPLAY = "Exibição",
-    TAB_LAYOUT = "Layout",
-    TAB_PROFILES = "Perfis",
-    TAB_THEMES = "Temas",
-    TAB_INFO = "Info",
 
-    GROUP_SLIDERS = "Controles",
-    GROUP_DROPDOWNS = "Opções",
-    GROUP_COLORS = "Cores",
-    GROUP_CHECKBOXES = "Alternadores",
 
     HEADER_PROFILES = "Perfis",
     HEADER_SPEC_PROFILES = "Perfis de Especialização",
-    HEADER_THEMES = "Temas",
     HEADER_INFO = "Sobre",
     HEADER_COMMANDS = "Comandos",
-    HEADER_QUICKSTART = "Início Rápido",
-    HEADER_TIPS = "Dicas",
-    HEADER_SUPPORT = "Suporte",
     HEADER_ATTRIBUTES = "Atributos",
     HEADER_ENHANCEMENTS = "Aperfeiçoamentos",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("ptBR", {
     LABEL_BG_OPACITY = "Opacidade do Fundo",
     LABEL_BORDER_OPACITY = "Opacidade da Borda",
     LABEL_TEXT_OPACITY = "Opacidade do Texto",
-    LABEL_SCALE = "Escala",
 
     LABEL_FONT_FACE = "Fonte",
     LABEL_BORDER_STYLE = "Estilo da Borda",
@@ -190,7 +176,6 @@ ns.RegisterLocale("ptBR", {
     BTN_NEW = "Novo",
     BTN_COPY = "Copiar",
     BTN_DELETE = "Excluir",
-    BTN_CLOSE = "Fechar",
     BTN_OK = "OK",
     BTN_CANCEL = "Cancelar",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("ptBR", {
     POPUP_COPY_PROFILE_TITLE = "Copiar Perfil",
     POPUP_COPY_PROFILE_DESC = "Copiar o perfil atual.",
     POPUP_DELETE_PROFILE_TITLE = "Excluir Perfil",
-    POPUP_DELETE_PROFILE_DESC = "Excluir perfil '%s'?",
     POPUP_RESET_PROFILES_TITLE = "Redefinir Perfis",
     POPUP_RESET_PROFILES_DESC = "Redefinir todos os perfis? Isso não pode ser desfeito.",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("ptBR", {
     SHARE_RAID = "Compartilhar para Raide",
     SHARE_PARTY = "Compartilhar para Grupo",
     SHARE_WHISPER = "Sussurrar para Alvo",
-    SHARE_SAY = "Dizer",
-    SHARE_HINT = "Clique com o botão direito no quadro de stats para compartilhar.",
     SHARE_FRIENDS = "Enviar para Amigo",
     SHARE_SELECT_FRIEND = "Selecionar Amigo...",
     SHARE_SEND = "Enviar",
@@ -271,7 +253,6 @@ ns.RegisterLocale("ptBR", {
     GEAR_EMPTY_SOCKET = "Engaste vazio",
     GEAR_EMPTY_SOCKETS = "Gemas: %d",
     GEAR_ENCHANTED = "Encantado",
-    GEAR_LABEL = "Equipamento",
     GEAR_MISSING = "Faltando",
     GEAR_MISSING_ENCHANT = "Sem encantamento",
     GEAR_MISSING_ENCHANTS = "Encantamentos: %d",

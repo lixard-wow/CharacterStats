@@ -105,25 +105,12 @@ ns.RegisterLocale("zhCN", {
     STAT_PVPRESILIENCE_TT = "降低来自玩家的伤害。",
     STAT_RANGEDATTACKPOWER_TT = "提高你的远程攻击伤害。",
 
-    TAB_DISPLAY = "显示",
-    TAB_LAYOUT = "布局",
-    TAB_PROFILES = "配置文件",
-    TAB_THEMES = "主题",
-    TAB_INFO = "信息",
 
-    GROUP_SLIDERS = "滑块",
-    GROUP_DROPDOWNS = "选项",
-    GROUP_COLORS = "颜色",
-    GROUP_CHECKBOXES = "开关",
 
     HEADER_PROFILES = "配置文件",
     HEADER_SPEC_PROFILES = "专精配置",
-    HEADER_THEMES = "主题",
     HEADER_INFO = "关于",
     HEADER_COMMANDS = "命令",
-    HEADER_QUICKSTART = "快速入门",
-    HEADER_TIPS = "提示",
-    HEADER_SUPPORT = "支持",
     HEADER_ATTRIBUTES = "属性",
     HEADER_ENHANCEMENTS = "强化属性",
 
@@ -132,7 +119,6 @@ ns.RegisterLocale("zhCN", {
     LABEL_BG_OPACITY = "背景不透明度",
     LABEL_BORDER_OPACITY = "边框不透明度",
     LABEL_TEXT_OPACITY = "文字不透明度",
-    LABEL_SCALE = "缩放",
 
     LABEL_FONT_FACE = "字体",
     LABEL_BORDER_STYLE = "边框样式",
@@ -190,7 +176,6 @@ ns.RegisterLocale("zhCN", {
     BTN_NEW = "新建",
     BTN_COPY = "复制",
     BTN_DELETE = "删除",
-    BTN_CLOSE = "关闭",
     BTN_OK = "确定",
     BTN_CANCEL = "取消",
 
@@ -208,7 +193,6 @@ ns.RegisterLocale("zhCN", {
     POPUP_COPY_PROFILE_TITLE = "复制配置",
     POPUP_COPY_PROFILE_DESC = "复制当前配置。",
     POPUP_DELETE_PROFILE_TITLE = "删除配置",
-    POPUP_DELETE_PROFILE_DESC = "删除配置 '%s'？",
     POPUP_RESET_PROFILES_TITLE = "重置配置",
     POPUP_RESET_PROFILES_DESC = "重置所有配置？此操作无法撤销。",
 
@@ -221,8 +205,6 @@ ns.RegisterLocale("zhCN", {
     SHARE_RAID = "分享到团队",
     SHARE_PARTY = "分享到小队",
     SHARE_WHISPER = "密语目标",
-    SHARE_SAY = "说",
-    SHARE_HINT = "右键点击属性面板进行分享。",
     SHARE_FRIENDS = "发送给好友",
     SHARE_SELECT_FRIEND = "选择好友...",
     SHARE_SEND = "发送",
@@ -271,7 +253,6 @@ ns.RegisterLocale("zhCN", {
     GEAR_EMPTY_SOCKET = "空插槽",
     GEAR_EMPTY_SOCKETS = "宝石：%d",
     GEAR_ENCHANTED = "已附魔",
-    GEAR_LABEL = "装备",
     GEAR_MISSING = "缺失",
     GEAR_MISSING_ENCHANT = "缺少附魔",
     GEAR_MISSING_ENCHANTS = "附魔：%d",

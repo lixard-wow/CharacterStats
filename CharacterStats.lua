@@ -293,7 +293,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
             ns.db.statColors.ilvl = nil
         end
         if ns.db.profiles then
-            for profileName, profile in pairs(ns.db.profiles) do
+            for _, profile in pairs(ns.db.profiles) do
                 if type(profile) == "table" and profile.statColors and profile.statColors.ilvl then
                     profile.statColors.ilvl = nil
                 end

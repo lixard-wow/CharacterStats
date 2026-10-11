@@ -106,11 +106,6 @@ local L = {
     STAT_PVPRESILIENCE_TT = "Reduces damage taken from players.",
     STAT_RANGEDATTACKPOWER_TT = "Increases the damage dealt by your ranged attacks.",
 
-    TAB_DISPLAY = "Display",
-    TAB_LAYOUT = "Layout",
-    TAB_PROFILES = "Profiles",
-    TAB_THEMES = "Themes",
-    TAB_INFO = "Info",
 
     NAV_GENERAL = "General",
     NAV_STATS = "Stats",
@@ -239,7 +234,6 @@ local L = {
     LABEL_GEAR_COLOR_SOCKET = "Empty Gem Socket Dot",
     HINT_GEAR_COLORS = "Item level numbers are colored by upgrade track.",
     GEAR_MISSING = "Missing",
-    GEAR_LABEL = "Gear",
     GEAR_MISSING_ENCHANTS = "Enchants: %d",
     GEAR_EMPTY_SOCKETS = "Gems: %d",
     GEAR_ALL_GOOD = "Enchants and gems: all set",
@@ -253,19 +247,11 @@ local L = {
     POPUP_DELETE_SELECT = "Select a profile to delete:",
     MSG_COMBAT_OPTIONS = "Cannot open options during combat.",
 
-    GROUP_SLIDERS = "Sliders",
-    GROUP_DROPDOWNS = "Options",
-    GROUP_COLORS = "Colors",
-    GROUP_CHECKBOXES = "Toggles",
 
     HEADER_PROFILES = "Profiles",
     HEADER_SPEC_PROFILES = "Specialization Profiles",
-    HEADER_THEMES = "Themes",
     HEADER_INFO = "About",
     HEADER_COMMANDS = "Slash Commands",
-    HEADER_QUICKSTART = "Quick Start",
-    HEADER_TIPS = "Tips",
-    HEADER_SUPPORT = "Support",
     HEADER_ATTRIBUTES = "Attributes",
     HEADER_ENHANCEMENTS = "Enhancements",
 
@@ -286,7 +272,6 @@ local L = {
     LABEL_BG_OPACITY = "Background Opacity",
     LABEL_BORDER_OPACITY = "Border Opacity",
     LABEL_TEXT_OPACITY = "Text Opacity",
-    LABEL_SCALE = "UI Scale",
     LABEL_OPTIONS_SCALE = "Options Window Scale",
     LABEL_FRAME_SCALE = "Frame Scale",
     TIP_MINIMIZE = "Minimize",
@@ -351,7 +336,6 @@ local L = {
     BTN_NEW = "New",
     BTN_COPY = "Copy",
     BTN_DELETE = "Delete",
-    BTN_CLOSE = "Close",
     BTN_OK = "OK",
     BTN_CANCEL = "Cancel",
 
@@ -370,7 +354,6 @@ local L = {
     POPUP_COPY_PROFILE_TITLE = "Copy Profile",
     POPUP_COPY_PROFILE_DESC = "Copy the current profile to a new one.",
     POPUP_DELETE_PROFILE_TITLE = "Delete Profile",
-    POPUP_DELETE_PROFILE_DESC = "Delete profile '%s'?",
     POPUP_RESET_PROFILES_TITLE = "Reset Profiles",
     POPUP_RESET_PROFILES_DESC = "Reset all profiles? This cannot be undone.",
 
