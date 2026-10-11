@@ -1,95 +1,73 @@
 local ADDON_NAME, ns = ...
 local Parts = ns.WindowParts
 local W, H = 920, 610
-local EDGE = 9
+local EDGE = 6
 local RAIL = 82
-local HEADER = 74
+local HEADER = 70
 local ASIDE = 256
-local SLOT = 44
-local SLOT_GAP = 5
+local SLOT = 42
+local SLOT_GAP = 6
+local RADIUS = 4
 local ART = ns.Theme.ART
+local P = ns.Theme.THEMES.ledger.colors
 local C = {
-    gold = { 0.86, 0.68, 0.30 },
-    goldBright = { 1.0, 0.88, 0.55 },
-    text = { 0.95, 0.91, 0.80 },
-    muted = { 0.72, 0.66, 0.53 },
-    goldLine = { 0.62, 0.47, 0.19 },
+    window = P.window, surface = P.surface, nav = P.nav, field = P.field, hover = P.hover,
+    border = P.border, line = P.line, accent = P.accent, text = P.text, muted = P.muted,
+    title = P.title, heading = P.heading, buttonText = P.buttonText,
 }
+local function Rgb(c, alpha)
+    return c[1], c[2], c[3], alpha or c[4] or 1
+end
+local function Box(frame, fill, edge, radius, sublevel)
+    local base = sublevel or 0
+    local e = frame:CreateTexture(nil, "BACKGROUND", nil, base)
+    e:SetAllPoints()
+    ns.Theme.Shape(e, radius or RADIUS)
+    e:SetVertexColor(Rgb(edge))
+    local f = frame:CreateTexture(nil, "BACKGROUND", nil, base + 1)
+    f:SetPoint("TOPLEFT", 1, -1)
+    f:SetPoint("BOTTOMRIGHT", -1, 1)
+    ns.Theme.Shape(f, radius or RADIUS)
+    f:SetVertexColor(Rgb(fill))
+    return f, e
+end
+local function Line(parent, vertical, color)
+    local t = parent:CreateTexture(nil, "BORDER")
+    t:SetColorTexture(Rgb(color or C.line))
+    if vertical then t:SetWidth(1) else t:SetHeight(1) end
+    return t
+end
 local function Text(parent, font, size, color, flags)
     local fs = parent:CreateFontString(nil, "OVERLAY")
     Parts.SetFont(fs, font, size, flags or "")
     fs:SetTextColor(color[1], color[2], color[3])
     return fs
 end
-local function Slice(tex, file, margin)
-    tex:SetTexture(ART .. file)
-    if tex.SetTextureSliceMargins then
-        tex:SetTextureSliceMargins(margin, margin, margin, margin)
-        if Enum and Enum.UITextureSliceMode and tex.SetTextureSliceMode then
-            tex:SetTextureSliceMode(Enum.UITextureSliceMode.Stretched)
-        end
-    end
-    return tex
-end
-local function Stone(parent, shade, layer, sublevel)
-    local t = parent:CreateTexture(nil, layer or "BACKGROUND", nil, sublevel or 0)
-    t:SetTexture(ART .. "forged_stone", "REPEAT", "REPEAT")
-    t:SetHorizTile(true)
-    t:SetVertTile(true)
-    t:SetVertexColor(shade, shade, shade)
-    return t
-end
-local function Shade(parent, alpha, layer, sublevel)
-    local t = parent:CreateTexture(nil, layer or "BACKGROUND", nil, sublevel or 1)
-    t:SetTexture(ART .. "page_edges")
-    t:SetVertexColor(0, 0, 0, alpha or 0.8)
-    return t
-end
-local function Plaque(parent, layer, sublevel)
-    local t = parent:CreateTexture(nil, layer or "BACKGROUND", nil, sublevel or 0)
-    return Slice(t, "forged_plaque", 12)
-end
-local function GoldLine(parent, vertical)
-    local t = parent:CreateTexture(nil, "BORDER")
-    t:SetColorTexture(C.goldLine[1], C.goldLine[2], C.goldLine[3], 0.9)
-    if vertical then t:SetWidth(1) else t:SetHeight(1) end
-    return t
-end
-local function Filigree(parent, width)
-    local t = parent:CreateTexture(nil, "ARTWORK")
-    t:SetTexture(ART .. "forged_divider")
-    t:SetSize(width, 14)
-    return t
-end
 local function Button(parent, width, height, label)
     local b = CreateFrame("Button", nil, parent)
     b:SetSize(width, height)
-    b.glow = b:CreateTexture(nil, "BACKGROUND", nil, -1)
-    b.glow:SetTexture(ART .. "glow_radial")
-    b.glow:SetPoint("TOPLEFT", -10, 8)
-    b.glow:SetPoint("BOTTOMRIGHT", 10, -8)
-    b.glow:SetVertexColor(1, 0.75, 0.3, 0.55)
-    b.glow:SetBlendMode("ADD")
-    b.glow:Hide()
-    b.plate = Plaque(b, "BACKGROUND", 0)
-    b.plate:SetAllPoints()
-    b.label = Text(b, "Cinzel-Bold.ttf", 12, C.goldBright)
-    b.label:SetPoint("CENTER", 0, 1)
+    b.fill, b.edge = Box(b, C.surface, C.border)
+    b.label = Text(b, "SourceSans3-Bold.ttf", 12, C.buttonText)
+    b.label:SetPoint("CENTER", 0, 0)
     b.label:SetText(label or "")
-    b:SetScript("OnEnter", function(self) self.plate:SetVertexColor(1.25, 1.2, 1.1) end)
-    b:SetScript("OnLeave", function(self) if not self.selected then self.plate:SetVertexColor(1, 1, 1) end end)
+    b:SetScript("OnEnter", function(self)
+        if not self.selected then self.fill:SetVertexColor(Rgb(C.hover)) end
+    end)
+    b:SetScript("OnLeave", function(self)
+        if not self.selected then self.fill:SetVertexColor(Rgb(C.surface)) end
+    end)
     function b:SetSelected(on)
         self.selected = on
-        self.glow:SetShown(on and true or false)
-        self.plate:SetVertexColor(on and 1.25 or 1, on and 1.2 or 1, on and 1.1 or 1)
-        local c = on and C.goldBright or C.muted
+        self.fill:SetVertexColor(Rgb(on and C.hover or C.surface))
+        self.edge:SetVertexColor(Rgb(on and C.accent or C.border))
+        local c = on and C.title or C.muted
         self.label:SetTextColor(c[1], c[2], c[3])
     end
     return b
 end
 local function IconButton(parent, glyph, tooltip, onClick)
-    local b = Button(parent, 28, 28, glyph)
-    Parts.SetFont(b.label, "SourceSans3-Bold.ttf", 15, "")
+    local b = Button(parent, 26, 26, glyph)
+    Parts.SetFont(b.label, "SourceSans3-Bold.ttf", 14, "")
     b:SetScript("OnClick", onClick)
     b:HookScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
@@ -101,10 +79,10 @@ local function IconButton(parent, glyph, tooltip, onClick)
 end
 local function SlotStyle(side, size)
     return {
-        size = size, side = side, bezel = ART .. "forged_bezel", iconInset = 5, borderInset = 4,
+        size = size, side = side, radius = RADIUS, iconInset = 3, borderInset = 1,
         numberFont = "SourceSans3-Bold.ttf", textFont = "SourceSans3-Regular.ttf",
-        ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = { 0.25, 0.22, 0.18 },
-        flyoutEdge = C.gold, flyoutFill = { 0.07, 0.06, 0.05 },
+        ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.border,
+        flyoutEdge = C.border, flyoutFill = C.window,
     }
 end
 local function BuildRail(f)
@@ -112,10 +90,10 @@ local function BuildRail(f)
     rail:SetPoint("TOPLEFT", EDGE, -EDGE)
     rail:SetPoint("BOTTOMLEFT", EDGE, EDGE)
     rail:SetWidth(RAIL)
-    Stone(rail, 0.62):SetAllPoints()
-    local shade = Shade(rail, 0.6)
-    shade:SetAllPoints()
-    local line = GoldLine(rail, true)
+    local bg = rail:CreateTexture(nil, "BACKGROUND", nil, 4)
+    bg:SetAllPoints()
+    bg:SetColorTexture(Rgb(C.nav))
+    local line = Line(rail, true)
     line:SetPoint("TOPRIGHT")
     line:SetPoint("BOTTOMRIGHT")
     local tabs = {
@@ -125,10 +103,10 @@ local function BuildRail(f)
     }
     f.tabs = {}
     for i, tab in ipairs(tabs) do
-        local b = Button(rail, RAIL - 14, 50, tab.label)
-        Parts.SetFont(b.label, "Cinzel-Bold.ttf", 8, "")
-        b.label:SetWidth(RAIL - 20)
-        b:SetPoint("TOP", rail, "TOP", 0, -(HEADER + 4) - (i - 1) * 58)
+        local b = Button(rail, RAIL - 14, 44, tab.label)
+        Parts.SetFont(b.label, "SourceSans3-Bold.ttf", 12, "")
+        b.label:SetWidth(RAIL - 18)
+        b:SetPoint("TOP", rail, "TOP", 0, -(HEADER + 6) - (i - 1) * 50)
         b:SetScript("OnClick", function() ns.Window.ShowTab(tab.key) end)
         b:SetSelected(tab.key == "PaperDollFrame")
         f.tabs[tab.key] = b
@@ -139,37 +117,31 @@ local function BuildHeader(f)
     header:SetPoint("TOPLEFT", EDGE + RAIL, -EDGE)
     header:SetPoint("TOPRIGHT", -EDGE, -EDGE)
     header:SetHeight(HEADER)
-    local plate = Plaque(header)
-    plate:SetPoint("TOPLEFT", 8, -8)
-    plate:SetPoint("BOTTOMRIGHT", -8, 6)
-    local crestGlow = header:CreateTexture(nil, "ARTWORK", nil, 0)
-    crestGlow:SetTexture(ART .. "glow_radial")
-    crestGlow:SetSize(84, 84)
-    crestGlow:SetPoint("LEFT", 2, -1)
-    crestGlow:SetVertexColor(1, 0.7, 0.25, 0.45)
-    crestGlow:SetBlendMode("ADD")
-    local crest = header:CreateTexture(nil, "ARTWORK", nil, 1)
-    crest:SetSize(40, 40)
-    crest:SetPoint("CENTER", crestGlow)
+    local line = Line(header, false)
+    line:SetPoint("BOTTOMLEFT")
+    line:SetPoint("BOTTOMRIGHT")
+    local accent = header:CreateTexture(nil, "BORDER", nil, 1)
+    accent:SetPoint("BOTTOMLEFT", 16, 0)
+    accent:SetSize(56, 1)
+    accent:SetColorTexture(Rgb(C.accent))
+    local crestBox = CreateFrame("Frame", nil, header)
+    crestBox:SetSize(46, 46)
+    crestBox:SetPoint("LEFT", 16, 0)
+    Box(crestBox, C.field, C.border)
+    local crest = crestBox:CreateTexture(nil, "ARTWORK")
+    crest:SetPoint("TOPLEFT", 3, -3)
+    crest:SetPoint("BOTTOMRIGHT", -3, 3)
     crest:SetTexCoord(0.07, 0.93, 0.07, 0.93)
     f.crest = crest
-    local mask = header:CreateMaskTexture()
-    mask:SetAllPoints(crest)
-    mask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-    crest:AddMaskTexture(mask)
-    local ring = header:CreateTexture(nil, "ARTWORK", nil, 3)
-    ring:SetTexture(ART .. "forged_ring")
-    ring:SetSize(54, 54)
-    ring:SetPoint("CENTER", crest)
-    f.nameText = Text(header, "Cinzel-Bold.ttf", 21, C.goldBright)
-    f.nameText:SetPoint("TOPLEFT", crest, "TOPRIGHT", 18, 4)
+    f.nameText = Text(header, "Cinzel-Bold.ttf", 19, C.title)
+    f.nameText:SetPoint("TOPLEFT", crestBox, "TOPRIGHT", 14, -2)
     f.subText = Text(header, "SourceSans3-Regular.ttf", 13, C.muted)
-    f.subText:SetPoint("TOPLEFT", f.nameText, "BOTTOMLEFT", 1, -4)
+    f.subText:SetPoint("TOPLEFT", f.nameText, "BOTTOMLEFT", 0, -5)
     local close = IconButton(header, "x", CLOSE or "Close", ns.Window.Close)
-    close:SetPoint("RIGHT", -18, 1)
-    f.ilvlValue = Text(header, "Cinzel-Bold.ttf", 25, { 0.80, 0.58, 1 })
-    f.ilvlValue:SetPoint("RIGHT", close, "LEFT", -20, -4)
-    f.ilvlLabel = Text(header, "Cinzel-Bold.ttf", 9, C.muted)
+    close:SetPoint("RIGHT", -14, 2)
+    f.ilvlValue = Text(header, "Cinzel-Bold.ttf", 22, C.accent)
+    f.ilvlValue:SetPoint("RIGHT", close, "LEFT", -18, -4)
+    f.ilvlLabel = Text(header, "SourceSans3-Bold.ttf", 10, C.muted)
     f.ilvlLabel:SetPoint("BOTTOMRIGHT", f.ilvlValue, "TOPRIGHT", 0, 1)
     f.ilvlLabel:SetText((ns.L.STAT_ILVL or "Item Level"):upper())
     f.ilvlBags = Text(header, "SourceSans3-Regular.ttf", 11, C.muted)
@@ -180,11 +152,11 @@ local function BuildGear(f, body)
     local function Column(list, side)
         for i, slot in ipairs(list) do
             local b = Parts.CreateSlot(body, slot, SlotStyle(side, SLOT))
-            local y = -10 - (i - 1) * (SLOT + SLOT_GAP)
+            local y = -12 - (i - 1) * (SLOT + SLOT_GAP)
             if side == "right" then
-                b:SetPoint("TOPLEFT", body, "TOPLEFT", 12, y)
+                b:SetPoint("TOPLEFT", body, "TOPLEFT", 14, y)
             else
-                b:SetPoint("TOPRIGHT", body, "TOPRIGHT", -12, y)
+                b:SetPoint("TOPRIGHT", body, "TOPRIGHT", -14, y)
             end
             f.slotButtons[#f.slotButtons + 1] = b
         end
@@ -199,31 +171,29 @@ local function BuildGear(f, body)
 end
 local function BuildStage(f, body)
     local stage = CreateFrame("Frame", nil, body)
-    stage:SetPoint("TOP", body, "TOP", 0, -10)
+    stage:SetPoint("TOP", body, "TOP", 0, -12)
     stage:SetPoint("BOTTOM", body, "BOTTOM", 0, 108)
-    stage:SetWidth(252)
-    local plate = Plaque(stage)
-    plate:SetAllPoints()
-    plate:SetVertexColor(0.85, 0.8, 0.9)
-    local glow = stage:CreateTexture(nil, "BACKGROUND", nil, 2)
+    stage:SetWidth(250)
+    Box(stage, C.field, C.border)
+    local glow = stage:CreateTexture(nil, "BACKGROUND", nil, 3)
     glow:SetTexture(ART .. "glow_radial")
-    glow:SetPoint("TOPLEFT", 6, -20)
-    glow:SetPoint("BOTTOMRIGHT", -6, 20)
-    glow:SetVertexColor(1, 0.72, 0.32, 0.30)
+    glow:SetPoint("TOPLEFT", 10, -30)
+    glow:SetPoint("BOTTOMRIGHT", -10, 30)
+    glow:SetVertexColor(C.accent[1], C.accent[2], C.accent[3], 0.12)
     glow:SetBlendMode("ADD")
-    local floor = stage:CreateTexture(nil, "BACKGROUND", nil, 3)
+    local floor = stage:CreateTexture(nil, "BACKGROUND", nil, 4)
     floor:SetTexture(ART .. "ring_floor")
-    floor:SetSize(220, 30)
-    floor:SetPoint("BOTTOM", stage, "BOTTOM", 0, 10)
-    floor:SetVertexColor(1, 0.75, 0.35, 0.55)
+    floor:SetSize(210, 26)
+    floor:SetPoint("BOTTOM", stage, "BOTTOM", 0, 12)
+    floor:SetVertexColor(C.accent[1], C.accent[2], C.accent[3], 0.35)
     floor:SetBlendMode("ADD")
     f.model = Parts.CreateModel(stage)
-    f.model:SetPoint("TOPLEFT", 6, -6)
-    f.model:SetPoint("BOTTOMRIGHT", -6, 6)
+    f.model:SetPoint("TOPLEFT", 4, -4)
+    f.model:SetPoint("BOTTOMRIGHT", -4, 4)
     local controls = CreateFrame("Frame", nil, body)
-    controls:SetSize(260, 30)
-    controls:SetPoint("BOTTOM", body, "BOTTOM", 0, 12)
-    f.setButton = Button(controls, 150, 28, ns.L.WINDOW_SETS or "Equipment Sets")
+    controls:SetSize(260, 28)
+    controls:SetPoint("BOTTOM", body, "BOTTOM", 0, 14)
+    f.setButton = Button(controls, 150, 26, ns.L.WINDOW_SETS or "Equipment Sets")
     f.setButton:SetPoint("LEFT", controls, "LEFT", 0, 0)
     f.setButton:SetScript("OnClick", function() f:ShowPane("sets") end)
     local reset = IconButton(controls, "o", ns.L.WINDOW_RESET_CAMERA or "Reset camera", function() f.model:Reset() end)
@@ -238,10 +208,10 @@ local function BuildAside(f)
     aside:SetPoint("TOPRIGHT", -EDGE, -(EDGE + HEADER))
     aside:SetPoint("BOTTOMRIGHT", -EDGE, EDGE)
     aside:SetWidth(ASIDE)
-    Stone(aside, 0.72):SetAllPoints()
-    local shade = Shade(aside, 0.55)
-    shade:SetAllPoints()
-    local line = GoldLine(aside, true)
+    local bg = aside:CreateTexture(nil, "BACKGROUND", nil, 4)
+    bg:SetAllPoints()
+    bg:SetColorTexture(Rgb(C.surface))
+    local line = Line(aside, true)
     line:SetPoint("TOPLEFT")
     line:SetPoint("BOTTOMLEFT")
     local paneTabs = {
@@ -252,20 +222,21 @@ local function BuildAside(f)
     f.paneButtons = {}
     local tabWidth = math.floor((ASIDE - 24 - 8) / 3)
     for i, tab in ipairs(paneTabs) do
-        local b = Button(aside, tabWidth, 28, tab.label)
-        b:SetPoint("TOPLEFT", aside, "TOPLEFT", 12 + (i - 1) * (tabWidth + 4), -10)
+        local b = Button(aside, tabWidth, 26, tab.label)
+        b:SetPoint("TOPLEFT", aside, "TOPLEFT", 12 + (i - 1) * (tabWidth + 4), -12)
         b:SetScript("OnClick", function() f:ShowPane(tab.key) end)
         f.paneButtons[tab.key] = b
     end
-    local fil = Filigree(aside, ASIDE - 30)
-    fil:SetPoint("TOP", aside, "TOP", 0, -44)
+    local sep = Line(aside, false)
+    sep:SetPoint("TOPLEFT", 12, -48)
+    sep:SetPoint("TOPRIGHT", -12, -48)
     local content = CreateFrame("Frame", nil, aside)
-    content:SetPoint("TOPLEFT", aside, "TOPLEFT", 6, -60)
+    content:SetPoint("TOPLEFT", aside, "TOPLEFT", 6, -54)
     content:SetPoint("BOTTOMRIGHT", aside, "BOTTOMRIGHT", -4, 6)
     f.panes = {}
     f.panes.stats = Parts.CreateStats(content, { bars = true, gearSummary = true })
     local ui = {
-        Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.goldBright,
+        Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.accent,
         bodyFont = "SourceSans3-Regular.ttf", boldFont = "SourceSans3-Bold.ttf", headerFont = "Cinzel-Bold.ttf",
     }
     f.panes.titles = Parts.CreateTitlesPane(content, ui)
@@ -279,38 +250,44 @@ local function Create()
     f:SetToplevel(true)
     f:EnableMouse(true)
     f:SetClampedToScreen(true)
-    local base = Stone(f, 0.85, "BACKGROUND", -8)
-    base:SetPoint("TOPLEFT", 4, -4)
-    base:SetPoint("BOTTOMRIGHT", -4, 4)
-    local vignette = Shade(f, 0.75, "BACKGROUND", -7)
-    vignette:SetAllPoints(base)
+    Box(f, C.window, C.border, RADIUS, -8)
+    local ring = f:CreateTexture(nil, "BACKGROUND", nil, -6)
+    ring:SetPoint("TOPLEFT", 4, -4)
+    ring:SetPoint("BOTTOMRIGHT", -4, 4)
+    ns.Theme.Shape(ring, RADIUS)
+    ring:SetVertexColor(Rgb(C.line))
+    local ringFill = f:CreateTexture(nil, "BACKGROUND", nil, -5)
+    ringFill:SetPoint("TOPLEFT", ring, 1, -1)
+    ringFill:SetPoint("BOTTOMRIGHT", ring, -1, 1)
+    ns.Theme.Shape(ringFill, RADIUS)
+    ringFill:SetVertexColor(Rgb(C.window))
     BuildRail(f)
     BuildHeader(f)
     BuildAside(f)
     local body = CreateFrame("Frame", nil, f)
     body:SetPoint("TOPLEFT", EDGE + RAIL, -(EDGE + HEADER))
     body:SetPoint("BOTTOMRIGHT", -(EDGE + ASIDE), EDGE)
-    local bodyShade = Shade(body, 0.45)
-    bodyShade:SetAllPoints()
     BuildStage(f, body)
     BuildGear(f, body)
     local function TabPanel(module)
         local panel = module.Create(f, {
-            Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.goldBright,
+            Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.accent,
             bodyFont = "SourceSans3-Regular.ttf", boldFont = "SourceSans3-Bold.ttf", headerFont = "Cinzel-Bold.ttf",
-            barTrack = { 0.05, 0.045, 0.04, 1 }, rowFill = { 0, 0, 0, 0.25 }, barWidth = 210, boxEdge = C.goldLine,
+            barTrack = C.field, rowFill = { C.surface[1], C.surface[2], C.surface[3], 0.7 }, barWidth = 210,
+            boxEdge = C.border, boxFill = C.field,
         })
         panel:SetPoint("TOPLEFT", EDGE + RAIL, -(EDGE + HEADER))
         panel:SetPoint("BOTTOMRIGHT", -EDGE, EDGE)
         panel:SetFrameLevel(f:GetFrameLevel() + 40)
-        Stone(panel, 0.8):SetAllPoints()
-        local shade = Shade(panel, 0.5)
-        shade:SetAllPoints()
-        local detailBg = Stone(panel, 0.66, "BACKGROUND", 2)
+        local bg = panel:CreateTexture(nil, "BACKGROUND")
+        bg:SetAllPoints()
+        bg:SetColorTexture(Rgb(C.window))
+        local detailBg = panel:CreateTexture(nil, "BACKGROUND", nil, 1)
         detailBg:SetPoint("TOPRIGHT")
         detailBg:SetPoint("BOTTOMRIGHT")
         detailBg:SetWidth(ASIDE)
-        local detailLine = GoldLine(panel, true)
+        detailBg:SetColorTexture(Rgb(C.surface))
+        local detailLine = Line(panel, true)
         detailLine:SetPoint("TOPRIGHT", -ASIDE, 0)
         detailLine:SetPoint("BOTTOMRIGHT", -ASIDE, 0)
         panel.list:SetPoint("TOPLEFT", 14, -12)
@@ -323,13 +300,6 @@ local function Create()
     end
     f.rep = TabPanel(ns.WindowReputation)
     f.cur = TabPanel(ns.WindowCurrency)
-    local trim = CreateFrame("Frame", nil, f)
-    trim:SetAllPoints()
-    trim:SetFrameLevel(f:GetFrameLevel() + 60)
-    local frameArt = trim:CreateTexture(nil, "OVERLAY")
-    frameArt:SetPoint("TOPLEFT", -2, 2)
-    frameArt:SetPoint("BOTTOMRIGHT", 2, -2)
-    Slice(frameArt, "forged_frame", 32)
     f.activeTab = "PaperDollFrame"
     function f:ShowTab(sub)
         self.activeTab = sub
@@ -358,7 +328,7 @@ local function Create()
         local spec = info.specName and (info.specName .. " ") or ""
         local line = string.format("%s %d  |cff%02x%02x%02x%s%s|r", LEVEL or "Level", info.level, math.floor(cc.r * 255), math.floor(cc.g * 255), math.floor(cc.b * 255), spec, info.className)
         if info.guild then
-            line = line .. "  |cffb8a77f<" .. info.guild .. ">|r"
+            line = line .. "  <" .. info.guild .. ">"
         end
         self.subText:SetText(line)
         self.crest:SetTexture(info.specIcon or 134400)
@@ -385,7 +355,7 @@ local function Create()
     return f
 end
 ns.Window.RegisterLook("forged", {
-    label = ns.L.WINDOW_LOOK_FORGED or "Forged Stone",
+    label = ns.L.WINDOW_LOOK_FORGED or "Artisan",
     labelKey = "WINDOW_LOOK_FORGED",
     Create = Create,
 })
