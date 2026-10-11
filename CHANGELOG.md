@@ -19,7 +19,7 @@
   - The drawer's Ratings tab shows the rating needed for 1% more at your current penalty.
 - Bar thickness settings for the stats panel and the character window (Meters look).
 - Detection of other addons that restyle the character window (ElvUI, EllesmereUI, Chonky Character Sheet and others), with a popup that offers to turn off the conflicting part or the other addon (off by default, turn on under Character Frame).
-- WoW Classic Forever support: Blizzard's own stat list on the character window, resistances colored by school, the ranged slot, and a Ratings tab with the combat ratings that client uses. The drawer sits clear of the character window's side tabs.
+- WoW Forever support: Blizzard's own stat list on the character window, resistances colored by school, the ranged slot, and a Ratings tab with the combat ratings that client uses. The drawer sits clear of the character window's side tabs.
 - MoP Classic: the character window lists Blizzard's own stat categories (General, Attributes, Melee, Ranged, Spell, Defense, Resistance) in a scrolling list, showing only what matters for your class and spec, with every stat in its own color. Health, Power, weapon damage, Spell Healing, Spell Penetration and resistances are now in the Stats list too. Supports MoP Classic 5.5.4.
 - Addon language: show CharacterStats in any of its languages, independent of your game language, from General > Language or with `/cs locale`.
 
