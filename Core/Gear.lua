@@ -10,6 +10,7 @@ local ENCHANT_SLOTS_RETAIL = {
     [1] = true,
     [3] = true,
     [5] = true,
+    [7] = true,
     [8] = true,
     [11] = true,
     [12] = true,
