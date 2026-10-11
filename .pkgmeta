@@ -8,5 +8,6 @@ ignore:
   - .pkgmeta
   - README.md
   - docs
+  - tools
   - .vscode
   - .luacheckrc

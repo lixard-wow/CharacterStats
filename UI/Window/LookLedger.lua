@@ -289,11 +289,15 @@ local function BuildCharacterPage(f, page)
     f.panes = { titles = Parts.CreateTitlesPane(lower, ui), sets = Parts.CreateSetsPane(lower, ui) }
     f.panes.titles:Hide()
     f.panes.sets:Hide()
-    f.titlesButton = Button(page, 176, 32, ns.L.WINDOW_PANE_TITLES or "Titles")
-    f.titlesButton:SetPoint("BOTTOMLEFT", page, "BOTTOMLEFT", 22, 16)
+    local third = math.floor((RIGHT_PAGE - 44 - 12) / 3)
+    f.statsButton = Button(page, third, 32, ns.L.WINDOW_PANE_STATS or "Stats")
+    f.statsButton:SetPoint("BOTTOMLEFT", page, "BOTTOMLEFT", 22, 16)
+    f.statsButton:SetScript("OnClick", function() f:ShowLower(false) end)
+    f.titlesButton = Button(page, third, 32, ns.L.WINDOW_PANE_TITLES or "Titles")
+    f.titlesButton:SetPoint("LEFT", f.statsButton, "RIGHT", 6, 0)
     f.titlesButton:SetScript("OnClick", function() f:ShowLower("titles") end)
-    f.setsButton = Button(page, 176, 32, ns.L.WINDOW_SETS or "Equipment Sets")
-    f.setsButton:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -22, 16)
+    f.setsButton = Button(page, third, 32, ns.L.WINDOW_PANE_SETS or "Sets")
+    f.setsButton:SetPoint("LEFT", f.titlesButton, "RIGHT", 6, 0)
     f.setsButton:SetScript("OnClick", function() f:ShowLower("sets") end)
 end
 local function FillGearRows(f, db)
@@ -491,11 +495,13 @@ local function Create()
         for key, b in pairs(self.tabs) do b:SetAlpha(key == sub and 1 or 0.82) end
     end
     f.lowerKey = false
+    f.statsButton:SetSelected(true)
     function f:ShowLower(key)
-        if self.lowerKey == key then key = false end
+        key = key or false
         self.lowerKey = key
         self.statsPane:SetShown(not key)
         for paneKey, pane in pairs(self.panes) do pane:SetShown(paneKey == key) end
+        self.statsButton:SetSelected(not key)
         self.titlesButton:SetSelected(key == "titles")
         self.setsButton:SetSelected(key == "sets")
         if key then self.panes[key]:Refresh() else FillStats(self, ns.db) end
