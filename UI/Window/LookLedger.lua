@@ -442,44 +442,52 @@ local function Create()
     spine:SetWidth(2)
     BuildGearPage(f, left)
     BuildCharacterPage(f, right)
-    local rep = ns.WindowReputation.Create(f, {
-        Text = function(parent, font, size, color) return Text(parent, font, size, color) end,
-        Button = Button, text = C.ink, muted = C.inkMuted, accent = C.heading,
-        bodyFont = SANS, boldFont = SANS_BOLD, headerFont = FELL_SC,
-        barTrack = { 0.80, 0.72, 0.53, 1 }, rowFill = { 0.55, 0.42, 0.22, 0.08 }, barWidth = 170,
-        boxEdge = C.brass, boxFill = { 0.96, 0.92, 0.82, 1 },
-    })
-    rep:SetPoint("TOPLEFT", BOOK_PAD, -BOOK_PAD)
-    rep:SetPoint("BOTTOMRIGHT", -BOOK_PAD, BOOK_PAD)
-    rep:SetFrameLevel(f:GetFrameLevel() + 40)
-    local repLeft = Page(rep)
-    repLeft:SetPoint("TOPLEFT")
-    repLeft:SetPoint("BOTTOMRIGHT", rep, "BOTTOMRIGHT", -RIGHT_PAGE, 0)
-    repLeft:SetFrameLevel(rep:GetFrameLevel())
-    local repRight = Page(rep)
-    repRight:SetPoint("TOPRIGHT")
-    repRight:SetPoint("BOTTOMRIGHT")
-    repRight:SetWidth(RIGHT_PAGE)
-    repRight:SetFrameLevel(rep:GetFrameLevel())
-    local repTitle = Text(repLeft, FELL, 26, C.leather)
-    repTitle:SetPoint("TOPLEFT", 26, -18)
-    repTitle:SetText(ns.L.WINDOW_TAB_REPUTATION or "Reputation")
-    rep.list:SetFrameLevel(rep:GetFrameLevel() + 5)
-    rep.detail:SetFrameLevel(rep:GetFrameLevel() + 5)
-    rep.list:SetPoint("TOPLEFT", repLeft, "TOPLEFT", 24, -56)
-    rep.list:SetPoint("BOTTOMRIGHT", repLeft, "BOTTOMRIGHT", -20, 16)
-    rep.detail:SetPoint("TOPLEFT", repRight, "TOPLEFT", 24, -24)
-    rep.detail:SetPoint("BOTTOMRIGHT", repRight, "BOTTOMRIGHT", -24, 20)
-    local close = Button(repRight, 26, 26, "x")
-    close:SetPoint("TOPRIGHT", repRight, "TOPRIGHT", -16, -18)
-    close:SetFrameLevel(rep:GetFrameLevel() + 8)
-    close:SetScript("OnClick", ns.Window.Close)
-    rep:Hide()
-    f.rep = rep
+    local function TabPanel(module)
+        local rep = module.Create(f, {
+            Text = function(parent, font, size, color) return Text(parent, font, size, color) end,
+            Button = Button, text = C.ink, muted = C.inkMuted, accent = C.heading,
+            bodyFont = SANS, boldFont = SANS_BOLD, headerFont = FELL_SC,
+            barTrack = { 0.80, 0.72, 0.53, 1 }, rowFill = { 0.55, 0.42, 0.22, 0.08 }, barWidth = 170,
+            boxEdge = C.brass, boxFill = { 0.96, 0.92, 0.82, 1 },
+        })
+        rep:SetPoint("TOPLEFT", BOOK_PAD, -BOOK_PAD)
+        rep:SetPoint("BOTTOMRIGHT", -BOOK_PAD, BOOK_PAD)
+        rep:SetFrameLevel(f:GetFrameLevel() + 40)
+        local repLeft = Page(rep)
+        repLeft:SetPoint("TOPLEFT")
+        repLeft:SetPoint("BOTTOMRIGHT", rep, "BOTTOMRIGHT", -RIGHT_PAGE, 0)
+        repLeft:SetFrameLevel(rep:GetFrameLevel())
+        local repRight = Page(rep)
+        repRight:SetPoint("TOPRIGHT")
+        repRight:SetPoint("BOTTOMRIGHT")
+        repRight:SetWidth(RIGHT_PAGE)
+        repRight:SetFrameLevel(rep:GetFrameLevel())
+        local repTitle = Text(repLeft, FELL, 26, C.leather)
+        repTitle:SetPoint("TOPLEFT", 26, -18)
+        repTitle:SetText(module.title)
+        rep.list:SetFrameLevel(rep:GetFrameLevel() + 5)
+        rep.detail:SetFrameLevel(rep:GetFrameLevel() + 5)
+        rep.list:SetPoint("TOPLEFT", repLeft, "TOPLEFT", 24, -56)
+        rep.list:SetPoint("BOTTOMRIGHT", repLeft, "BOTTOMRIGHT", -20, 16)
+        rep.detail:SetPoint("TOPLEFT", repRight, "TOPLEFT", 24, -24)
+        rep.detail:SetPoint("BOTTOMRIGHT", repRight, "BOTTOMRIGHT", -24, 20)
+        local close = Button(repRight, 26, 26, "x")
+        close:SetPoint("TOPRIGHT", repRight, "TOPRIGHT", -16, -18)
+        close:SetFrameLevel(rep:GetFrameLevel() + 8)
+        close:SetScript("OnClick", ns.Window.Close)
+        rep:Hide()
+        return rep
+    end
+    f.rep = TabPanel(ns.WindowReputation)
+    f.cur = TabPanel(ns.WindowCurrency)
     f.activeTab = "PaperDollFrame"
     function f:ShowTab(sub)
         self.activeTab = sub
         self.rep:SetShown(sub == "ReputationFrame")
+        self.cur:SetShown(sub == "TokenFrame")
+        if self.tabs.TokenFrame then
+            self.tabs.TokenFrame:SetShown(C_CurrencyInfo.GetCurrencyListSize() > 0)
+        end
         for key, b in pairs(self.tabs) do b:SetAlpha(key == sub and 1 or 0.82) end
     end
     f.lowerKey = false
@@ -508,6 +516,10 @@ local function Create()
         self.ilvlLine:SetText(ilvlText)
         if self.activeTab == "ReputationFrame" then
             self.rep:Refresh()
+            return
+        end
+        if self.activeTab == "TokenFrame" then
+            self.cur:Refresh()
             return
         end
         Parts.RefreshSlots(self)

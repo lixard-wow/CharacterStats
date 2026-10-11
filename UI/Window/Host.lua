@@ -5,7 +5,8 @@ local looks = {}
 local lookOrder = {}
 local frames = {}
 local hooked = false
-local OUR_SUBFRAMES = { PaperDollFrame = true, ReputationFrame = true }
+local OUR_SUBFRAMES = { PaperDollFrame = true, ReputationFrame = true, TokenFrame = true }
+local blizzardOverride
 function Window.RegisterLook(id, def)
     if not looks[id] then
         lookOrder[#lookOrder + 1] = id
@@ -64,8 +65,12 @@ local function HideFrames()
 end
 function Window.Sync()
     if not CharacterFrame then return end
+    local sub = CharacterFrame.activeSubframe or ""
+    if not CharacterFrame:IsShown() or (blizzardOverride and blizzardOverride ~= sub) then
+        blizzardOverride = nil
+    end
     local want = CharacterFrame:IsShown() and Window.IsEnabled()
-        and OUR_SUBFRAMES[CharacterFrame.activeSubframe or ""] == true
+        and OUR_SUBFRAMES[sub] == true and blizzardOverride ~= sub
     if not want then
         if HideFrames() then
             CharacterFrame:SetAlpha(1)
@@ -94,6 +99,10 @@ function Window.Sync()
     if frame.Refresh then
         frame:Refresh()
     end
+end
+function Window.ShowBlizzard(subFrame)
+    blizzardOverride = subFrame
+    Window.Sync()
 end
 function Window.HideAll()
     Window.Sync()

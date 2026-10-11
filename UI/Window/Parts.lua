@@ -464,6 +464,36 @@ end
 function Parts.DeleteSet(id, name)
     if id then StaticPopup_Show("CHARACTERSTATS_DELETE_EQUIPMENT_SET", name, nil, id) end
 end
+function Parts.Solid(parent, color, layer, sublevel)
+    local t = parent:CreateTexture(nil, layer or "BACKGROUND", nil, sublevel or 0)
+    t:SetColorTexture(color[1], color[2], color[3], color[4] or 1)
+    return t
+end
+function Parts.CreateCheck(parent, ui, label, onClick)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetSize(220, 22)
+    b.box = Parts.Solid(b, ui.boxEdge or ui.muted, "ARTWORK")
+    b.box:SetSize(16, 16)
+    b.box:SetPoint("LEFT")
+    b.inner = Parts.Solid(b, ui.boxFill or { 0, 0, 0, 0.6 }, "ARTWORK", 1)
+    b.inner:SetPoint("TOPLEFT", b.box, "TOPLEFT", 1, -1)
+    b.inner:SetPoint("BOTTOMRIGHT", b.box, "BOTTOMRIGHT", -1, 1)
+    b.mark = Parts.Solid(b, ui.accent, "ARTWORK", 2)
+    b.mark:SetPoint("TOPLEFT", b.box, "TOPLEFT", 4, -4)
+    b.mark:SetPoint("BOTTOMRIGHT", b.box, "BOTTOMRIGHT", -4, 4)
+    b.label = ui.Text(b, ui.bodyFont, 13, ui.text)
+    b.label:SetPoint("LEFT", b.box, "RIGHT", 8, 0)
+    b.label:SetText(label)
+    b:SetScript("OnClick", onClick)
+    function b:SetState(checked, enabled, color)
+        self.mark:SetShown(checked and true or false)
+        self:SetEnabled(enabled ~= false)
+        local c = (enabled == false) and ui.muted or (color or ui.text)
+        self.label:SetTextColor(c[1], c[2], c[3])
+        self:SetAlpha(enabled == false and 0.6 or 1)
+    end
+    return b
+end
 function Parts.CreateTitlesPane(parent, ui)
     local pane = CreateFrame("Frame", nil, parent)
     pane:SetAllPoints(parent)
@@ -608,6 +638,8 @@ local function RegisterEvents()
     events:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
     events:RegisterEvent("MAJOR_FACTION_UNLOCKED")
     events:RegisterEvent("QUEST_LOG_UPDATE")
+    events:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+    events:RegisterEvent("ACCOUNT_CHARACTER_CURRENCY_DATA_RECEIVED")
 end
 local refreshQueued = false
 events:SetScript("OnEvent", function(_, event)

@@ -2,6 +2,7 @@ local ADDON_NAME, ns = ...
 local Parts = ns.WindowParts
 local Rep = {}
 ns.WindowReputation = Rep
+Rep.title = ns.L.WINDOW_TAB_REPUTATION or "Reputation"
 local ROW = 30
 local KIND_STANDARD, KIND_FRIEND, KIND_MAJOR = 1, 2, 3
 local function KindOf(data)
@@ -120,31 +121,6 @@ local function Solid(parent, color, layer, sublevel)
     t:SetColorTexture(color[1], color[2], color[3], color[4] or 1)
     return t
 end
-local function CreateCheck(parent, ui, label, onClick)
-    local b = CreateFrame("Button", nil, parent)
-    b:SetSize(220, 22)
-    b.box = Solid(b, ui.boxEdge or ui.muted, "ARTWORK")
-    b.box:SetSize(16, 16)
-    b.box:SetPoint("LEFT")
-    b.inner = Solid(b, ui.boxFill or { 0, 0, 0, 0.6 }, "ARTWORK", 1)
-    b.inner:SetPoint("TOPLEFT", b.box, "TOPLEFT", 1, -1)
-    b.inner:SetPoint("BOTTOMRIGHT", b.box, "BOTTOMRIGHT", -1, 1)
-    b.mark = Solid(b, ui.accent, "ARTWORK", 2)
-    b.mark:SetPoint("TOPLEFT", b.box, "TOPLEFT", 4, -4)
-    b.mark:SetPoint("BOTTOMRIGHT", b.box, "BOTTOMRIGHT", -4, 4)
-    b.label = ui.Text(b, ui.bodyFont, 13, ui.text)
-    b.label:SetPoint("LEFT", b.box, "RIGHT", 8, 0)
-    b.label:SetText(label)
-    b:SetScript("OnClick", onClick)
-    function b:SetState(checked, enabled, color)
-        self.mark:SetShown(checked and true or false)
-        self:SetEnabled(enabled ~= false)
-        local c = (enabled == false) and ui.muted or (color or ui.text)
-        self.label:SetTextColor(c[1], c[2], c[3])
-        self:SetAlpha(enabled == false and 0.6 or 1)
-    end
-    return b
-end
 function Rep.Create(parent, ui)
     local rep = CreateFrame("Frame", nil, parent)
     rep:EnableMouse(true)
@@ -176,7 +152,7 @@ function Rep.Create(parent, ui)
         rep.filters[#rep.filters + 1] = b
         previous = b
     end
-    rep.legacy = CreateCheck(filterBar, ui, REPUTATION_CHECKBOX_SHOW_LEGACY_REPUTATIONS or "Show Legacy Reputations", function()
+    rep.legacy = Parts.CreateCheck(filterBar, ui, REPUTATION_CHECKBOX_SHOW_LEGACY_REPUTATIONS or "Show Legacy Reputations", function()
         C_Reputation.SetLegacyReputationsShown(not C_Reputation.AreLegacyReputationsShown())
         rep:Refresh()
     end)
@@ -313,18 +289,18 @@ function Rep.Create(parent, ui)
     rep.detail.desc:SetJustifyH("LEFT")
     rep.detail.desc:SetJustifyV("TOP")
     rep.detail.desc:SetHeight(180)
-    rep.detail.atWar = CreateCheck(rep.detail, ui, AT_WAR or "At War", function()
+    rep.detail.atWar = Parts.CreateCheck(rep.detail, ui, AT_WAR or "At War", function()
         C_Reputation.ToggleFactionAtWar(C_Reputation.GetSelectedFaction())
         rep:Refresh()
     end)
     rep.detail.atWar:SetPoint("TOPLEFT", rep.detail.desc, "BOTTOMLEFT", 0, -10)
-    rep.detail.inactive = CreateCheck(rep.detail, ui, MOVE_TO_INACTIVE or "Inactive", function()
+    rep.detail.inactive = Parts.CreateCheck(rep.detail, ui, MOVE_TO_INACTIVE or "Inactive", function()
         local index = C_Reputation.GetSelectedFaction()
         C_Reputation.SetFactionActive(index, not C_Reputation.IsFactionActive(index))
         rep:Refresh()
     end)
     rep.detail.inactive:SetPoint("TOPLEFT", rep.detail.atWar, "BOTTOMLEFT", 0, -6)
-    rep.detail.watch = CreateCheck(rep.detail, ui, SHOW_FACTION_ON_MAINSCREEN or "Show as Experience Bar", function(self)
+    rep.detail.watch = Parts.CreateCheck(rep.detail, ui, SHOW_FACTION_ON_MAINSCREEN or "Show as Experience Bar", function(self)
         local index = C_Reputation.GetSelectedFaction()
         local data = C_Reputation.GetFactionDataByIndex(index)
         C_Reputation.SetWatchedFactionByIndex((data and not data.isWatched) and index or 0)
