@@ -277,7 +277,7 @@ local function GetBadge(slot)
     badge.flagMask:SetTexture("Interface\\Masks\\CircleMaskScalable", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     badge.flag:AddMaskTexture(badge.flagMask)
     local side = DETAIL_RIGHT[slot] and "right" or "left"
-    if WEAPON_SLOTS[slot] and rawget(_G, SLOT_BUTTONS[18]) then
+    if slot == 17 and rawget(_G, SLOT_BUTTONS[18]) then
         side = "top"
     end
     badge.detail = CreateDetail(badge, button, side, WEAPON_SLOTS[slot] and WEAPON_DETAIL_WIDTH or DETAIL_WIDTH)
