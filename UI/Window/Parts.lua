@@ -601,6 +601,10 @@ local function RegisterEvents()
     events:RegisterEvent("PLAYER_AVG_ITEM_LEVEL_UPDATE")
     events:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     events:RegisterUnitEvent("UNIT_MODEL_CHANGED", "player")
+    events:RegisterEvent("UPDATE_FACTION")
+    events:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
+    events:RegisterEvent("MAJOR_FACTION_UNLOCKED")
+    events:RegisterEvent("QUEST_LOG_UPDATE")
 end
 local refreshQueued = false
 events:SetScript("OnEvent", function(_, event)

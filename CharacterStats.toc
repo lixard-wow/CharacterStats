@@ -52,6 +52,7 @@ UI\CharacterButton.lua
 UI\CharacterWidth.lua
 UI\Window\Host.lua
 UI\Window\Parts.lua
+UI\Window\Reputation.lua
 UI\Window\LookForged.lua
 UI\Window\LookArcane.lua
 UI\Window\LookLedger.lua

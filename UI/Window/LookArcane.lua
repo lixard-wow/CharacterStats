@@ -366,6 +366,41 @@ local function Create()
     BuildStage(f)
     BuildStrip(f)
     BuildPanel(f)
+    local rep = ns.WindowReputation.Create(f, {
+        Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.gold,
+        bodyFont = "Barlow-Regular.ttf", boldFont = "Barlow-SemiBold.ttf", headerFont = "BarlowCondensed-Bold.ttf",
+        barTrack = C.track, rowFill = { 0.090, 0.075, 0.227, 0.6 }, barWidth = 220, boxEdge = C.cardEdge,
+        boxFill = C.card,
+    })
+    rep:SetPoint("TOPLEFT", 1, -(HEADER + 1))
+    rep:SetPoint("BOTTOMRIGHT", -1, 1)
+    rep:SetFrameLevel(f:GetFrameLevel() + 50)
+    local repBg = rep:CreateTexture(nil, "BACKGROUND")
+    repBg:SetAllPoints()
+    repBg:SetColorTexture(C.ground[1], C.ground[2], C.ground[3])
+    local detailBox = CreateFrame("Frame", nil, rep)
+    detailBox:SetPoint("TOPRIGHT", -14, -14)
+    detailBox:SetPoint("BOTTOMRIGHT", -14, 14)
+    detailBox:SetWidth(280)
+    RoundBox(detailBox, C.card, C.violet, 10)
+    rep.list:SetPoint("TOPLEFT", 18, -16)
+    rep.list:SetPoint("BOTTOMRIGHT", -310, 14)
+    rep.detail:SetPoint("TOPLEFT", detailBox, "TOPLEFT", 14, -14)
+    rep.detail:SetPoint("BOTTOMRIGHT", detailBox, "BOTTOMRIGHT", -12, 12)
+    rep:Hide()
+    f.rep = rep
+    f.activeTab = "PaperDollFrame"
+    function f:ShowTab(sub)
+        self.activeTab = sub
+        self.rep:SetShown(sub == "ReputationFrame")
+        for key, b in pairs(self.tabs) do b:SetSelected(key == sub) end
+        self.titlesButton:SetShown(sub == "PaperDollFrame")
+        self.setsButton:SetShown(sub == "PaperDollFrame")
+        if sub ~= "PaperDollFrame" and self.panel:IsShown() then
+            self.panel:Hide()
+            self.activePanel = nil
+        end
+    end
     function f:TogglePanel(key)
         if self.panel:IsShown() and self.activePanel == key then
             self.panel:Hide()
@@ -413,6 +448,10 @@ local function Create()
             self.ilvlBags:Show()
         else
             self.ilvlBags:Hide()
+        end
+        if self.activeTab == "ReputationFrame" then
+            self.rep:Refresh()
+            return
         end
         Parts.RefreshSlots(self)
         self.model:Load()

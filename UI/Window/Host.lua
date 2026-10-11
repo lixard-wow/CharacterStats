@@ -5,7 +5,7 @@ local looks = {}
 local lookOrder = {}
 local frames = {}
 local hooked = false
-local OUR_SUBFRAMES = { PaperDollFrame = true }
+local OUR_SUBFRAMES = { PaperDollFrame = true, ReputationFrame = true }
 function Window.RegisterLook(id, def)
     if not looks[id] then
         lookOrder[#lookOrder + 1] = id
@@ -88,6 +88,9 @@ function Window.Sync()
     frame:ClearAllPoints()
     frame:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 0, 0)
     frame:Show()
+    if frame.ShowTab then
+        frame:ShowTab(CharacterFrame.activeSubframe)
+    end
     if frame.Refresh then
         frame:Refresh()
     end

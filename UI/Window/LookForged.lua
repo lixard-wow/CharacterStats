@@ -240,6 +240,36 @@ local function Create()
     Fill(body, { 0.082, 0.071, 0.059 }):SetAllPoints()
     BuildStage(f, body)
     BuildGear(f, body)
+    local rep = ns.WindowReputation.Create(f, {
+        Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.goldBright,
+        bodyFont = "SourceSans3-Regular.ttf", boldFont = "SourceSans3-Bold.ttf", headerFont = "Cinzel-Bold.ttf",
+        barTrack = { 0.05, 0.045, 0.04, 1 }, rowFill = { 1, 1, 1, 0.03 }, barWidth = 210, boxEdge = C.line,
+    })
+    rep:SetPoint("TOPLEFT", RAIL + 2, -(HEADER + 2))
+    rep:SetPoint("BOTTOMRIGHT", -2, 2)
+    rep:SetFrameLevel(f:GetFrameLevel() + 40)
+    Fill(rep, { 0.082, 0.071, 0.059 }):SetAllPoints()
+    local detailBg = Fill(rep, C.aside, "BACKGROUND", 1)
+    detailBg:SetPoint("TOPRIGHT")
+    detailBg:SetPoint("BOTTOMRIGHT")
+    detailBg:SetWidth(ASIDE)
+    local detailLine = Fill(rep, C.line, "BORDER")
+    detailLine:SetPoint("TOPRIGHT", -ASIDE, 0)
+    detailLine:SetPoint("BOTTOMRIGHT", -ASIDE, 0)
+    detailLine:SetWidth(1)
+    rep.list:SetPoint("TOPLEFT", 14, -12)
+    rep.list:SetPoint("BOTTOMRIGHT", -(ASIDE + 12), 10)
+    rep.detail:SetPoint("TOPRIGHT", -14, -14)
+    rep.detail:SetPoint("BOTTOMRIGHT", -14, 10)
+    rep.detail:SetWidth(ASIDE - 28)
+    rep:Hide()
+    f.rep = rep
+    f.activeTab = "PaperDollFrame"
+    function f:ShowTab(sub)
+        self.activeTab = sub
+        self.rep:SetShown(sub == "ReputationFrame")
+        for key, b in pairs(self.tabs) do b:SetSelected(key == sub) end
+    end
     function f:ShowPane(key)
         self.activePane = key
         for paneKey, pane in pairs(self.panes) do
@@ -268,6 +298,10 @@ local function Create()
             self.ilvlBags:Show()
         else
             self.ilvlBags:Hide()
+        end
+        if self.activeTab == "ReputationFrame" then
+            self.rep:Refresh()
+            return
         end
         Parts.RefreshSlots(self)
         self.model:Load()
