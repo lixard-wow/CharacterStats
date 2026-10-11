@@ -201,6 +201,14 @@ function Parts.UpdateSlot(b, entry, db)
     else
         b.cooldown:Clear()
     end
+    if style.plain then
+        b.ilvl:Hide()
+        b.rank:Hide()
+        for _, gem in ipairs(b.gems) do gem:Hide() end
+        b.enchantIcon:Hide()
+        b.enchantText:SetText("")
+        return
+    end
     local tr, tg, tb = 1, 1, 1
     if entry and ns.GearBadges then
         tr, tg, tb = ns.GearBadges.GetTrackColor(db, entry.track)
@@ -356,6 +364,15 @@ function Parts.GetHeaderInfo()
     info.equipped = equipped or overall or 0
     info.overall = overall or info.equipped
     return info
+end
+function Parts.SlotLabel(slot)
+    return SlotLabel(slot)
+end
+function Parts.ItemName(slot)
+    local link = GetInventoryItemLink("player", slot)
+    if not link then return nil end
+    local name = link:match("%[(.-)%]")
+    return name
 end
 function Parts.FormatItemLevel(value)
     return string.format("%.2f", value or 0)
