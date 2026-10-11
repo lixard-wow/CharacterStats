@@ -53,6 +53,7 @@ UI\CharacterWidth.lua
 UI\Window\Host.lua
 UI\Window\Parts.lua
 UI\Window\LookForged.lua
+UI\Window\LookArcane.lua
 UI\Styles\Paperdoll.lua
 UI\Styles\Ledger.lua
 UI\Styles\Meters.lua

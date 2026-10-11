@@ -78,9 +78,17 @@ function Parts.CreateSlot(parent, slot, style)
     b.icon:SetPoint("TOPLEFT", 2, -2)
     b.icon:SetPoint("BOTTOMRIGHT", -2, 2)
     b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    if style.glow then
+        b.glow = b:CreateTexture(nil, "BACKGROUND", nil, -2)
+        b.glow:SetTexture(ns.Theme.ART .. "glow_radial")
+        b.glow:SetPoint("TOPLEFT", -14, 14)
+        b.glow:SetPoint("BOTTOMRIGHT", 14, -14)
+        b.glow:SetVertexColor(style.glow[1], style.glow[2], style.glow[3], style.glow[4] or 0.5)
+        b.glow:SetBlendMode("ADD")
+    end
     b.border = b:CreateTexture(nil, "BORDER")
     b.border:SetAllPoints()
-    b.border:SetColorTexture(1, 1, 1, 1)
+    ns.Theme.Shape(b.border, style.radius)
     b.highlight = b:CreateTexture(nil, "HIGHLIGHT")
     b.highlight:SetPoint("TOPLEFT", 2, -2)
     b.highlight:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -184,7 +192,9 @@ function Parts.UpdateSlot(b, entry, db)
     elseif style.emptyBorder then
         r, g, bl = style.emptyBorder[1], style.emptyBorder[2], style.emptyBorder[3]
     end
-    b.border:SetColorTexture(r, g, bl, texture and 1 or 0.6)
+    b.border:SetVertexColor(r, g, bl, texture and 1 or 0.6)
+    local glow = rawget(b, "glow")
+    if glow then glow:SetShown(texture ~= nil) end
     local start, duration, enable = GetInventoryItemCooldown("player", slot)
     if start and duration and duration > 0 and enable and enable ~= 0 then
         b.cooldown:SetCooldown(start, duration)
@@ -441,6 +451,106 @@ function Parts.SaveSet(id, name)
 end
 function Parts.DeleteSet(id, name)
     if id then StaticPopup_Show("CHARACTERSTATS_DELETE_EQUIPMENT_SET", name, nil, id) end
+end
+function Parts.CreateTitlesPane(parent, ui)
+    local pane = CreateFrame("Frame", nil, parent)
+    pane:SetAllPoints(parent)
+    pane.list = Parts.CreateList(pane, 22, function(listParent)
+        local row = CreateFrame("Button", nil, listParent)
+        row.hl = row:CreateTexture(nil, "HIGHLIGHT")
+        row.hl:SetAllPoints()
+        row.hl:SetColorTexture(1, 1, 1, 0.06)
+        row.text = ui.Text(row, ui.bodyFont, 13, ui.text)
+        row.text:SetPoint("LEFT", 8, 0)
+        row.text:SetPoint("RIGHT", -8, 0)
+        row.text:SetJustifyH("LEFT")
+        row:SetScript("OnClick", function(self) SetCurrentTitle(self.titleId) end)
+        return row
+    end, function(row, item)
+        row.titleId = item.id
+        row.text:SetText(item.name)
+        local current = GetCurrentTitle()
+        local selected = item.id == current or (item.id == -1 and (current == nil or current <= 0))
+        local c = selected and ui.accent or ui.text
+        row.text:SetTextColor(c[1], c[2], c[3])
+    end)
+    function pane:Refresh() self.list:SetData(Parts.GetTitles()) end
+    return pane
+end
+function Parts.CreateSetsPane(parent, ui)
+    local pane = CreateFrame("Frame", nil, parent)
+    pane:SetAllPoints(parent)
+    local listHolder = CreateFrame("Frame", nil, pane)
+    listHolder:SetPoint("TOPLEFT")
+    listHolder:SetPoint("BOTTOMRIGHT", 0, 70)
+    pane.list = Parts.CreateList(listHolder, 34, function(listParent)
+        local row = CreateFrame("Button", nil, listParent)
+        row:RegisterForDrag("LeftButton")
+        row.hl = row:CreateTexture(nil, "HIGHLIGHT")
+        row.hl:SetAllPoints()
+        row.hl:SetColorTexture(1, 1, 1, 0.06)
+        row.sel = row:CreateTexture(nil, "BACKGROUND")
+        row.sel:SetAllPoints()
+        row.sel:SetColorTexture(ui.accent[1], ui.accent[2], ui.accent[3], 0.18)
+        row.icon = row:CreateTexture(nil, "ARTWORK")
+        row.icon:SetSize(26, 26)
+        row.icon:SetPoint("LEFT", 6, 0)
+        row.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        row.text = ui.Text(row, ui.boldFont, 13, ui.text)
+        row.text:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 8, 0)
+        row.sub = ui.Text(row, ui.bodyFont, 11, ui.muted)
+        row.sub:SetPoint("BOTTOMLEFT", row.icon, "BOTTOMRIGHT", 8, 0)
+        row:SetScript("OnClick", function(self)
+            pane.selected = self.setId
+            pane.selectedName = self.setName
+            pane:Refresh()
+        end)
+        row:SetScript("OnDoubleClick", function(self) Parts.EquipSet(self.setId) end)
+        row:SetScript("OnDragStart", function(self) C_EquipmentSet.PickupEquipmentSet(self.setId) end)
+        row:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetEquipmentSet(self.setId)
+            GameTooltip:Show()
+        end)
+        row:SetScript("OnLeave", GameTooltip_Hide)
+        return row
+    end, function(row, item)
+        row.setId = item.id
+        row.setName = item.name
+        row.icon:SetTexture(item.icon)
+        row.text:SetText(item.name)
+        if item.missing > 0 then
+            row.sub:SetText(string.format(ns.L.WINDOW_SET_MISSING or "%d missing", item.missing))
+            row.sub:SetTextColor(0.91, 0.42, 0.32)
+        else
+            row.sub:SetText(item.equipped and (ns.L.WINDOW_SET_EQUIPPED or "Equipped") or "")
+            row.sub:SetTextColor(ui.muted[1], ui.muted[2], ui.muted[3])
+        end
+        row.sel:SetShown(pane.selected == item.id)
+    end)
+    local width = ui.buttonWidth or 110
+    local equip = ui.Button(pane, width, 26, ns.L.WINDOW_SET_EQUIP or "Equip")
+    equip:SetPoint("BOTTOMLEFT", pane, "BOTTOMLEFT", 6, 38)
+    equip:SetScript("OnClick", function() Parts.EquipSet(pane.selected) end)
+    local save = ui.Button(pane, width, 26, ns.L.WINDOW_SET_SAVE or "Save")
+    save:SetPoint("LEFT", equip, "RIGHT", 6, 0)
+    save:SetScript("OnClick", function() Parts.SaveSet(pane.selected, pane.selectedName) end)
+    local new = ui.Button(pane, width, 26, ns.L.WINDOW_SET_NEW or "New Set")
+    new:SetPoint("TOPLEFT", equip, "BOTTOMLEFT", 0, -6)
+    new:SetScript("OnClick", Parts.NewSet)
+    local delete = ui.Button(pane, width, 26, ns.L.WINDOW_SET_DELETE or "Delete")
+    delete:SetPoint("LEFT", new, "RIGHT", 6, 0)
+    delete:SetScript("OnClick", function() Parts.DeleteSet(pane.selected, pane.selectedName) end)
+    function pane:Refresh()
+        local data = Parts.GetEquipmentSets()
+        local found = false
+        for _, item in ipairs(data) do
+            if item.id == self.selected then found = true end
+        end
+        if not found then self.selected, self.selectedName = nil, nil end
+        self.list:SetData(data)
+    end
+    return pane
 end
 function Parts.CreateList(parent, rowHeight, buildRow, fillRow)
     local scroll = ns.ConfigWidgets.CreateScrollFrame(parent)

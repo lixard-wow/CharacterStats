@@ -214,98 +214,12 @@ local function BuildAside(f)
     content:SetPoint("BOTTOMRIGHT", aside, "BOTTOMRIGHT", -4, 6)
     f.panes = {}
     f.panes.stats = Parts.CreateStats(content, { bars = true, gearSummary = true })
-    local titles = CreateFrame("Frame", nil, content)
-    titles:SetAllPoints(content)
-    titles.list = Parts.CreateList(titles, 22, function(parent)
-        local row = CreateFrame("Button", nil, parent)
-        row.hl = Fill(row, { 1, 1, 1, 0.06 }, "HIGHLIGHT")
-        row.hl:SetAllPoints()
-        row.text = Text(row, "SourceSans3-Regular.ttf", 13, C.text)
-        row.text:SetPoint("LEFT", 8, 0)
-        row.text:SetPoint("RIGHT", -8, 0)
-        row.text:SetJustifyH("LEFT")
-        row:SetScript("OnClick", function(self) SetCurrentTitle(self.titleId) end)
-        return row
-    end, function(row, item)
-        row.titleId = item.id
-        row.text:SetText(item.name)
-        local current = GetCurrentTitle()
-        local selected = item.id == current or (item.id == -1 and (current == nil or current <= 0))
-        local c = selected and C.goldBright or C.text
-        row.text:SetTextColor(c[1], c[2], c[3])
-    end)
-    function titles:Refresh() self.list:SetData(Parts.GetTitles()) end
-    f.panes.titles = titles
-    local sets = CreateFrame("Frame", nil, content)
-    sets:SetAllPoints(content)
-    local listHolder = CreateFrame("Frame", nil, sets)
-    listHolder:SetPoint("TOPLEFT")
-    listHolder:SetPoint("BOTTOMRIGHT", 0, 70)
-    sets.list = Parts.CreateList(listHolder, 34, function(parent)
-        local row = CreateFrame("Button", nil, parent)
-        row:RegisterForDrag("LeftButton")
-        row.hl = Fill(row, { 1, 1, 1, 0.06 }, "HIGHLIGHT")
-        row.hl:SetAllPoints()
-        row.sel = Fill(row, { C.gold[1], C.gold[2], C.gold[3], 0.18 })
-        row.sel:SetAllPoints()
-        row.icon = row:CreateTexture(nil, "ARTWORK")
-        row.icon:SetSize(26, 26)
-        row.icon:SetPoint("LEFT", 6, 0)
-        row.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-        row.text = Text(row, "SourceSans3-Bold.ttf", 13, C.text)
-        row.text:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 8, 0)
-        row.sub = Text(row, "SourceSans3-Regular.ttf", 11, C.muted)
-        row.sub:SetPoint("BOTTOMLEFT", row.icon, "BOTTOMRIGHT", 8, 0)
-        row:SetScript("OnClick", function(self)
-            sets.selected = self.setId
-            sets.selectedName = self.setName
-            sets:Refresh()
-        end)
-        row:SetScript("OnDoubleClick", function(self) Parts.EquipSet(self.setId) end)
-        row:SetScript("OnDragStart", function(self) C_EquipmentSet.PickupEquipmentSet(self.setId) end)
-        row:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetEquipmentSet(self.setId)
-            GameTooltip:Show()
-        end)
-        row:SetScript("OnLeave", GameTooltip_Hide)
-        return row
-    end, function(row, item)
-        row.setId = item.id
-        row.setName = item.name
-        row.icon:SetTexture(item.icon)
-        row.text:SetText(item.name)
-        if item.missing > 0 then
-            row.sub:SetText(string.format(ns.L.WINDOW_SET_MISSING or "%d missing", item.missing))
-            row.sub:SetTextColor(0.91, 0.42, 0.32)
-        else
-            row.sub:SetText(item.equipped and (ns.L.WINDOW_SET_EQUIPPED or "Equipped") or "")
-            row.sub:SetTextColor(C.muted[1], C.muted[2], C.muted[3])
-        end
-        row.sel:SetShown(sets.selected == item.id)
-    end)
-    local equip = Button(sets, 110, 26, ns.L.WINDOW_SET_EQUIP or EQUIPSET_EQUIP or "Equip")
-    equip:SetPoint("BOTTOMLEFT", sets, "BOTTOMLEFT", 6, 38)
-    equip:SetScript("OnClick", function() Parts.EquipSet(sets.selected) end)
-    local save = Button(sets, 110, 26, ns.L.WINDOW_SET_SAVE or SAVE or "Save")
-    save:SetPoint("LEFT", equip, "RIGHT", 6, 0)
-    save:SetScript("OnClick", function() Parts.SaveSet(sets.selected, sets.selectedName) end)
-    local new = Button(sets, 110, 26, ns.L.WINDOW_SET_NEW or "New Set")
-    new:SetPoint("TOPLEFT", equip, "BOTTOMLEFT", 0, -6)
-    new:SetScript("OnClick", Parts.NewSet)
-    local delete = Button(sets, 110, 26, ns.L.WINDOW_SET_DELETE or DELETE or "Delete")
-    delete:SetPoint("LEFT", new, "RIGHT", 6, 0)
-    delete:SetScript("OnClick", function() Parts.DeleteSet(sets.selected, sets.selectedName) end)
-    function sets:Refresh()
-        local data = Parts.GetEquipmentSets()
-        local found = false
-        for _, item in ipairs(data) do
-            if item.id == self.selected then found = true end
-        end
-        if not found then self.selected, self.selectedName = nil, nil end
-        self.list:SetData(data)
-    end
-    f.panes.sets = sets
+    local ui = {
+        Text = Text, Button = Button, text = C.text, muted = C.muted, accent = C.goldBright,
+        bodyFont = "SourceSans3-Regular.ttf", boldFont = "SourceSans3-Bold.ttf",
+    }
+    f.panes.titles = Parts.CreateTitlesPane(content, ui)
+    f.panes.sets = Parts.CreateSetsPane(content, ui)
     f.activePane = "stats"
 end
 local function Create()
