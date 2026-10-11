@@ -88,7 +88,8 @@ local function BuildEntries(L)
         },
         {
             kind = "slider", key = "characterFrameExtraWidth", label = L.LABEL_CHARACTER_WIDTH or "Extra Character Frame Width",
-            min = 0, max = 120, step = 5, retailOnly = true,
+            min = 0, max = 120, step = 5,
+            available = function() return CS.CharacterWidth and CS.CharacterWidth.IsSupported() end,
             formatValue = function(v) return string.format("%.0f %s", v, L.UNIT_PX or "px") end,
             onChange = function()
                 if CS.CharacterWidth then CS.CharacterWidth.Apply() end

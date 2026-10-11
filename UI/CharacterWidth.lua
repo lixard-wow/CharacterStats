@@ -3,13 +3,17 @@ local CharacterWidth = {}
 ns.CharacterWidth = CharacterWidth
 local MODEL_X, MODEL_Y = 52, -66
 local BACKGROUND_LEFT_WIDTH = 212
-local WEAPON_X, WEAPON_Y = 130, 16
+local WEAPON_Y = 16
 local applied = 0
 local layoutExtra = 0
 local hooked = false
+function CharacterWidth.IsSupported()
+    if ns.IS_RETAIL then return true end
+    return not (ns.BlizzardStats and ns.BlizzardStats.IsAvailable())
+end
 local function GetExtra()
     local db = ns.db
-    if not db or ns.IS_CLASSIC then return 0 end
+    if not db or not CharacterWidth.IsSupported() then return 0 end
     if CharacterFrame.activeSubframe ~= "PaperDollFrame" then return 0 end
     if ns.Integrations and ns.Integrations.CharacterFrameTaken() then return 0 end
     return math.max(0, math.floor(db.characterFrameExtraWidth or 50))
@@ -34,7 +38,7 @@ local function Layout(extra)
     local weapon = rawget(_G, "CharacterMainHandSlot")
     if weapon then
         weapon:ClearAllPoints()
-        weapon:SetPoint("BOTTOMLEFT", weapon:GetParent(), "BOTTOMLEFT", WEAPON_X + math.floor(extra / 2), WEAPON_Y)
+        weapon:SetPoint("BOTTOMLEFT", weapon:GetParent(), "BOTTOMLEFT", (ns.IS_RETAIL and 130 or 106) + math.floor(extra / 2), WEAPON_Y)
     end
 end
 local function OnUpdateSize(frame)
@@ -47,7 +51,7 @@ local function OnUpdateSize(frame)
     Layout(extra)
 end
 function CharacterWidth.Apply()
-    if ns.IS_CLASSIC or not CharacterFrame or not CharacterFrame.UpdateSize or not CharacterFrame.Inset then return end
+    if not CharacterWidth.IsSupported() or not CharacterFrame or not CharacterFrame.UpdateSize or not CharacterFrame.Inset then return end
     if not hooked then
         hooked = true
         hooksecurefunc(CharacterFrame, "UpdateSize", OnUpdateSize)
