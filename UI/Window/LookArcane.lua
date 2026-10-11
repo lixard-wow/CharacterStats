@@ -158,7 +158,7 @@ local function BuildStage(f)
             local b = Parts.CreateSlot(stage, slot, {
                 size = SLOT, side = side, radius = 4, glow = { 0.5, 0.35, 1, 0.35 },
                 numberFont = "Barlow-SemiBold.ttf", textFont = "Barlow-Regular.ttf",
-                ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.cardEdge,
+                ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.cardEdge, flyoutEdge = C.violet, flyoutFill = { 0.067, 0.055, 0.165 },
                 missingColor = { 1, 0.48, 0.42 },
             })
             local y = -14 - (i - 1) * (SLOT + SLOT_GAP)
@@ -176,7 +176,7 @@ local function BuildStage(f)
         local b = Parts.CreateSlot(stage, slot, {
             size = SLOT + 4, side = i == 1 and "left" or "right", radius = 4, glow = { 0.5, 0.35, 1, 0.35 },
             numberFont = "Barlow-SemiBold.ttf", textFont = "Barlow-Regular.ttf",
-            ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.cardEdge, missingColor = { 1, 0.48, 0.42 },
+            ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.cardEdge, flyoutEdge = C.violet, flyoutFill = { 0.067, 0.055, 0.165 }, missingColor = { 1, 0.48, 0.42 },
         })
         b:SetPoint("BOTTOM", stage, "BOTTOM", (i == 1 and -1 or 1) * (SLOT / 2 + 6), 10)
         f.slotButtons[#f.slotButtons + 1] = b

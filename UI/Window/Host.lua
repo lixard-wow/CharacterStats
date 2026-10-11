@@ -54,6 +54,7 @@ local function GetFrame(id)
     return frame
 end
 local function HideFrames()
+    if ns.WindowFlyout then ns.WindowFlyout.Hide() end
     local wasShown = false
     for _, frame in pairs(frames) do
         if frame:IsShown() then

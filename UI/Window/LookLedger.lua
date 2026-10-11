@@ -137,7 +137,7 @@ local function BuildGearPage(f, page)
         local dots = Rule(row, C.dots)
         dots:SetPoint("BOTTOMLEFT")
         dots:SetPoint("BOTTOMRIGHT")
-        local b = Parts.CreateSlot(row, slot, { size = ICON + 2, plain = true, emptyBorder = C.rule })
+        local b = Parts.CreateSlot(row, slot, { size = ICON + 2, plain = true, emptyBorder = C.rule, flyoutEdge = C.brass, flyoutFill = { 0.231, 0.141, 0.078 } })
         b:SetPoint("LEFT", row, "LEFT", 0, 0)
         f.slotButtons[#f.slotButtons + 1] = b
         row.ilvl = Text(row, SANS_BOLD, 15, C.ink)

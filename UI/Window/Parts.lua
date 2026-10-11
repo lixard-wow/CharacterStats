@@ -142,8 +142,14 @@ function Parts.CreateSlot(parent, slot, style)
         b.enchantText:SetPoint("BOTTOM" .. near, b, "BOTTOM" .. far, outward * 6, 3)
     end
     b.enchantIcon:Hide()
-    b:SetScript("OnEnter", ShowSlotTooltip)
-    b:SetScript("OnLeave", GameTooltip_Hide)
+    b:SetScript("OnEnter", function(self)
+        ShowSlotTooltip(self)
+        if ns.WindowFlyout then ns.WindowFlyout.OnSlotEnter(self) end
+    end)
+    b:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+        if ns.WindowFlyout then ns.WindowFlyout.OnSlotLeave(self) end
+    end)
     b:SetScript("OnDragStart", function(self) PickupInventoryItem(self.slot) end)
     b:SetScript("OnReceiveDrag", function(self) PickupInventoryItem(self.slot) end)
     b:SetScript("OnClick", OnSlotClick)

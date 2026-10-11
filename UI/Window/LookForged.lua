@@ -141,7 +141,7 @@ local function BuildGear(f, body)
         for i, slot in ipairs(list) do
             local b = Parts.CreateSlot(body, slot, {
                 size = SLOT, side = side, numberFont = "SourceSans3-Bold.ttf", textFont = "SourceSans3-Regular.ttf",
-                ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.line,
+                ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.line, flyoutEdge = C.gold, flyoutFill = { 0.07, 0.06, 0.05 },
             })
             local y = -12 - (i - 1) * (SLOT + SLOT_GAP)
             if side == "right" then
@@ -157,7 +157,7 @@ local function BuildGear(f, body)
     for i, slot in ipairs(Parts.WEAPONS) do
         local b = Parts.CreateSlot(body, slot, {
             size = SLOT + 4, side = i == 1 and "left" or "right", numberFont = "SourceSans3-Bold.ttf",
-            textFont = "SourceSans3-Regular.ttf", ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.line,
+            textFont = "SourceSans3-Regular.ttf", ilvlSize = 13, rankSize = 11, detailSize = 11, emptyBorder = C.line, flyoutEdge = C.gold, flyoutFill = { 0.07, 0.06, 0.05 },
         })
         b:SetPoint("BOTTOM", body, "BOTTOM", (i == 1 and -1 or 1) * (SLOT / 2 + 5), 48)
         f.slotButtons[#f.slotButtons + 1] = b
