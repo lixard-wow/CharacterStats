@@ -12,7 +12,7 @@ local function GetExtra()
     if not db or ns.IS_CLASSIC then return 0 end
     if CharacterFrame.activeSubframe ~= "PaperDollFrame" then return 0 end
     if ns.Integrations and ns.Integrations.CharacterFrameTaken() then return 0 end
-    return math.max(0, math.floor(db.characterFrameExtraWidth or 0))
+    return math.max(0, math.floor(db.characterFrameExtraWidth or 50))
 end
 local function Layout(extra)
     local frame = CharacterFrame

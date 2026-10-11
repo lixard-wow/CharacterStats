@@ -158,7 +158,7 @@ local PLACE_INSET = { top = -EDGE_INSET, middle = 0, bottom = EDGE_INSET }
 local PLACE_ROW = { bottom = 0, middle = 1, top = 2 }
 local PLACE_ORDER = { "top", "middle", "bottom" }
 local function ApplyLevelLayout(badge, db)
-    local size = db.gearLevelSize or 11
+    local size = db.gearLevelSize or 13
     local upgradeSize = db.gearUpgradeSize or 9
     local key = size .. ":" .. upgradeSize
     if badge.levelLayout == key then return end
@@ -218,7 +218,7 @@ local function LayoutSlot(badge, db)
     if upgradePlace == "under" then upgradePlace = "icon" end
     if badge.level:IsShown() then
         if levelPlace == "icon" then
-            PlaceOnIcon(badge.level, badge, db.gearLevelAnchor or "TOPRIGHT", db.gearLevelX, db.gearLevelY)
+            PlaceOnIcon(badge.level, badge, db.gearLevelAnchor or "TOP", db.gearLevelX, db.gearLevelY)
         else
             badge.level:SetJustifyH("LEFT")
             AddToChain(levelPlace, badge.level)
@@ -233,13 +233,13 @@ local function LayoutSlot(badge, db)
         end
     end
     if detail:IsShown() then
-        local gemPlace = db.gearGemPlace or "bottom"
+        local gemPlace = db.gearGemPlace or "top"
         for _, gem in ipairs(detail.gems) do
             if gem:IsShown() then
                 AddToChain(gemPlace, gem)
             end
         end
-        local enchantPlace = db.gearEnchantPlace or "top"
+        local enchantPlace = db.gearEnchantPlace or "bottom"
         if detail.enchantIcon:IsShown() then
             AddToChain(enchantPlace, detail.enchantIcon)
         elseif detail.enchant:GetText() ~= "" then
