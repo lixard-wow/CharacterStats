@@ -60,17 +60,12 @@ local function ShowGemTooltip(self)
 end
 function Parts.CreateSlot(parent, slot, style)
     local size = style.size or 42
-    local b = CreateFrame("Button", nil, parent, "SecureActionButtonTemplate")
+    local b = CreateFrame("Button", nil, parent)
     b.slot = slot
     b.style = style
     b:SetSize(size, size)
-    b:RegisterForClicks("AnyUp")
+    b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     b:RegisterForDrag("LeftButton")
-    b:SetAttribute("type2", "item")
-    b:SetAttribute("item2", tostring(slot))
-    b:SetAttribute("shift-type2", "")
-    b:SetAttribute("ctrl-type2", "")
-    b:SetAttribute("alt-type2", "")
     b.bg = b:CreateTexture(nil, "BACKGROUND")
     b.bg:SetAllPoints()
     b.bg:SetColorTexture(0, 0, 0, 0.6)
@@ -151,7 +146,7 @@ function Parts.CreateSlot(parent, slot, style)
     b:SetScript("OnLeave", GameTooltip_Hide)
     b:SetScript("OnDragStart", function(self) PickupInventoryItem(self.slot) end)
     b:SetScript("OnReceiveDrag", function(self) PickupInventoryItem(self.slot) end)
-    b:HookScript("OnClick", OnSlotClick)
+    b:SetScript("OnClick", OnSlotClick)
     slots[#slots + 1] = b
     return b
 end

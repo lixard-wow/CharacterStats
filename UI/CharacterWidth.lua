@@ -23,6 +23,7 @@ local function GetExtra()
     if not db or not CharacterWidth.IsSupported() then return 0 end
     if CharacterFrame.activeSubframe ~= "PaperDollFrame" then return 0 end
     if ns.Integrations and ns.Integrations.CharacterFrameTaken() then return 0 end
+    if ns.Window and ns.Window.IsEnabled() then return 0 end
     return math.max(0, math.floor(db.characterFrameExtraWidth or 50))
 end
 local function LayoutStandard(extra)
