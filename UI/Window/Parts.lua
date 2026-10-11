@@ -409,31 +409,6 @@ function Parts.GetEquipmentSets()
     table.sort(list, function(a, b) return a.name < b.name end)
     return list
 end
-StaticPopupDialogs["CHARACTERSTATS_NEW_EQUIPMENT_SET"] = {
-    text = EQUIPMENT_SET_NAME or "Equipment set name",
-    button1 = ACCEPT,
-    button2 = CANCEL,
-    hasEditBox = true,
-    maxLetters = 16,
-    OnAccept = function(self)
-        local box = self.editBox or self.EditBox
-        local name = box and strtrim(box:GetText() or "")
-        if name and name ~= "" then
-            local specIndex = GetSpecialization and GetSpecialization()
-            local icon = specIndex and select(4, GetSpecializationInfo(specIndex)) or 134400
-            C_EquipmentSet.CreateEquipmentSet(name, icon)
-        end
-    end,
-    EditBoxOnEnterPressed = function(self)
-        local parent = self:GetParent()
-        StaticPopupDialogs["CHARACTERSTATS_NEW_EQUIPMENT_SET"].OnAccept(parent)
-        parent:Hide()
-    end,
-    EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-}
 StaticPopupDialogs["CHARACTERSTATS_DELETE_EQUIPMENT_SET"] = {
     text = CONFIRM_DELETE_EQUIPMENT_SET or "Delete equipment set %s?",
     button1 = YES,
@@ -460,9 +435,6 @@ function Parts.EquipSet(id)
     if id and not InCombatLockdown() then
         C_EquipmentSet.UseEquipmentSet(id)
     end
-end
-function Parts.NewSet()
-    StaticPopup_Show("CHARACTERSTATS_NEW_EQUIPMENT_SET")
 end
 function Parts.SaveSet(id, name)
     if id then StaticPopup_Show("CHARACTERSTATS_SAVE_EQUIPMENT_SET", name, nil, id) end
@@ -548,6 +520,22 @@ function Parts.CreateSetsPane(parent, ui)
         row.text:SetPoint("TOPLEFT", row.icon, "TOPRIGHT", 8, 0)
         row.sub = ui.Text(row, ui.bodyFont, 11, ui.muted)
         row.sub:SetPoint("BOTTOMLEFT", row.icon, "BOTTOMRIGHT", 8, 0)
+        row.gear = CreateFrame("Button", nil, row)
+        row.gear:SetSize(20, 20)
+        row.gear:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+        row.gear.icon = row.gear:CreateTexture(nil, "ARTWORK")
+        row.gear.icon:SetAllPoints()
+        row.gear.icon:SetTexture(ns.Theme.ART .. "icon_gear")
+        row.gear.icon:SetVertexColor(ui.muted[1], ui.muted[2], ui.muted[3])
+        row.gear:SetScript("OnEnter", function(self) self.icon:SetVertexColor(ui.accent[1], ui.accent[2], ui.accent[3]) end)
+        row.gear:SetScript("OnLeave", function(self) self.icon:SetVertexColor(ui.muted[1], ui.muted[2], ui.muted[3]) end)
+        row.gear:SetScript("OnClick", function(self)
+            ns.WindowSetEditor.OpenMenu(self, row.setId, ui, function() pane:Refresh() end)
+        end)
+        row.spec = row:CreateTexture(nil, "ARTWORK")
+        row.spec:SetSize(16, 16)
+        row.spec:SetPoint("RIGHT", row.gear, "LEFT", -6, 0)
+        row.spec:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         row:SetScript("OnClick", function(self)
             pane.selected = self.setId
             pane.selectedName = self.setName
@@ -575,6 +563,9 @@ function Parts.CreateSetsPane(parent, ui)
             row.sub:SetTextColor(ui.muted[1], ui.muted[2], ui.muted[3])
         end
         row.sel:SetShown(pane.selected == item.id)
+        local specIcon = item.spec and select(4, GetSpecializationInfo(item.spec))
+        row.spec:SetShown(specIcon ~= nil)
+        if specIcon then row.spec:SetTexture(specIcon) end
     end)
     local width = ui.buttonWidth or 110
     local equip = ui.Button(pane, width, 26, ns.L.WINDOW_SET_EQUIP or "Equip")
@@ -585,7 +576,7 @@ function Parts.CreateSetsPane(parent, ui)
     save:SetScript("OnClick", function() Parts.SaveSet(pane.selected, pane.selectedName) end)
     local new = ui.Button(pane, width, 26, ns.L.WINDOW_SET_NEW or "New Set")
     new:SetPoint("TOPLEFT", equip, "BOTTOMLEFT", 0, -6)
-    new:SetScript("OnClick", Parts.NewSet)
+    new:SetScript("OnClick", function() ns.WindowSetEditor.Open(nil, ui) end)
     local delete = ui.Button(pane, width, 26, ns.L.WINDOW_SET_DELETE or "Delete")
     delete:SetPoint("LEFT", new, "RIGHT", 6, 0)
     delete:SetScript("OnClick", function() Parts.DeleteSet(pane.selected, pane.selectedName) end)
