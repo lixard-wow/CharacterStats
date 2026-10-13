@@ -1,4 +1,6 @@
 ﻿local ADDON_NAME, ns = ...
+local GetSpecialization = (C_SpecializationInfo and C_SpecializationInfo.GetSpecialization) or GetSpecialization
+local GetSpecializationInfo = (C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo) or GetSpecializationInfo
 local PROJECT_MAINLINE = 1
 local projectId = WOW_PROJECT_ID or PROJECT_MAINLINE
 ns.IS_RETAIL = (projectId == PROJECT_MAINLINE)
@@ -52,8 +54,8 @@ ns.IsStatAvailable = function(statId)
 end
 local function HasSpell(spellId)
     if not spellId then return false end
-    if C_Spell and C_Spell.IsSpellKnown then
-        local ok, known = pcall(C_Spell.IsSpellKnown, spellId)
+    if C_SpellBook and C_SpellBook.IsSpellKnown then
+        local ok, known = pcall(C_SpellBook.IsSpellKnown, spellId)
         if ok then return known == true end
     end
     if IsPlayerSpell then

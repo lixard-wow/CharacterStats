@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## Version 2.2.1
+
+### Changed
+
+- Updated for patch 12.1.5.
+- Spec detection, spell checks and sharing to chat or Battle.net whispers now use the current game functions, so they keep working when the game's old-function fallback setting is off.
+
 ## Version 2.2.0
 
 ### Added

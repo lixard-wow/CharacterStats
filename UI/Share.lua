@@ -4,7 +4,8 @@ ns.Share = Share
 local pcall = pcall
 local wipe = wipe
 local GetTime = GetTime
-local BNSendWhisper = BNSendWhisper
+local BNSendWhisper = (C_BattleNet and C_BattleNet.SendWhisper) or BNSendWhisper
+local SendChatMessage = (C_ChatInfo and C_ChatInfo.SendChatMessage) or SendChatMessage
 local sharePopup = nil
 local SHARE_INTERVAL = 0.5
 local shareSessions = {}
@@ -68,8 +69,7 @@ end
 local function EnqueueShareSession(kind, channel, target, statLines)
     if type(statLines) ~= "table" or #statLines == 0 then return end
     if kind == "CHAT" then
-        local sendChatMessage = _G and rawget(_G, "SendChatMessage")
-        if not sendChatMessage then return end
+        if not SendChatMessage then return end
         if channel == "WHISPER" and not target then return end
     elseif kind == "BNET" then
         if not BNSendWhisper or not target then return end

@@ -2,7 +2,7 @@
 ## Title: |cffff8000CharacterStats|r
 ## Notes: Display character statistics in a clean, minimal panel.
 ## Author: Lixard
-## Version: 2.2.0
+## Version: 2.2.1
 ## X-Curse-Project-ID: 1386469
 ## IconTexture: Interface\AddOns\CharacterStats\Assets\CharacterStats_minimap_32x32.tga
 ## SavedVariables: CharacterStatsDB
