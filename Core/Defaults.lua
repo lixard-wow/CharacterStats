@@ -1,6 +1,6 @@
 ﻿local ADDON_NAME, ns = ...
-local GetSpecialization = (C_SpecializationInfo and C_SpecializationInfo.GetSpecialization) or GetSpecialization
-local GetSpecializationInfo = (C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo) or GetSpecializationInfo
+local GetSpecialization = C_SpecializationInfo.GetSpecialization
+local GetSpecializationInfo = C_SpecializationInfo.GetSpecializationInfo
 ns.IsSecretValue = function(value)
     if not issecretvalue then return false end
     local ok, result = pcall(issecretvalue, value)
@@ -1043,13 +1043,8 @@ ns.GetAverageItemQualityColor = function()
             if not quality and getLink then
                 local link = getLink("player", slot)
                 if link then
-                    if C_Item and C_Item.GetItemInfo then
-                        local _, _, itemQuality = C_Item.GetItemInfo(link)
-                        quality = itemQuality
-                    else
-                        local _, _, itemQuality = GetItemInfo(link)
-                        quality = itemQuality
-                    end
+                    local _, _, itemQuality = C_Item.GetItemInfo(link)
+                    quality = itemQuality
                 end
             end
             if quality then
@@ -1147,7 +1142,7 @@ local ITEM_CLASS_ARMOR = (Enum and Enum.ItemClass and Enum.ItemClass.Armor) or 4
 local ITEM_SUBCLASS_SHIELD = (Enum and Enum.ItemArmorSubclass and Enum.ItemArmorSubclass.Shield) or 6
 ns.IsShieldItem = function(itemLink)
     if not itemLink then return false end
-    local getInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
+    local getInstant = C_Item.GetItemInfoInstant
     if not getInstant then return false end
     local ok, _, _, _, _, _, classId, subclassId = pcall(getInstant, itemLink)
     return ok and classId == ITEM_CLASS_ARMOR and subclassId == ITEM_SUBCLASS_SHIELD

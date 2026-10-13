@@ -1,4 +1,4 @@
-local ADDON_NAME, ns = ...
+﻿local ADDON_NAME, ns = ...
 local Gear = {}
 ns.Gear = Gear
 local pcall, pairs, ipairs, type, tonumber, wipe = pcall, pairs, ipairs, type, tonumber, wipe
@@ -123,17 +123,9 @@ local function EnchantNameFromSource(enchantId)
     local spell, item = ns.GetEnchantSource(enchantId)
     local name
     if spell then
-        if C_Spell and C_Spell.GetSpellName then
-            name = C_Spell.GetSpellName(spell)
-        elseif GetSpellInfo then
-            name = GetSpellInfo(spell)
-        end
+        name = C_Spell.GetSpellName(spell)
     elseif item then
-        if C_Item and C_Item.GetItemNameByID then
-            name = C_Item.GetItemNameByID(item)
-        elseif GetItemInfo then
-            name = GetItemInfo(item)
-        end
+        name = C_Item.GetItemNameByID(item)
     end
     if type(name) ~= "string" or name == "" then return nil end
     return name:match("^.- %- (.+)$") or name
@@ -225,7 +217,7 @@ local function NeedsEnchant(slot, link)
     local rule = GetEnchantSlots()[slot]
     if not rule then return false end
     if rule == "weapon" then
-        local getInstant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
+        local getInstant = C_Item.GetItemInfoInstant
         local ok, _, _, _, _, _, classId = pcall(getInstant, link)
         return ok and classId == ITEM_CLASS_WEAPON
     end

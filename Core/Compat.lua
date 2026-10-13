@@ -1,6 +1,6 @@
 ﻿local ADDON_NAME, ns = ...
-local GetSpecialization = (C_SpecializationInfo and C_SpecializationInfo.GetSpecialization) or GetSpecialization
-local GetSpecializationInfo = (C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo) or GetSpecializationInfo
+local GetSpecialization = C_SpecializationInfo.GetSpecialization
+local GetSpecializationInfo = C_SpecializationInfo.GetSpecializationInfo
 local PROJECT_MAINLINE = 1
 local projectId = WOW_PROJECT_ID or PROJECT_MAINLINE
 ns.IS_RETAIL = (projectId == PROJECT_MAINLINE)
@@ -54,19 +54,8 @@ ns.IsStatAvailable = function(statId)
 end
 local function HasSpell(spellId)
     if not spellId then return false end
-    if C_SpellBook and C_SpellBook.IsSpellKnown then
-        local ok, known = pcall(C_SpellBook.IsSpellKnown, spellId)
-        if ok then return known == true end
-    end
-    if IsPlayerSpell then
-        local ok, known = pcall(IsPlayerSpell, spellId)
-        if ok then return known == true end
-    end
-    if IsSpellKnown then
-        local ok, known = pcall(IsSpellKnown, spellId, false)
-        if ok then return known == true end
-    end
-    return false
+    local ok, known = pcall(C_SpellBook.IsSpellKnown, spellId)
+    return ok and known == true
 end
 local TANK_SPEC_IDS = {
     [73] = true,
