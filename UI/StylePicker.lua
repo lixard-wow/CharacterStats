@@ -247,6 +247,14 @@ local function Create()
         buttonList[#buttonList + 1] = themeButtons[key]
     end
     Widgets.NormalizeButtonWidths(buttonList, 12)
+    local themeRowWidth = PAD * 2 + (themeLabel:GetStringWidth() or 0) + 12 + (#buttonList - 1) * 6
+    for _, button in ipairs(buttonList) do
+        themeRowWidth = themeRowWidth + button:GetWidth()
+    end
+    if themeRowWidth > width then
+        width = themeRowWidth
+        frame:SetWidth(width)
+    end
     local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     subtitle:SetPoint("TOPLEFT", frame, "TOPLEFT", PAD, -(HEADER_HEIGHT + 44))
     subtitle:SetPoint("RIGHT", frame, "RIGHT", -PAD, 0)

@@ -2,6 +2,10 @@
 
 ## Version 2.2.1
 
+### Added
+
+- Two new window themes, Horde and Alliance: Artisan Ledger in blood red and iron, or royal blue and gold. Pick one from the gear button in the options window's title bar or cycle with `/cs theme`.
+
 ### Changed
 
 - Updated for patch 12.1.5.
