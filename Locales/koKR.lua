@@ -319,7 +319,6 @@ ns.RegisterLocale("koKR", {
     LABEL_YIELD = "충돌하는 캐릭터 창 애드온 확인",
     MSG_COMBAT_OPTIONS = "전투 중에는 설정을 열 수 없습니다.",
     MSG_COMMANDS = "명령어:",
-    MSG_LOADED = "|cffff8000%s|r 로드됨. /cs 입력으로 전환합니다.",
     MSG_MINIMAP_MISSING = "미니맵 버튼을 사용할 수 없습니다.",
     MSG_MINIMAP_RESET = "미니맵 버튼 위치가 기본값으로 초기화되었습니다.",
     MSG_PAPERDOLL_MISSING = "캐릭터 창을 찾을 수 없어 캐릭터 창 능력치가 비활성화되었습니다.",

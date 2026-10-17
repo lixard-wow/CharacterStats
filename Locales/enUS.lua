@@ -370,7 +370,6 @@ local L = {
     CMD_HIDE = "/cs hide - Hide the stats frame",
     CMD_REFRESH = "/cs refresh - Refresh stats now",
     MSG_COMMANDS = "Commands:",
-    MSG_LOADED = "|cffff8000%s|r loaded. Type /cs to toggle.",
     MSG_REFRESHED = "Stats refreshed.",
     MSG_MINIMAP_RESET = "Minimap button position reset to default.",
     MSG_MINIMAP_MISSING = "Minimap button not available.",

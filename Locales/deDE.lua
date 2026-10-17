@@ -319,7 +319,6 @@ ns.RegisterLocale("deDE", {
     LABEL_YIELD = "Auf konkurrierende Charakterfenster-Addons prüfen",
     MSG_COMBAT_OPTIONS = "Optionen können im Kampf nicht geöffnet werden.",
     MSG_COMMANDS = "Befehle:",
-    MSG_LOADED = "|cffff8000%s|r geladen. Gib /cs ein zum Umschalten.",
     MSG_MINIMAP_MISSING = "Minikartenbutton nicht verfügbar.",
     MSG_MINIMAP_RESET = "Position des Minikartenbuttons auf Standard zurückgesetzt.",
     MSG_PAPERDOLL_MISSING = "Charakterfenster nicht gefunden, Werte im Charakterfenster deaktiviert.",

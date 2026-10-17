@@ -318,7 +318,6 @@ ns.RegisterLocale("itIT", {
     LABEL_YIELD = "Controlla addon in conflitto con la finestra del personaggio",
     MSG_COMBAT_OPTIONS = "Impossibile aprire le opzioni in combattimento.",
     MSG_COMMANDS = "Comandi:",
-    MSG_LOADED = "|cffff8000%s|r caricato. Digita /cs per mostrare/nascondere.",
     MSG_MINIMAP_MISSING = "Pulsante della minimappa non disponibile.",
     MSG_MINIMAP_RESET = "Posizione del pulsante della minimappa ripristinata.",
     MSG_PAPERDOLL_MISSING = "Finestra del personaggio non trovata, statistiche nella finestra disattivate.",

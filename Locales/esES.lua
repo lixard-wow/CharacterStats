@@ -319,7 +319,6 @@ ns.RegisterLocale("esES", {
     LABEL_YIELD = "Buscar addons de ventana de personaje en conflicto",
     MSG_COMBAT_OPTIONS = "No se pueden abrir las opciones en combate.",
     MSG_COMMANDS = "Comandos:",
-    MSG_LOADED = "|cffff8000%s|r cargado. Escribe /cs para mostrar/ocultar.",
     MSG_MINIMAP_MISSING = "Botón del minimapa no disponible.",
     MSG_MINIMAP_RESET = "Posición del botón del minimapa restablecida.",
     MSG_PAPERDOLL_MISSING = "No se encontró el panel de personaje; estadísticas del panel desactivadas.",

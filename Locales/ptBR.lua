@@ -319,7 +319,6 @@ ns.RegisterLocale("ptBR", {
     LABEL_YIELD = "Verificar Addons de Janela do Personagem em Conflito",
     MSG_COMBAT_OPTIONS = "Não é possível abrir as opções em combate.",
     MSG_COMMANDS = "Comandos:",
-    MSG_LOADED = "|cffff8000%s|r carregado. Digite /cs para alternar.",
     MSG_MINIMAP_MISSING = "Botão do minimapa indisponível.",
     MSG_MINIMAP_RESET = "Posição do botão do minimapa redefinida para o padrão.",
     MSG_PAPERDOLL_MISSING = "Painel do personagem não encontrado; stats do painel desativados.",

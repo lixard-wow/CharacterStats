@@ -319,7 +319,6 @@ ns.RegisterLocale("zhTW", {
     LABEL_YIELD = "檢查衝突的角色框架插件",
     MSG_COMBAT_OPTIONS = "戰鬥中無法開啟選項。",
     MSG_COMMANDS = "指令：",
-    MSG_LOADED = "|cffff8000%s|r 已載入。輸入 /cs 切換顯示。",
     MSG_MINIMAP_MISSING = "小地圖按鈕無法使用。",
     MSG_MINIMAP_RESET = "小地圖按鈕位置已重設為預設值。",
     MSG_PAPERDOLL_MISSING = "找不到角色面板，已停用角色面板屬性。",

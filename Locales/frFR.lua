@@ -319,7 +319,6 @@ ns.RegisterLocale("frFR", {
     LABEL_YIELD = "Détecter les addons de fenêtre du personnage en conflit",
     MSG_COMBAT_OPTIONS = "Impossible d'ouvrir les options en combat.",
     MSG_COMMANDS = "Commandes :",
-    MSG_LOADED = "|cffff8000%s|r chargé. Tapez /cs pour afficher/masquer.",
     MSG_MINIMAP_MISSING = "Bouton de la minicarte indisponible.",
     MSG_MINIMAP_RESET = "Position du bouton de la minicarte réinitialisée.",
     MSG_PAPERDOLL_MISSING = "Fenêtre du personnage introuvable, stats de la fenêtre du personnage désactivées.",

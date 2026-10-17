@@ -300,8 +300,6 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
             end
         end
         ns.db.cachedStatValues = nil
-        local addonName = ns.L.ADDON_TITLE or "CharacterStats"
-        print(string.format(ns.L.MSG_LOADED or "|cffff8000%s|r loaded. Type /cs to toggle.", addonName))
         return
     end
     if event == "PLAYER_LOGIN" then

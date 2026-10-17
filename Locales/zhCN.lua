@@ -319,7 +319,6 @@ ns.RegisterLocale("zhCN", {
     LABEL_YIELD = "检查冲突的角色框体插件",
     MSG_COMBAT_OPTIONS = "战斗中无法打开设置。",
     MSG_COMMANDS = "命令：",
-    MSG_LOADED = "|cffff8000%s|r 已加载。输入 /cs 切换显示。",
     MSG_MINIMAP_MISSING = "小地图按钮不可用。",
     MSG_MINIMAP_RESET = "小地图按钮位置已重置为默认。",
     MSG_PAPERDOLL_MISSING = "未找到角色面板，已禁用角色面板属性。",
