@@ -5,6 +5,8 @@ local PROJECT_MAINLINE = 1
 local projectId = WOW_PROJECT_ID or PROJECT_MAINLINE
 ns.IS_RETAIL = (projectId == PROJECT_MAINLINE)
 ns.IS_CLASSIC = (projectId ~= PROJECT_MAINLINE)
+ns.IS_FOREVER = WOW_PROJECT_CAMELOT ~= nil and projectId == WOW_PROJECT_CAMELOT
+local FOREVER_HIDDEN = { mastery = true }
 ns.STAT_AVAILABILITY = {
     ilvl        = { true, true },
     str         = { true, true },
@@ -37,6 +39,7 @@ ns.STAT_AVAILABILITY = {
     movespeed   = { true, true },
 }
 ns.IsStatAvailable = function(statId)
+    if ns.IS_FOREVER and FOREVER_HIDDEN[statId] then return false end
     local def = ns.STAT_DEFS and ns.STAT_DEFS[statId]
     if def and def.foreverOnly then
         local BlizzardStats = ns.BlizzardStats
@@ -335,6 +338,9 @@ ns.IsCaster = function()
             local _, str = UnitStat("player", 1)
             local _, agi = UnitStat("player", 2)
             local _, int = UnitStat("player", 4)
+            if ns.IsSecretValue(str) or ns.IsSecretValue(agi) or ns.IsSecretValue(int) then
+                return ns.GetSpecPrimaryStat and ns.GetSpecPrimaryStat() == "int" or false
+            end
             str = tonumber(str) or 0
             agi = tonumber(agi) or 0
             int = tonumber(int) or 0

@@ -11,6 +11,11 @@
 - Updated for patch 12.1.5.
 - Spec detection, spell checks and sharing to chat or Battle.net whispers now use the current game functions, so they keep working when the game's old-function fallback setting is off.
 
+### Fixed
+
+- WoW Forever: Mastery is no longer listed (it doesn't exist there), and Haste, Expertise and Hit are hidden while they're 0, like Forever's own character panel.
+- Primary-stat and caster detection no longer break when stats come back hidden in combat.
+
 ## Version 2.2.0
 
 ### Added

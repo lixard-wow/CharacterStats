@@ -891,6 +891,11 @@ ns.STAT_DEFS = {
         end,
     },
 }
+if ns.IS_FOREVER then
+    for _, id in ipairs({ "haste", "expertise", "hit", "spellhit" }) do
+        if ns.STAT_DEFS[id] then ns.STAT_DEFS[id].hideIfZero = true end
+    end
+end
 local FOREVER_BLIZZARD_STATS = {
     { id = "health", key = "HEALTH", mopKey = "HEALTH", label = "Health", short = "HP", category = "general", alwaysShow = true },
     { id = "power", key = "POWER", mopKey = "POWER", label = "Power", short = "Power", category = "general", alwaysShow = true, useBlizzardLabel = true },
@@ -1000,12 +1005,20 @@ local function GetHighestStatFallback()
     local _, str = UnitStat("player", 1)
     local _, agi = UnitStat("player", 2)
     local _, int = UnitStat("player", 4)
+    if ns.IsSecretValue(str) or ns.IsSecretValue(agi) or ns.IsSecretValue(int) then
+        return ns._lastHighestStat
+    end
     str = str or 0
     agi = agi or 0
     int = int or 0
-    if int >= str and int >= agi then return "int" end
-    if agi >= str and agi >= int then return "agi" end
-    return "str"
+    local best = "str"
+    if int >= str and int >= agi then
+        best = "int"
+    elseif agi >= str and agi >= int then
+        best = "agi"
+    end
+    ns._lastHighestStat = best
+    return best
 end
 ns.GetSpecPrimaryStat = function()
     local classToken = GetCachedClassToken()
