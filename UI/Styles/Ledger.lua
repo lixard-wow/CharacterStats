@@ -5,7 +5,7 @@ local PAD = 10
 local H_PAD = 6
 local H_GAP = 5
 local H_SPACING = 14
-local HEADER_GAP = 4
+local HEADER_GAP = 8
 local function CreateLine(parent)
     local line = {}
     line.frame = CreateFrame("Frame", nil, parent)
@@ -210,7 +210,7 @@ local function CreateStatsRenderer(parent, original)
                     end
                     local headerHeight, width = Styles.PlaceHeader(header, self.container, PAD, y, Styles.GetGroupLabel(group), fontPath, db)
                     if width > maxWidth then maxWidth = width end
-                    y = y - headerHeight
+                    y = y - headerHeight - 2
                     lastGroup = group
                 end
                 lineCount = lineCount + 1
@@ -253,7 +253,7 @@ local function CreateStatsRenderer(parent, original)
         self.useHeadline = false
         wipe(self.byId)
         local fontPath = ns.GetFontPath(db.fontFace)
-        local rowHeight = db.fontSize + (db.rowPadding or 0)
+        local rowHeight = db.fontSize + 4 + (db.rowPadding or 0)
         if db.orientation == "horizontal" then
             return LayoutHorizontal(self, stats, db, fontPath, rowHeight)
         end
