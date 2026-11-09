@@ -75,6 +75,7 @@ ns.DEFAULTS = {
     locked = false,
     showMinimapButton = true,
     paperdollEnabled = true,
+    paperdollStatColors = false,
     bgAlpha = 1.0,
     borderAlpha = 1.0,
     textAlpha = 1.0,

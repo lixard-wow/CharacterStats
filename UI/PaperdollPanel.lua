@@ -316,7 +316,16 @@ local renderers = {}
 local activeRenderer = nil
 local hiddenStatsPaneChildren = {}
 local hiddenStatsPaneRegions = {}
+local function BlizzardScrollBar()
+    local box = rawget(_G, "CharacterStatsPaneScrollBox")
+    return box and box.ScrollBar
+end
 local function HideStatsPaneChildren(captureRestoreSet)
+    local bar = BlizzardScrollBar()
+    if bar then
+        bar:SetAlpha(0)
+        bar:EnableMouse(false)
+    end
     local statsPane = GetCharacterStatsPane()
     if not statsPane then return end
     if captureRestoreSet then
@@ -337,6 +346,11 @@ local function HideStatsPaneChildren(captureRestoreSet)
     end
 end
 local function ShowStatsPaneChildren()
+    local bar = BlizzardScrollBar()
+    if bar then
+        bar:SetAlpha(1)
+        bar:EnableMouse(true)
+    end
     for child in pairs(hiddenStatsPaneChildren) do
         if child and child.Show then
             child:Show()
