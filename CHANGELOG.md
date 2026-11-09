@@ -9,6 +9,7 @@
 ### Changed
 
 - Updated for patch 12.1.5.
+- Stats on the character frame use one color: names light gray, values white. Turn on "Color Each Stat on Character Frame" in the Character page to get the per-stat colors back.
 - Spec detection, spell checks and sharing to chat or Battle.net whispers now use the current game functions, so they keep working when the game's old-function fallback setting is off.
 
 ### Fixed

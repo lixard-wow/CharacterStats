@@ -115,8 +115,13 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
             row.value:SetText(valueText)
         end
         local sr, sg, sb = ns.GetStatColor(stat.id)
-        row.label:SetTextColor(sr, sg, sb)
-        row.value:SetTextColor(sr, sg, sb)
+        if db.paperdollStatColors then
+            row.label:SetTextColor(sr, sg, sb)
+            row.value:SetTextColor(sr, sg, sb)
+        else
+            row.label:SetTextColor(0.82, 0.82, 0.82)
+            row.value:SetTextColor(1, 1, 1)
+        end
         row.highlight:SetShown(striped)
         local hasBar = opts.bars and Styles.HasBar(stat)
         if hasBar then
@@ -152,7 +157,11 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
         end
         row.value:SetText(valueText)
         local schoolColor = item.school and SCHOOL_COLORS[item.school:lower()]
-        if schoolColor then
+        local colored = ns.db and ns.db.paperdollStatColors
+        if not colored then
+            row.label:SetTextColor(0.82, 0.82, 0.82)
+            row.value:SetTextColor(1, 1, 1)
+        elseif schoolColor then
             row.label:SetTextColor(schoolColor[1], schoolColor[2], schoolColor[3])
             row.value:SetTextColor(schoolColor[1], schoolColor[2], schoolColor[3])
         elseif item.statId then
@@ -227,8 +236,12 @@ function Styles.CreateListPaperdollRenderer(panel, opts)
         local equipped, overall = Paperdoll.GetItemLevels()
         self.ilvl.caption:SetTextColor(ar, ag, ab)
         self.ilvl.value:SetText(string.format("%.2f", equipped))
-        local ir, ig, ib = ns.GetStatColor("ilvl")
-        self.ilvl.value:SetTextColor(ir or 1, ig or 1, ib or 1)
+        if db.paperdollStatColors then
+            local ir, ig, ib = ns.GetStatColor("ilvl")
+            self.ilvl.value:SetTextColor(ir or 1, ig or 1, ib or 1)
+        else
+            self.ilvl.value:SetTextColor(1, 1, 1)
+        end
         self.ilvl.tooltipValue = string.format("%.2f", equipped)
         if overall and overall > equipped + 0.005 then
             self.ilvl.sub:SetText(string.format(ns.L.PAPERDOLL_ILVL_BAGS or "%s in bags", string.format("%.1f", overall)))

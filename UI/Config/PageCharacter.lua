@@ -69,6 +69,15 @@ local function BuildEntries(L)
             end,
         },
         {
+            kind = "toggle", key = "paperdollStatColors", label = L.LABEL_PAPERDOLL_STAT_COLORS or "Color Each Stat on Character Frame", fullRow = true,
+            onChange = function()
+                if CS.PaperdollPanel then
+                    CS.PaperdollPanel:Refresh()
+                end
+                MarkDirty()
+            end,
+        },
+        {
             kind = "toggle", key = "characterButton", label = L.LABEL_CHARACTER_BUTTON or "Show Options Button on Character Frame", fullRow = true,
             onChange = function()
                 if CS.CharacterButton then

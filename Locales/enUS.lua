@@ -299,6 +299,7 @@ local L = {
     LABEL_LOCK = "Lock Position",
     LABEL_OUTLINE = "Font Outline",
     LABEL_PAPERDOLL = "Show Stats on Character Frame",
+    LABEL_PAPERDOLL_STAT_COLORS = "Color Each Stat on Character Frame",
     LABEL_CLASS_COLOR = "Use Class Color for Border",
     LABEL_THEME_USE_CLASS = "Use my class color",
     LABEL_SPEC_AUTO_SWITCH = "Automatically switch by specialization",
