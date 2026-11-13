@@ -11,10 +11,14 @@
 - Updated for patch 12.1.5.
 - Stats on the character frame use one color: names light gray, values white. Turn on "Color Each Stat on Character Frame" in the Character page to get the per-stat colors back.
 - Spec detection, spell checks and sharing to chat or Battle.net whispers now use the current game functions, so they keep working when the game's old-function fallback setting is off.
+- Artisan Ledger: taller rows and more space between sections.
+- No more chat message at login.
 
 ### Fixed
 
-- WoW Forever: Mastery is no longer listed (it doesn't exist there), and Haste, Expertise and Hit are hidden while they're 0, like Forever's own character panel.
+- WoW Forever: the stat list now matches Forever's own character panel. All five attributes show for every class, Defense is back, and Hit, Crit, Haste, Expertise, Attack Power, Spell Power, Dodge, Parry and Block read the same values Blizzard shows instead of a spec-based guess. Mastery, Stagger and PvP stats aren't listed (they don't exist there), and stats at 0 stay hidden like on Forever's panel.
+- WoW Forever: Defense and the other combat stats no longer disappear from the panel during combat.
+- Blizzard's empty stats scroll bar no longer shows behind the character frame panel.
 - Primary-stat and caster detection no longer break when stats come back hidden in combat.
 
 ## Version 2.2.0

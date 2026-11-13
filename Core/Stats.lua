@@ -74,6 +74,9 @@ local function IsInPvPContent()
     return false
 end
 local function ShouldFilterStatByRole(statId, def, ctx)
+    if ns.IS_FOREVER then
+        return statId == "spellhit"
+    end
     if def and def.category == "primary" and def.primary then
         if ctx.specPrimaryStat and statId ~= ctx.specPrimaryStat then
             return true
@@ -290,7 +293,7 @@ end
 function Stats:CollectByCategory()
     local filtered = self:CollectFiltered(false, true)
     local staminaStat = nil
-    local primaryStat = nil
+    local primaryStats = {}
     local armorStat = nil
     local spiritStat = nil
     local staggerStat = nil
@@ -311,7 +314,7 @@ function Stats:CollectByCategory()
             elseif stat.id == "spirit" then
                 spiritStat = stat
             else
-                primaryStat = stat
+                primaryStats[#primaryStats + 1] = stat
             end
         elseif stat.id == "armor" then
             armorStat = stat
@@ -328,7 +331,9 @@ function Stats:CollectByCategory()
         end
     end
     local attributes = {}
-    if primaryStat then table.insert(attributes, primaryStat) end
+    for _, stat in ipairs(primaryStats) do
+        table.insert(attributes, stat)
+    end
     if staminaStat then table.insert(attributes, staminaStat) end
     if armorStat then table.insert(attributes, armorStat) end
     if staggerStat then table.insert(attributes, staggerStat) end
