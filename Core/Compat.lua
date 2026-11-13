@@ -6,7 +6,7 @@ local projectId = WOW_PROJECT_ID or PROJECT_MAINLINE
 ns.IS_RETAIL = (projectId == PROJECT_MAINLINE)
 ns.IS_CLASSIC = (projectId ~= PROJECT_MAINLINE)
 ns.IS_FOREVER = WOW_PROJECT_CAMELOT ~= nil and projectId == WOW_PROJECT_CAMELOT
-local FOREVER_HIDDEN = { mastery = true }
+local FOREVER_HIDDEN = { mastery = true, stagger = true, pvppower = true, pvpresilience = true }
 ns.STAT_AVAILABILITY = {
     ilvl        = { true, true },
     str         = { true, true },

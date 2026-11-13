@@ -190,7 +190,7 @@ ns.DEFAULTS = {
         "crit", "haste", "hit", "expertise", "mastery",
         "versatility",
         "leech", "avoidance", "speed",
-        "dodge", "parry", "block",
+        "dodge", "parry", "block", "defense",
         "pvpresilience", "pvppower",
         "spellpenetration", "armorpenetration",
         "movespeed",
@@ -754,6 +754,12 @@ ns.STAT_DEFS = {
         category = "defense",
         tooltipKey = "STAT_DEFENSE_TT",
         api = function()
+            if UnitDefenseSkill then
+                local ok, base = pcall(UnitDefenseSkill, "player")
+                if ok and type(base) == "number" then
+                    return base
+                end
+            end
             local getDefense = _G and rawget(_G, "GetDefense")
             if getDefense then
                 local ok, base, modifier = pcall(getDefense)
@@ -895,6 +901,43 @@ ns.STAT_DEFS = {
 if ns.IS_FOREVER then
     for _, id in ipairs({ "haste", "expertise", "hit", "spellhit" }) do
         if ns.STAT_DEFS[id] then ns.STAT_DEFS[id].hideIfZero = true end
+    end
+end
+if ns.IS_FOREVER then
+    local FOREVER_KEYS = {
+        crit = "CRITCHANCE",
+        haste = "HASTE",
+        hit = "HITCHANCE",
+        expertise = "EXPERTISE",
+        attackpower = "ATTACK_AP",
+        rangedattackpower = "RANGED_ATTACK_AP",
+        spellpower = "SPELLPOWER",
+        defense = "DEFENSE",
+        dodge = "DODGE",
+        parry = "PARRY",
+        block = "BLOCK",
+    }
+    for id, key in pairs(FOREVER_KEYS) do
+        local def = ns.STAT_DEFS[id]
+        if def then
+            local fallback = def.api
+            local last
+            def.foreverOnly = true
+            def.api = function()
+                local _, _, numeric = ns.BlizzardStats.Capture(key, "player")
+                if type(numeric) == "number" then
+                    last = numeric
+                    return numeric
+                end
+                if fallback then
+                    local ok, value = pcall(fallback)
+                    if ok and type(value) == "number" and (ns.IsSecretValue(value) or value ~= 0) then
+                        return value
+                    end
+                end
+                return last or 0
+            end
+        end
     end
 end
 local FOREVER_BLIZZARD_STATS = {
